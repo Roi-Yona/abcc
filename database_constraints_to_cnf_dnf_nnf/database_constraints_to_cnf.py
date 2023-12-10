@@ -169,14 +169,26 @@ if __name__ == '__main__':
     database = 'the_basketball_synthetic_db'
     db_engine = db_interface.database_connect(server, database)
 
-    # Sanity test.
+    # Restrict denial convert sanity test.
     print('\nDatabaseConstraintsConvertorRestrictDenialConstraintToCNF - Start Testing:')
     dbc_to_cnf_tester = DatabaseConstraintsConvertorRestrictDenialConstraintToCNF(db_engine, 0, 10)
     cnf_string_predicted_outcome = 'p cnf 10 6\n-1 -2 0\n-1 -7 0\n-2 -7 0\n-3 -5 0\n-3 -10 0\n-5 -10 0\n'
     cnf_string = dbc_to_cnf_tester.convert('basketball_metadata', 'id', 'position')
     if cnf_string_predicted_outcome != cnf_string:
         print("********************")
-        print("Failed!")
+        print("Restrict denial convert failed!")
         print("********************")
-    print(f"CNF convert results:\n{cnf_string}")
+    print(f"CNF restrict denial constraint convert results:\n{cnf_string}")
     print('DatabaseConstraintsConvertorRestrictDenialConstraintToCNF - Test completed successfully.')
+
+    # Restrict TGD convert sanity test.
+    print('\nDatabaseConstraintsConvertorRestrictTGDConstraintToCNF - Start Testing:')
+    dbc_to_cnf_tester = DatabaseConstraintsConvertorRestrictTGDConstraintToCNF(db_engine, 0, 10)
+    cnf_string_predicted_outcome = 'p cnf 10 6\n2 3 6 7 0\n3 5 8 0\n8 0\n0\n4 0\n9 10 0\n'
+    cnf_string = dbc_to_cnf_tester.convert([('basketball_metadata', 'basketball_metadata2', 'position')], 'userId')
+    if cnf_string_predicted_outcome != cnf_string:
+        print("********************")
+        print("Restrict TGD convert Failed!")
+        print("********************")
+    print(f"CNF restrict TGD constraint convert results:\n{cnf_string}")
+    print('DatabaseConstraintsConvertorRestrictTGDConstraintToCNF - Test completed successfully.')
