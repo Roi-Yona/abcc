@@ -1,9 +1,9 @@
-from ortools.sat.python import cp_model
 import ortools.linear_solver.pywraplp as pywraplp
+import ilp_convertor
+import thiele_functions
 
 
-# TODO: Create an abstract ILP convertor.
-class ThieleRuleToILP:
+class ThieleRuleToILP(ilp_convertor.ILPConvertor):
     """A class for converting ABC problem of finding
        a winning committee given a thiele voting rule
        to an ILP problem.
@@ -29,6 +29,8 @@ class ThieleRuleToILP:
                                          the thiele score as value ({1,..,k}->N).
         :param solver:                    The input solver wrapper.
         """
+        super().__init__(solver)
+
         # ABC data.
         self._candidates_group_size = candidates_group_size
         self._voters_group_size = voters_group_size
@@ -43,14 +45,10 @@ class ThieleRuleToILP:
             if self._max_thiele_function_value < score:
                 self._max_thiele_function_value = score
 
-        self._model = solver
         # The model variables.
         self._model_candidates_variables = []
         self._model_voters_score_contribution_variables = []
         self._model_voters_approval_candidates_sum_variables = []
-
-        self._solved = False
-        self._solver_status = None
 
     def define_ilp_model_variables(self):
         # Create the committee ILP variables.
@@ -100,52 +98,19 @@ class ThieleRuleToILP:
     def define_ilp_model_objective(self):
         self._model.Maximize(sum(self._model_voters_score_contribution_variables))
 
-    def solve(self):
-        self._solver_status = self._model.Solve()
-        if self._solver_status == pywraplp.Solver.OPTIMAL:
-            self._solved = True
+    def show_solution(self) -> str:
+        """Creates a representation for the problem solution.
 
-    def __str__(self):
+        :return: A string that represents the ABC problem solution.
+        """
         solution = ""
-        if self._solved:
-            for key, value in enumerate(self._model_candidates_variables):
-                solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
-            for key, value in enumerate(self._model_voters_approval_candidates_sum_variables):
-                solution += f"Voter id: {key}, Voter approval sum: {value.solution_value()}.\n"
-            for key, value in enumerate(self._model_voters_score_contribution_variables):
-                solution += f"Voter id: {key}, Voter contribution: {value.solution_value()}.\n"
-        else:
-            solution = f"The solver doesn't hane an optimal solution, the solver status is {str(self._solver_status)}."
+        for key, value in enumerate(self._model_candidates_variables):
+            solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
+        for key, value in enumerate(self._model_voters_approval_candidates_sum_variables):
+            solution += f"Voter id: {key}, Voter approval sum: {value.solution_value()}.\n"
+        for key, value in enumerate(self._model_voters_score_contribution_variables):
+            solution += f"Voter id: {key}, Voter contribution: {value.solution_value()}.\n"
         return solution
-
-    def print_all_model_variables(self):
-        if self._solved:
-            for var in self._model.variables():
-                print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
-
-
-def utility_create_av_thiele_dict(length: int) -> dict:
-    """Creates a dict from size of length contain the AV thiele function.
-    :param length: The length of the returned AV thiele function dict.
-    :return: An AV thiele function dict.
-    """
-    av_thiele_function = {}
-    for i in range(0, length):
-        av_thiele_function[i] = i
-    return av_thiele_function
-
-
-def utility_create_cc_thiele_dict(length: int) -> dict:
-    """Creates a dict from size of length contain the CC thiele function.
-    :param length: The length of the returned CC thiele function dict.
-    :return: A CC thiele function dict.
-    """
-    cc_thiele_function = {}
-    if length > 0:
-        cc_thiele_function[0] = 0
-    for i in range(1, length):
-        cc_thiele_function[i] = 1
-    return cc_thiele_function
 
 
 if __name__ == '__main__':
@@ -165,7 +130,7 @@ if __name__ == '__main__':
     4         : 2                        : 3
     """
     COMMITTEE_SIZE = 3
-    THIELE_SCORE_FUNCTION = utility_create_av_thiele_dict(COMMITTEE_SIZE + 1)
+    THIELE_SCORE_FUNCTION = thiele_functions.create_av_thiele_dict(COMMITTEE_SIZE + 1)
     # ----------------------------------------------------------------
     # Define the ILP solver.
     SOLVER = pywraplp.Solver.CreateSolver("SAT")

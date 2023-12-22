@@ -8,8 +8,8 @@ from sqlalchemy.engine import Engine
 import database_server_interface.database_server_interface as db_interface
 import ortools.linear_solver.pywraplp as pywraplp
 import ilp_reduction.thiele_rule_to_ilp as thiele_rule_utility
-import pandas as pd
-import numpy as np
+import ilp_reduction.thiele_functions as thiele_functions
+
 DEBUG = True
 
 
@@ -24,7 +24,7 @@ class AVExperiment:
         self._voters_group_size = 0
         self._approval_profile = dict()
         self._committee_size = committee_size
-        self._thiele_function = thiele_rule_utility.utility_create_av_thiele_dict(self._committee_size + 1)
+        self._thiele_function = thiele_functions.create_av_thiele_dict(self._committee_size + 1)
         self._solver = solver
 
         # Initializing DB properties.
