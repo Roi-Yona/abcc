@@ -2,8 +2,10 @@ from ortools.sat.python import cp_model
 import ortools.linear_solver.pywraplp as pywraplp
 
 
+# TODO: Create an abstract ILP convertor.
 class ThieleRuleToILP:
-    """A class for converting ABC problem of finding a winning committee given a thiele voting rule
+    """A class for converting ABC problem of finding
+       a winning committee given a thiele voting rule
        to an ILP problem.
 
            The problem original input is:
@@ -12,7 +14,7 @@ class ThieleRuleToILP:
            A(V) - Approval profile.
            k - The committee size.
            r - The thiele rule.
-        """
+    """
 
     def __init__(self, candidates_group_size: int, voters_group_size: int, approval_profile: dict,
                  committee_size: int, thiele_score_function: dict, solver: pywraplp.Solver):
@@ -99,7 +101,7 @@ class ThieleRuleToILP:
         self._model.Maximize(sum(self._model_voters_score_contribution_variables))
 
     def solve(self):
-        self._solver_status = SOLVER.Solve()
+        self._solver_status = self._model.Solve()
         if self._solver_status == pywraplp.Solver.OPTIMAL:
             self._solved = True
 
@@ -122,7 +124,7 @@ class ThieleRuleToILP:
                 print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
 
 
-def create_av_thiele_dict(length: int) -> dict:
+def utility_create_av_thiele_dict(length: int) -> dict:
     """Creates a dict from size of length contain the AV thiele function.
     :param length: The length of the returned AV thiele function dict.
     :return: An AV thiele function dict.
@@ -133,7 +135,7 @@ def create_av_thiele_dict(length: int) -> dict:
     return av_thiele_function
 
 
-def create_cc_thiele_dict(length: int) -> dict:
+def utility_create_cc_thiele_dict(length: int) -> dict:
     """Creates a dict from size of length contain the CC thiele function.
     :param length: The length of the returned CC thiele function dict.
     :return: A CC thiele function dict.
@@ -163,7 +165,7 @@ if __name__ == '__main__':
     4         : 2                        : 3
     """
     COMMITTEE_SIZE = 3
-    THIELE_SCORE_FUNCTION = create_av_thiele_dict(COMMITTEE_SIZE + 1)
+    THIELE_SCORE_FUNCTION = utility_create_av_thiele_dict(COMMITTEE_SIZE + 1)
     # ----------------------------------------------------------------
     # Define the ILP solver.
     SOLVER = pywraplp.Solver.CreateSolver("SAT")
@@ -172,19 +174,20 @@ if __name__ == '__main__':
         exit(1)
     # ----------------------------------------------------------------
     # Convert to ILP domain.
-    thiele_rule_to_ulp_convertor = ThieleRuleToILP(CANDIDATES_GROUP_SIZE,
+    thiele_rule_to_ilp_convertor = ThieleRuleToILP(CANDIDATES_GROUP_SIZE,
                                                    VOTERS_GROUP_SIZE,
                                                    APPROVAL_PROFILE_DICT,
                                                    COMMITTEE_SIZE,
                                                    THIELE_SCORE_FUNCTION,
                                                    SOLVER)
-    thiele_rule_to_ulp_convertor.define_ilp_model_variables()
-    thiele_rule_to_ulp_convertor.define_ilp_model_constraints()
-    thiele_rule_to_ulp_convertor.define_ilp_model_objective()
+    thiele_rule_to_ilp_convertor.define_ilp_model_variables()
+    thiele_rule_to_ilp_convertor.define_ilp_model_constraints()
+    thiele_rule_to_ilp_convertor.define_ilp_model_objective()
     # ----------------------------------------------------------------
     # Solve the ILP problem.
-    thiele_rule_to_ulp_convertor.solve()
+    thiele_rule_to_ilp_convertor.solve()
     # ----------------------------------------------------------------
+    # Test and print.
     EXPECTED_RESULT = "Candidate id: 0, Candidate value: 0.0.\n" \
                       "Candidate id: 1, Candidate value: 1.0.\n" \
                       "Candidate id: 2, Candidate value: 1.0.\n" \
@@ -206,9 +209,9 @@ if __name__ == '__main__':
                       "Voter id: 5, Voter contribution: 1.0.\n" \
                       "Voter id: 6, Voter contribution: 2.0.\n" \
                       "Voter id: 7, Voter contribution: 1.0.\n"
-    if EXPECTED_RESULT != str(thiele_rule_to_ulp_convertor):
+    if EXPECTED_RESULT != str(thiele_rule_to_ilp_convertor):
         print("ERROR: The solution is different than expected.")
-        print(str(thiele_rule_to_ulp_convertor))
+        print(str(thiele_rule_to_ilp_convertor))
         exit(1)
     # ----------------------------------------------------------------
     print("Sanity tests for thiele_rule_ilp module done successfully.")
