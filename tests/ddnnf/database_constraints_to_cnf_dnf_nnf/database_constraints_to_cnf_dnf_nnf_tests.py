@@ -1,12 +1,10 @@
 import database_server_interface.database_server_interface as db_interface
 import unittest
 import pathlib
-import pandas as pd
-import numpy as np
+import os
+import ddnnf.database_constraints_to_cnf_dnf_nnf.database_constraints_to_cnf as dbc_to_cnf
 
-import database_constraints_to_cnf_dnf_nnf.database_constraints_to_cnf as dbc_to_cnf
-
-CNF_RESULTS_PATH = '.\\CNF_results'
+CNF_RESULTS_PATH = '..\\CNF_results'
 
 
 class TestDatabaseConstraintsConvertor(unittest.TestCase):

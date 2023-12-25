@@ -1,6 +1,7 @@
 import ortools.linear_solver.pywraplp as pywraplp
-import ilp_convertor
-import thiele_functions
+import ilp.ilp_reduction.ilp_convertor as ilp_convertor
+import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
+import config
 
 
 class ThieleRuleToILP(ilp_convertor.ILPConvertor):
@@ -36,6 +37,14 @@ class ThieleRuleToILP(ilp_convertor.ILPConvertor):
         self._voters_group_size = voters_group_size
         self._approval_profile = approval_profile
         self._committee_size = committee_size
+        if config.DEBUG:
+            print("--------------------------------------------------")
+            print("The ABC settings:")
+            print(f"Candidates group size = {self._candidates_group_size}.")
+            print(f"Voters Group size = {self._voters_group_size}.")
+            print(f"Committee size = {self._committee_size}.")
+            print(f"Approval profile = {self._approval_profile}")
+            print("--------------------------------------------------")
 
         # The voting rule.
         self._thiele_score_function = thiele_score_function

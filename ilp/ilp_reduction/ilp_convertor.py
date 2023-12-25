@@ -49,7 +49,7 @@ class ILPConvertor:
             solution = f"The solver doesn't hane an optimal solution, the solver status is {str(self._solver_status)}."
         return solution
 
-    def print_all_model_variables(self):
+    def print_all_model_variables(self) -> None:
         if self._solved:
             for var in self._model.variables():
                 print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
