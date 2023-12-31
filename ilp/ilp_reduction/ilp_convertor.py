@@ -54,6 +54,12 @@ class ILPConvertor:
             for var in self._model.variables():
                 print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
 
+    def solved_status_getter(self) -> tuple:
+        """
+        :return: A tuple containing is_solved flag, solver status.
+        """
+        return self._solved, self._solver_status
+
 
 if __name__ == '__main__':
     pass

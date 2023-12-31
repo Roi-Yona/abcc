@@ -38,13 +38,13 @@ class ThieleRuleToILP(ilp_convertor.ILPConvertor):
         self._approval_profile = approval_profile
         self._committee_size = committee_size
         if config.DEBUG:
-            print("--------------------------------------------------")
             print("The ABC settings:")
+            print("----------------------------------")
             print(f"Candidates group size = {self._candidates_group_size}.")
             print(f"Voters Group size = {self._voters_group_size}.")
             print(f"Committee size = {self._committee_size}.")
-            print(f"Approval profile = {self._approval_profile}")
-            print("--------------------------------------------------")
+            print(f"Approval profile = {self._approval_profile}.")
+            print("----------------------------------\n")
 
         # The voting rule.
         self._thiele_score_function = thiele_score_function

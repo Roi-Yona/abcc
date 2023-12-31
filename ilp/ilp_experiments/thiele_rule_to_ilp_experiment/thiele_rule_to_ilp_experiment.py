@@ -1,9 +1,3 @@
-"""
-Experiments for finding a winning committee,
-Given 'The movie database' as the ABC setting,
-and AV as the voting rule.
-Without any additional contextual constraints.
-"""
 import ilp.ilp_experiments.experiment as experiment
 from sqlalchemy.engine import Engine
 import database_server_interface.database_server_interface as db_interface
@@ -52,10 +46,19 @@ class ThieleRuleExperiment(experiment.Experiment):
         sql_query = f"SELECT DISTINCT {self._candidates_column_name} FROM {self._candidates_table_name} " \
                     f"WHERE {self._candidates_column_name} <= {self._candidates_size_limit};"
         candidates_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
-        self._candidates_group_size = int(candidates_id_columns.max().iloc[0])
+        if len(candidates_id_columns) == 0:
+            self._candidates_group_size = 0
+        else:
+            self._candidates_group_size = int(candidates_id_columns.max().iloc[0])
+        if self._committee_size > self._candidates_group_size:
+            if config.DEBUG:
+                print("************************************")
+                print("Note:The committee size is lower than the candidates group size, \n"
+                      "due to missing candidates in the data.")
+                print("************************************")
         if config.DEBUG is True:
             print(f"The candidates id columns are:\n{str(candidates_id_columns.head())}")
-            print(f"The number of candidates is {self._candidates_group_size}")
+            print(f"The number of candidates is {self._candidates_group_size}.")
         # ----------------------------------------------
         # Extract voters group size.
         sql_query = f"SELECT DISTINCT {self._voters_column_name} FROM {self._voting_table_name} " \
@@ -64,7 +67,7 @@ class ThieleRuleExperiment(experiment.Experiment):
         self._voters_group_size = int(voters_id_columns.max().iloc[0])
         if config.DEBUG is True:
             print(f"The voters id columns are:\n{str(voters_id_columns.head())}")
-            print(f"The number of voters is {str(self._voters_group_size)}")
+            print(f"The number of voters is {str(self._voters_group_size)}.")
         # ----------------------------------------------
         # Extract approval profile.
         sql_query = f"SELECT DISTINCT {self._voters_column_name}, {self._candidates_column_name} " \
@@ -81,7 +84,7 @@ class ThieleRuleExperiment(experiment.Experiment):
             # (the voters id's starts from 1 in the db).
             self._approval_profile[voter_id - 1] = set(candidates_ids_df[self._candidates_column_name] - 1)
         if config.DEBUG is True:
-            print(f"The length of the approval profile is:\n{str(len(self._approval_profile))}")
+            print(f"The length of the approval profile is: {str(len(self._approval_profile))}.")
         # ----------------------------------------------
 
     def create_ilp_problem_convertor(self) -> None:
