@@ -27,6 +27,7 @@
 *.sqlite
 databases/*
 tests/ddnnf/CNF_results/*
+**/results/
 
 # OS generated files #
 ######################

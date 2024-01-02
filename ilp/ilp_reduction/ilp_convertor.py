@@ -1,4 +1,5 @@
 import ortools.linear_solver.pywraplp as pywraplp
+import time
 
 
 class ILPConvertor:
@@ -13,52 +14,38 @@ class ILPConvertor:
         # Initialize solver related variables.
         self._model = solver
         self._solved = False
-        self._solver_status = None
-
-    def define_ilp_model_variables(self) -> None:
-        # Abstract function.
-        pass
-
-    def define_ilp_model_constraints(self) -> None:
-        # Abstract function.
-        pass
-
-    def define_ilp_model_objective(self) -> None:
-        # Abstract function.
-        pass
+        self.solver_status = None
+        self.solving_time = -1
 
     def solve(self) -> None:
-        self._solver_status = self._model.Solve()
-        if self._solver_status == pywraplp.Solver.OPTIMAL:
+        # Solve the ILP problem.
+        start_time = time.time()
+        self.solver_status = self._model.Solve()
+        end_time = time.time()
+        if self.solver_status == pywraplp.Solver.OPTIMAL:
             self._solved = True
+            self.solving_time = end_time - start_time
 
-    def show_solution(self) -> str:
-        """Creates a representation for the problem solution.
+    def get_model_state(self) -> str:
+        """Creates a representation for the model current state.
 
-           An abstract function.
-
-        :return: A string that represents the general problem solution.
+        :return: A string that represents the general problem assignment.
         """
+        # Abstract function
         pass
 
     def __str__(self):
         solution = ""
         if self._solved:
-            solution = self.show_solution()
+            solution = self.get_model_state()
         else:
-            solution = f"The solver doesn't hane an optimal solution, the solver status is {str(self._solver_status)}."
+            solution = f"The solver doesn't hane an optimal solution, the solver status is {str(self.solver_status)}."
         return solution
 
     def print_all_model_variables(self) -> None:
         if self._solved:
             for var in self._model.variables():
                 print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
-
-    def solved_status_getter(self) -> tuple:
-        """
-        :return: A tuple containing is_solved flag, solver status.
-        """
-        return self._solved, self._solver_status
 
 
 if __name__ == '__main__':

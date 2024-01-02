@@ -1,14 +1,15 @@
-import ilp.ilp_experiments.experiment as experiment
+import config
 from sqlalchemy.engine import Engine
 import database_server_interface.database_server_interface as db_interface
-import ortools.linear_solver.pywraplp as pywraplp
-import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_rule_to_ilp as thiele_rule_utility
-import config
+import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
+import ilp.ilp_experiments.experiment as experiment
+
+MODULE_NAME = "Thiele Rule Experiment"
 
 
 class ThieleRuleExperiment(experiment.Experiment):
     def __init__(self,
-                 solver: pywraplp.Solver,
+                 abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: Engine,
                  committee_size: int,
                  voters_size_limit: int,
@@ -19,7 +20,7 @@ class ThieleRuleExperiment(experiment.Experiment):
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
                  approval_column_name='rating'):
-        super().__init__(solver, database_engine)
+        super().__init__(abc_convertor, database_engine)
 
         # Initializing ABC setting variables.
         self._candidates_group_size = 0
@@ -51,23 +52,18 @@ class ThieleRuleExperiment(experiment.Experiment):
         else:
             self._candidates_group_size = int(candidates_id_columns.max().iloc[0])
         if self._committee_size > self._candidates_group_size:
-            if config.DEBUG:
-                print("************************************")
-                print("Note:The committee size is lower than the candidates group size, \n"
-                      "due to missing candidates in the data.")
-                print("************************************")
-        if config.DEBUG is True:
-            print(f"The candidates id columns are:\n{str(candidates_id_columns.head())}")
-            print(f"The number of candidates is {self._candidates_group_size}.")
+            config.debug_print(MODULE_NAME, "Note:The committee size is lower than the candidates group size, \n"
+                                            "due to missing candidates in the data.")
+        config.debug_print(MODULE_NAME, f"The candidates id columns are:\n{str(candidates_id_columns.head())}\n"
+                                        f"The number of candidates is {self._candidates_group_size}.")
         # ----------------------------------------------
         # Extract voters group size.
         sql_query = f"SELECT DISTINCT {self._voters_column_name} FROM {self._voting_table_name} " \
                     f"WHERE {self._voters_column_name} <= {self._voters_size_limit};"
         voters_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
         self._voters_group_size = int(voters_id_columns.max().iloc[0])
-        if config.DEBUG is True:
-            print(f"The voters id columns are:\n{str(voters_id_columns.head())}")
-            print(f"The number of voters is {str(self._voters_group_size)}.")
+        config.debug_print(MODULE_NAME, f"The voters id columns are:\n{str(voters_id_columns.head())}\n"
+                                        f"The number of voters is {str(self._voters_group_size)}.")
         # ----------------------------------------------
         # Extract approval profile.
         sql_query = f"SELECT DISTINCT {self._voters_column_name}, {self._candidates_column_name} " \
@@ -83,18 +79,16 @@ class ThieleRuleExperiment(experiment.Experiment):
             # The 1 subtraction is because we denote the i voter in the i-1 cell
             # (the voters id's starts from 1 in the db).
             self._approval_profile[voter_id - 1] = set(candidates_ids_df[self._candidates_column_name] - 1)
-        if config.DEBUG is True:
-            print(f"The length of the approval profile is: {str(len(self._approval_profile))}.")
+        config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
         # ----------------------------------------------
 
-    def create_ilp_problem_convertor(self) -> None:
-        # Convert the problem to an ILP problem.
-        self.convertor = thiele_rule_utility.ThieleRuleToILP(self._candidates_group_size,
-                                                             self._voters_group_size,
-                                                             self._approval_profile,
-                                                             self._committee_size,
-                                                             self._thiele_function,
-                                                             self._solver)
+    def convert_to_ilp(self) -> None:
+        self._abc_convertor.define_abc_setting(
+            self._candidates_group_size,
+            self._voters_group_size,
+            self._approval_profile,
+            self._committee_size,
+            self._thiele_function,)
 
 
 if __name__ == '__main__':

@@ -1,13 +1,15 @@
+import config
 import ortools.linear_solver.pywraplp as pywraplp
 import ilp.ilp_reduction.ilp_convertor as ilp_convertor
 import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
-import config
+
+MODULE_NAME = "ABC to ILP Convertor"
 
 
-class ThieleRuleToILP(ilp_convertor.ILPConvertor):
+class ABCToILPConvertor(ilp_convertor.ILPConvertor):
     """A class for converting ABC problem of finding
        a winning committee given a thiele voting rule
-       to an ILP problem.
+       and contextual constraints to an ILP problem.
 
            The problem original input is:
            C - Group of candidates.
@@ -15,11 +17,47 @@ class ThieleRuleToILP(ilp_convertor.ILPConvertor):
            A(V) - Approval profile.
            k - The committee size.
            r - The thiele rule.
+           gamma - Set of contextual constraints.
     """
 
-    def __init__(self, candidates_group_size: int, voters_group_size: int, approval_profile: dict,
-                 committee_size: int, thiele_score_function: dict, solver: pywraplp.Solver):
+    def __init__(self, solver: pywraplp.Solver):
         """Initializing the convertor.
+        :param solver:                    The input solver wrapper.
+        """
+        super().__init__(solver)
+
+        # ABC data.
+        self._candidates_group_size = 0
+        self._voters_group_size = 0
+        self._approval_profile = {}
+        self._committee_size = 0
+
+        # The voting rule.
+        self._thiele_score_function = {}
+        self._max_thiele_function_value = 0
+
+        # The model variables.
+        self._model_candidates_variables = []
+        self._model_voters_score_contribution_variables = []
+        self._model_voters_approval_candidates_sum_variables = []
+
+    def get_model_state(self) -> str:
+        """Creates a representation for the model current state.
+
+        :return: A string that represents the ABC problem assignment.
+        """
+        solution = ""
+        for key, value in enumerate(self._model_candidates_variables):
+            solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
+        for key, value in enumerate(self._model_voters_approval_candidates_sum_variables):
+            solution += f"Voter id: {key}, Voter approval sum: {value.solution_value()}.\n"
+        for key, value in enumerate(self._model_voters_score_contribution_variables):
+            solution += f"Voter id: {key}, Voter contribution: {value.solution_value()}.\n"
+        return solution
+
+    def define_abc_setting(self, candidates_group_size: int, voters_group_size: int, approval_profile: dict,
+                           committee_size: int, thiele_score_function: dict) -> None:
+        """Set and convert to ILP the ABC problem setting, including the thiele score function.
 
         :param candidates_group_size:    The input candidates group size.
         :param voters_group_size:        The input voters group size.
@@ -28,23 +66,17 @@ class ThieleRuleToILP(ilp_convertor.ILPConvertor):
         :param committee_size:           The committee size.
         :param thiele_score_function:    A dict with the number of approved candidates as key,
                                          the thiele score as value ({1,..,k}->N).
-        :param solver:                    The input solver wrapper.
         """
-        super().__init__(solver)
-
         # ABC data.
         self._candidates_group_size = candidates_group_size
         self._voters_group_size = voters_group_size
         self._approval_profile = approval_profile
         self._committee_size = committee_size
-        if config.DEBUG:
-            print("The ABC settings:")
-            print("----------------------------------")
-            print(f"Candidates group size = {self._candidates_group_size}.")
-            print(f"Voters Group size = {self._voters_group_size}.")
-            print(f"Committee size = {self._committee_size}.")
-            print(f"Approval profile = {self._approval_profile}.")
-            print("----------------------------------\n")
+        debug_message = f"Candidates group size = {self._candidates_group_size}.\n" \
+                        f"Voters Group size = {self._voters_group_size}.\n" \
+                        f"Committee size = {self._committee_size}.\n" \
+                        f"Approval profile = {self._approval_profile}."
+        config.debug_print(MODULE_NAME, debug_message)
 
         # The voting rule.
         self._thiele_score_function = thiele_score_function
@@ -54,12 +86,11 @@ class ThieleRuleToILP(ilp_convertor.ILPConvertor):
             if self._max_thiele_function_value < score:
                 self._max_thiele_function_value = score
 
-        # The model variables.
-        self._model_candidates_variables = []
-        self._model_voters_score_contribution_variables = []
-        self._model_voters_approval_candidates_sum_variables = []
+        self._define_abc_setting_variables()
+        self._define_abc_setting_constraints()
+        self._define_abc_setting_objective()
 
-    def define_ilp_model_variables(self):
+    def _define_abc_setting_variables(self) -> None:
         # Create the committee ILP variables.
         for i in range(0, self._candidates_group_size):
             self._model_candidates_variables.append(self._model.BoolVar("c_" + str(i)))
@@ -74,7 +105,7 @@ class ThieleRuleToILP(ilp_convertor.ILPConvertor):
             self._model_voters_score_contribution_variables.append(
                 self._model.NumVar(0, self._max_thiele_function_value, "v_" + str(i) + "_score"))
 
-    def define_ilp_model_constraints(self):
+    def _define_abc_setting_constraints(self) -> None:
         # Add the constraint about the number of candidates in the committee.
         self._model.Add(sum(self._model_candidates_variables) == self._committee_size)
 
@@ -104,27 +135,27 @@ class ThieleRuleToILP(ilp_convertor.ILPConvertor):
                                 ((y_plus + y_minus) * (self._max_thiele_function_value + 1) +
                                  self._thiele_score_function[i]))
 
-    def define_ilp_model_objective(self):
+    def _define_abc_setting_objective(self) -> None:
         self._model.Maximize(sum(self._model_voters_score_contribution_variables))
 
-    def show_solution(self) -> str:
-        """Creates a representation for the problem solution.
+    def define_denial_constraint(self, denial_candidates_sets: set):
+        """Set and convert to ILP a denial constraint.
 
-        :return: A string that represents the ABC problem solution.
+        :param denial_candidates_sets: A set of denial candidates sets.
         """
-        solution = ""
-        for key, value in enumerate(self._model_candidates_variables):
-            solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
-        for key, value in enumerate(self._model_voters_approval_candidates_sum_variables):
-            solution += f"Voter id: {key}, Voter approval sum: {value.solution_value()}.\n"
-        for key, value in enumerate(self._model_voters_score_contribution_variables):
-            solution += f"Voter id: {key}, Voter contribution: {value.solution_value()}.\n"
-        return solution
+        config.debug_print(MODULE_NAME, f"The Denial constraint settings:\n"
+                                        f"The denial candidates sets are: {denial_candidates_sets}")
+        for candidates_set in denial_candidates_sets:
+            number_of_denial_candidates = len(candidates_set)
+            # We check if (i+1) in candidates set, because the ids are 1 to m, and the variables are 0 to m-1.
+            self._model.Add(sum([x for i, x in enumerate(self._model_candidates_variables) if (i+1) in candidates_set])
+                            < number_of_denial_candidates)
 
 
 if __name__ == '__main__':
     print("---------------------------------------------------------")
     print("Sanity tests for thiele_rule_ilp module starting...")
+    print("Sanity for ABC setting to ILP:")
     # ----------------------------------------------------------------
     # Define ABC setting:
     CANDIDATES_GROUP_SIZE = 5
@@ -148,18 +179,13 @@ if __name__ == '__main__':
         exit(1)
     # ----------------------------------------------------------------
     # Convert to ILP domain.
-    thiele_rule_to_ilp_convertor = ThieleRuleToILP(CANDIDATES_GROUP_SIZE,
-                                                   VOTERS_GROUP_SIZE,
-                                                   APPROVAL_PROFILE_DICT,
-                                                   COMMITTEE_SIZE,
-                                                   THIELE_SCORE_FUNCTION,
-                                                   SOLVER)
-    thiele_rule_to_ilp_convertor.define_ilp_model_variables()
-    thiele_rule_to_ilp_convertor.define_ilp_model_constraints()
-    thiele_rule_to_ilp_convertor.define_ilp_model_objective()
+    ilp_convertor = ABCToILPConvertor(SOLVER)
+    ilp_convertor.define_abc_setting(CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+                                     APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
+                                     THIELE_SCORE_FUNCTION)
     # ----------------------------------------------------------------
     # Solve the ILP problem.
-    thiele_rule_to_ilp_convertor.solve()
+    ilp_convertor.solve()
     # ----------------------------------------------------------------
     # Test and print.
     EXPECTED_RESULT = "Candidate id: 0, Candidate value: 0.0.\n" \
@@ -183,9 +209,9 @@ if __name__ == '__main__':
                       "Voter id: 5, Voter contribution: 1.0.\n" \
                       "Voter id: 6, Voter contribution: 2.0.\n" \
                       "Voter id: 7, Voter contribution: 1.0.\n"
-    if EXPECTED_RESULT != str(thiele_rule_to_ilp_convertor):
+    if EXPECTED_RESULT != str(ilp_convertor):
         print("ERROR: The solution is different than expected.")
-        print(str(thiele_rule_to_ilp_convertor))
+        print(str(ilp_convertor))
         exit(1)
     # ----------------------------------------------------------------
     print("Sanity tests for thiele_rule_ilp module done successfully.")
