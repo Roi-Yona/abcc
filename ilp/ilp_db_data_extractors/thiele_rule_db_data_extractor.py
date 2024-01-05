@@ -2,12 +2,13 @@ import config
 from sqlalchemy.engine import Engine
 import database_server_interface.database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
-import ilp.ilp_experiments.experiment as experiment
+import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
-MODULE_NAME = "Thiele Rule Experiment"
+MODULE_NAME = "Thiele Rule DB Data Extractor"
+APPROVAL_THRESHOLD = 4
 
 
-class ThieleRuleExperiment(experiment.Experiment):
+class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: Engine,
@@ -39,7 +40,7 @@ class ThieleRuleExperiment(experiment.Experiment):
         self._approval_column_name = approval_column_name
 
         # In this database each user rates the movie 1-5, we define approval as a rating higher or equal to 4.
-        self._approval_threshold = 4
+        self._approval_threshold = APPROVAL_THRESHOLD
 
     def extract_data_from_db(self) -> None:
         # ----------------------------------------------
@@ -52,7 +53,7 @@ class ThieleRuleExperiment(experiment.Experiment):
         else:
             self._candidates_group_size = int(candidates_id_columns.max().iloc[0])
         if self._committee_size > self._candidates_group_size:
-            config.debug_print(MODULE_NAME, "Note:The committee size is lower than the candidates group size, \n"
+            config.debug_print(MODULE_NAME, "Note: Candidates group size is lower then committee size, \n"
                                             "due to missing candidates in the data.")
         config.debug_print(MODULE_NAME, f"The candidates id columns are:\n{str(candidates_id_columns.head())}\n"
                                         f"The number of candidates is {self._candidates_group_size}.")

@@ -1,9 +1,8 @@
 from sqlalchemy.engine import Engine
-import ortools.linear_solver.pywraplp as pywraplp
 import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
 
 
-class Experiment:
+class DBDataExtractor:
     """An abstract class for an ILP experiment.
     """
     def __init__(self,
@@ -11,8 +10,6 @@ class Experiment:
                  database_engine: Engine):
         self._abc_convertor = abc_convertor
         self._db_engine = database_engine
-        self.convertor = None
-        self._experiment_time = -1
 
     def extract_data_from_db(self) -> None:
         # Abstract function.
@@ -28,15 +25,6 @@ class Experiment:
 
         # Convert to ILP problem (add the model properties)
         self.convert_to_ilp()
-
-
-def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:
-    solver = pywraplp.Solver.CreateSolver(solver_name)
-    if not solver:
-        print("ERROR: Creating solver failed.")
-        exit(1)
-    solver.set_time_limit(solver_time_limit)
-    return solver
 
 
 if __name__ == '__main__':

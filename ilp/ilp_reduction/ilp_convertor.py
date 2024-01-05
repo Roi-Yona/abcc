@@ -1,5 +1,7 @@
 import ortools.linear_solver.pywraplp as pywraplp
 import time
+import config
+MODULE_NAME = "ILP Convertor"
 
 
 class ILPConvertor:
@@ -46,6 +48,15 @@ class ILPConvertor:
         if self._solved:
             for var in self._model.variables():
                 print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
+
+
+def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:
+    solver = pywraplp.Solver.CreateSolver(solver_name)
+    if not solver:
+        print("ERROR: Creating solver failed.")
+        exit(1)
+    solver.set_time_limit(solver_time_limit)
+    return solver
 
 
 if __name__ == '__main__':
