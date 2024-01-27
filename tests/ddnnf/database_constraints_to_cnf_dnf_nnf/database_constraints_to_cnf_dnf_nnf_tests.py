@@ -1,7 +1,6 @@
-import database_server_interface.database_server_interface as db_interface
+from database.database_server_interface import database_server_interface as db_interface
 import unittest
 import pathlib
-import os
 import ddnnf.database_constraints_to_cnf_dnf_nnf.database_constraints_to_cnf as dbc_to_cnf
 
 CNF_RESULTS_PATH = '..\\CNF_results'

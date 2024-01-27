@@ -1,6 +1,5 @@
 import config
-from sqlalchemy.engine import Engine
-import database_server_interface.database_server_interface as db_interface
+from database.database_server_interface import database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
@@ -11,7 +10,7 @@ APPROVAL_THRESHOLD = 4
 class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
-                 database_engine: Engine,
+                 database_engine: db_interface.Database,
                  committee_size: int,
                  voters_size_limit: int,
                  candidates_size_limit: int,
@@ -47,7 +46,8 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         # Extract candidates group size.
         sql_query = f"SELECT DISTINCT {self._candidates_column_name} FROM {self._candidates_table_name} " \
                     f"WHERE {self._candidates_column_name} <= {self._candidates_size_limit};"
-        candidates_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
+        # candidates_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
+        candidates_id_columns = self._db_engine.run_query(sql_query)
         if len(candidates_id_columns) == 0:
             self._candidates_group_size = 0
         else:
@@ -61,7 +61,8 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         # Extract voters group size.
         sql_query = f"SELECT DISTINCT {self._voters_column_name} FROM {self._voting_table_name} " \
                     f"WHERE {self._voters_column_name} <= {self._voters_size_limit};"
-        voters_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
+        # voters_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
+        voters_id_columns = self._db_engine.run_query(sql_query)
         self._voters_group_size = int(voters_id_columns.max().iloc[0])
         config.debug_print(MODULE_NAME, f"The voters id columns are:\n{str(voters_id_columns.head())}\n"
                                         f"The number of voters is {str(self._voters_group_size)}.")
@@ -72,7 +73,8 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
                     f"WHERE {self._approval_column_name} > {str(self._approval_threshold)} " \
                     f"AND {self._voters_column_name} <= {self._voters_size_limit} " \
                     f"AND {self._candidates_column_name} <= {self._candidates_size_limit};"
-        voter_rating_columns = db_interface.database_run_query(self._db_engine, sql_query)
+        # voter_rating_columns = db_interface.database_run_query(self._db_engine, sql_query)
+        voter_rating_columns = self._db_engine.run_query(sql_query)
         grouped_by_voter_id_column = voter_rating_columns.groupby(by=self._voters_column_name)
         for voter_id in range(0, self._voters_group_size):
             self._approval_profile[voter_id] = set()

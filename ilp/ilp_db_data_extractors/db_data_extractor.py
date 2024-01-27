@@ -1,4 +1,4 @@
-from sqlalchemy.engine import Engine
+import database.database_server_interface.database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
 
 
@@ -7,7 +7,7 @@ class DBDataExtractor:
     """
     def __init__(self,
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
-                 database_engine: Engine):
+                 database_engine: db_interface.Database):
         self._abc_convertor = abc_convertor
         self._db_engine = database_engine
 

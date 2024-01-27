@@ -1,7 +1,5 @@
-from sqlalchemy.engine import Engine
-import database_server_interface.database_server_interface as db_interface
+from database.database_server_interface import database_server_interface as db_interface
 import pandas as pd
-import numpy as np
 import itertools
 
 DEBUG_MODE = False
@@ -16,7 +14,7 @@ class DatabaseConstraintsConvertor:
        General Denial Constraint,
        General TGD.
     """
-    def __init__(self, database_engine: Engine, number_of_voters=0, number_of_candidates=0,
+    def __init__(self, database_engine: db_interface.Database, number_of_voters=0, number_of_candidates=0,
                  candidates_column_name='id', voters_column_name='userId'):
         """Initializing the convertor.
 
@@ -67,7 +65,8 @@ class DatabaseConstraintsConvertorRestrictDenialConstraintToCNF(DatabaseConstrai
                     f"ORDER BY {element_column};"
 
         # Group by element column and find all the candidates conflict for an element.
-        grouped_by_element_column = db_interface.database_run_query(self._db_engine, sql_query)
+        # grouped_by_element_column = db_interface.database_run_query(self._db_engine, sql_query)
+        grouped_by_element_column = self._db_engine.run_query(sql_query)
         grouped_by_element_column = grouped_by_element_column.groupby(element_column)
         for element_name, element_df in grouped_by_element_column:
             candidates_ids_dict[element_name] = element_df[candidate_column]
@@ -134,7 +133,8 @@ class DatabaseConstraintsConvertorRestrictTGDConstraintToCNF(DatabaseConstraints
                         f"LEFT JOIN {relation[S_i_RELATION_NAME]} t2 " \
                         f"on t1.{relation[ELEMENT_COLUMN_NAME]} = t2.{relation[ELEMENT_COLUMN_NAME]} "\
                         f"ORDER BY t1.{relation[ELEMENT_COLUMN_NAME]};"
-            joined_R_S_i = db_interface.database_run_query(self._db_engine, sql_query)
+            # joined_R_S_i = db_interface.database_run_query(self._db_engine, sql_query)
+            joined_R_S_i = self._db_engine.run_query(sql_query)
 
             grouped_by_element_column = joined_R_S_i.groupby(relation[ELEMENT_COLUMN_NAME])
             for element_name, element_df in grouped_by_element_column:
@@ -167,7 +167,9 @@ class DatabaseConstraintsConvertorRestrictTGDConstraintToCNF(DatabaseConstraints
 if __name__ == '__main__':
     server = 'LAPTOP-MO1JPG72'
     database = 'the_basketball_synthetic_db'
-    db_engine = db_interface.database_connect(server, database)
+    # db_engine = db_interface.database_connect(server, database)
+    # TODO: Fix the database path and create the proper database.
+    db_engine = db_interface.Database(database)
 
     # Restrict denial convert sanity test.
     print('\nDatabaseConstraintsConvertorRestrictDenialConstraintToCNF - Start Testing:')

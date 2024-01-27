@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pathlib
 
-DATABASE_PATH = "databases\\the_movies_database\\"
+DATABASE_PATH = "database\\databases\\the_movies_database\\"
 
 
 def main():

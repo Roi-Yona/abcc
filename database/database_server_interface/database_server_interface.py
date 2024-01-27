@@ -1,6 +1,28 @@
 from sqlalchemy.engine import URL
 import pandas as pd
 import sqlalchemy as sa
+import sqlite3
+
+
+class Database:
+    def __init__(self, database_path: str):
+        # Connect the db in the current working directory,
+        # implicitly creating one if it does not exist.
+        self._con = sqlite3.connect(database_path)
+
+        # Creating a curser.
+        self._cur = self._con.cursor()
+
+    def run_query(self, query: str):
+        self._cur.execute(query)
+        return pd.read_sql_query(query, self._con)
+
+    def close(self):
+        # Committing changes
+        self._con.commit()
+
+        # Closing the connection
+        self._con.close()
 
 
 def database_connect(server_name: str, database_name: str, username='', password='') -> sa.engine.Engine:
@@ -32,14 +54,16 @@ def database_run_query(input_db_engine: sa.engine.Engine, query: str) -> pd.Data
 
 
 if __name__ == '__main__':
-    # Set up the connection parameters
-    server = 'LAPTOP-MO1JPG72'
-    database = 'the_basketball_synthetic_db'
-    db_engine = database_connect(server, database)
-
-    df = database_run_query(db_engine, 'SELECT * FROM basketball_metadata')
-    print(df)
-
+    # # Set up the connection parameters
+    # server = 'LAPTOP-MO1JPG72'
+    # database = 'the_basketball_synthetic_db'
+    # db_engine = database_connect(server, database)
+    #
+    # df = database_run_query(db_engine, 'SELECT * FROM basketball_metadata')
+    # print(df)
+    db = Database("..\\the_movies_database.db")
+    print(db.run_query("SELECT * FROM candidates WHERE candidate_id=3"))
+    db.close()
 
 # Alternative option (gives warning):
 # import pyodbc

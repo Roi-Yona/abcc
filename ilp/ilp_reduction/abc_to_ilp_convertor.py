@@ -1,3 +1,5 @@
+import pandas as pd
+
 import config
 import ortools.linear_solver.pywraplp as pywraplp
 import ilp.ilp_reduction.ilp_convertor as ilp_convertor
@@ -46,7 +48,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         :return: A string that represents the ABC problem assignment.
         """
-        solution = ""
+        solution = f""
         for key, value in enumerate(self._model_candidates_variables):
             solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
         for key, value in enumerate(self._model_voters_approval_candidates_sum_variables):
@@ -138,18 +140,30 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
     def _define_abc_setting_objective(self) -> None:
         self._model.Maximize(sum(self._model_voters_score_contribution_variables))
 
-    def define_denial_constraint(self, denial_candidates_sets: set):
+    def define_denial_constraint(self, denial_candidates_df: pd.DataFrame):
         """Set and convert to ILP a denial constraint.
 
-        :param denial_candidates_sets: A set of denial candidates sets.
+        :param denial_candidates_df: A df of denial candidates groups.
         """
         config.debug_print(MODULE_NAME, f"The Denial constraint settings:\n"
-                                        f"The denial candidates sets are: {denial_candidates_sets}")
+                                        f"The denial candidates sets are: {denial_candidates_df}")
+        row_length = 0
+        if len(denial_candidates_df.values) >= 1:
+            row_length = len(denial_candidates_df.values[0])
+        denial_candidates_sets = set()
+
+        for candidates_list in denial_candidates_df.values:
+            current_set = set()
+            for item in candidates_list:
+                current_set.add(item)
+            if len(current_set) == row_length:
+                denial_candidates_sets.add(frozenset(current_set))
+
         for candidates_set in denial_candidates_sets:
-            number_of_denial_candidates = len(candidates_set)
             # We check if (i+1) in candidates set, because the ids are 1 to m, and the variables are 0 to m-1.
-            self._model.Add(sum([x for i, x in enumerate(self._model_candidates_variables) if (i+1) in candidates_set])
-                            < number_of_denial_candidates)
+            self._model.Add(
+                sum([x for i, x in enumerate(self._model_candidates_variables) if (i + 1) in candidates_set])
+                <= (row_length - 1))
 
 
 if __name__ == '__main__':
