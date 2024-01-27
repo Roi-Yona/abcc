@@ -37,7 +37,7 @@ class Experiment:
         self._database_name = database_name
         self.results_file_path = RESULTS_PATH
         # self._db_engine = db_interface.database_connect(SERVER, self._database_name)
-        self._db_engine = db_interface.Database(f"{DATABASES_PATH}{self._database_name}.db")
+        self._db_engine = db_interface.Database(pathlib.Path(f"{DATABASES_PATH}{self._database_name}.db").__str__())
 
         self._solver = ilp_convertor.create_solver(solver_name, MINUTE * solver_time_limit)
         self._abc_convertor = abc_ilp_convertor.ABCToILPConvertor(self._solver)
