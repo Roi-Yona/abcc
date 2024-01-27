@@ -1,6 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import pathlib
 
 import config
 import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
@@ -63,25 +61,6 @@ class ThieleRuleExperiment(experiment.Experiment):
 
 
 # Functions------------------------------------------------------------------
-def thiele_rule_experiment_save_graph(df: pd.DataFrame, experiment_name: str, results_file_path: str):
-    config.debug_print(MODULE_NAME, f"Experiment results\n{str(df)}")
-    result_path = f'{results_file_path}{experiment_name}.png'
-    result_path = pathlib.Path(result_path)
-
-    # Scatter plot.
-    plt.scatter(df['voters_group_size'], df['solving_time(sec)'])
-    # Set specific tick marks.
-    plt.xticks(range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE))
-    # Set axis labels.
-    plt.xlabel('voters_group_size')
-    plt.ylabel('solving_time(sec)')
-    # Set plot title.
-    plt.title(f"candidates_group_size = {df['voters_group_size'].iloc[0]}, "
-              f"committee_size = {df['committee_size'].iloc[0]}")
-    # Save the plot
-    plt.savefig(result_path)
-
-
 def thiele_rule_experiment_runner(experiment_name: str, database_name: str,
                                   solver_time_limit: int,
                                   solver_name: str,
@@ -106,50 +85,19 @@ def thiele_rule_experiment_runner(experiment_name: str, database_name: str,
 
 if __name__ == '__main__':
     # Experiments----------------------------------------------------------------
-    # CC Thiele Rule - the_movies_database - Without Loop------------------------
-    # _experiment_name = 'CC Thiele Rule'
-    # _database_name = 'the_movies_database'
-    # _solver_time_limit = 500
-    # _solver_name = "SAT"
-    #
-    # # 15000, succeed (500)
-    # # 17500, succeed (500)
-    # # 18250, succeed (500)
-    # # 19250, succeed (500)
-    # # 19500, succeed (500)
-    # # 19750, succeed (500)
-    #
-    # # 20000, status=1 feasible but stopped by time limit (500)
-    # # 30000, status=1 feasible but stopped by time limit (1)
-    # # 30000, status=1 feasible but stopped by time limit (500)
-    #
-    # _voters_size_limit = 30000
-    # _candidates_size_limit = 30
-    # _committee_size = 10
-    # _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
-    #
-    # _voting_table_name = 'voting'
-    #
-    # _experiments_results = ThieleRuleExperiment.create_results_df()
-    # cc_experiment = ThieleRuleExperiment(_experiment_name, _database_name,
-    #                                      _solver_time_limit, _solver_name,
-    #                                      _committee_size, _voters_size_limit, _candidates_size_limit,
-    #                                      _thiele_rule_function_creator,
-    #                                      _voting_table_name)
-    # experiment.save_result(_experiments_results, cc_experiment.run_experiment())
-
-    # CC Thiele Rule - the_movies_database---------------------------------------
-    # Define the experiment.
-    _experiment_name = 'CC Thiele Rule'
     _database_name = 'the_movies_database'
     _solver_time_limit = 270
     _solver_name = "SAT"
 
     _candidates_size_limit = 30
     _committee_size = 10
-    _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     _voting_table_name = 'voting'
+
+    # Define the experiment - CC Thiele Rule:
+    # ---------------------------------------------------------------------------
+    _experiment_name = 'CC Thiele Rule'
+    _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     # Run the experiment.
     thiele_rule_experiment_runner(_experiment_name, _database_name,
@@ -158,25 +106,4 @@ if __name__ == '__main__':
                                   _committee_size, _candidates_size_limit,
                                   _thiele_rule_function_creator,
                                   _voting_table_name)
-
-    # # AV Thiele Rule - the_movies_database---------------------------------------
-    # # Define the experiment.
-    # _experiment_name = 'AV Thiele Rule'
-    # _database_name = 'the_movies_database'
-    # _solver_time_limit = 1
-    # _solver_name = "SAT"
-    #
-    # _voters_size_limit = 300
-    # _candidates_size_limit = 500
-    # _committee_size = 40
-    # _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
-    #
-    # _voting_table_name = 'voting_small'
-    #
-    # # Run the experiment.
-    # thiele_rule_experiment_runner(_experiment_name, _database_name,
-    #                               _solver_time_limit,
-    #                               _solver_name,
-    #                               _committee_size, _voters_size_limit, _candidates_size_limit,
-    #                               _thiele_rule_function_creator,
-    #                               _voting_table_name)
+    # ---------------------------------------------------------------------------

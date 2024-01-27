@@ -13,7 +13,6 @@
 import pandas as pd
 
 import config
-from sqlalchemy.engine import Engine
 from database.database_server_interface import database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
