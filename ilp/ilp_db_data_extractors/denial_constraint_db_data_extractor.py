@@ -120,7 +120,7 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
         #                                                     select_phrase + from_phrase + where_phrase)
         return legal_assignments
 
-    def extract_data_from_db(self) -> None:
+    def _extract_data_from_db(self) -> None:
         legal_assignments = self.join_tables(self._denial_constraint_dict)
 
         # Extract the committee members sets out of the resulted join.
@@ -129,7 +129,7 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
         config.debug_print(MODULE_NAME,
                            f"The denial constraints candidates are: {self._denial_constraint_candidates_df}.")
 
-    def convert_to_ilp(self) -> None:
+    def _convert_to_ilp(self) -> None:
         self._abc_convertor.define_denial_constraint(
             self._denial_constraint_candidates_df)
 

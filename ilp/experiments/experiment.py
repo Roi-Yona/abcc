@@ -42,10 +42,6 @@ class Experiment:
         self._solver = ilp_convertor.create_solver(solver_name, MINUTE * solver_time_limit)
         self._abc_convertor = abc_ilp_convertor.ABCToILPConvertor(self._solver)
 
-    @staticmethod
-    def create_results_df() -> pd.DataFrame:
-        pass
-
     def run_model(self) -> float:
         solved_time_scale = 1
         print("----------------------------------------------------------------------------")

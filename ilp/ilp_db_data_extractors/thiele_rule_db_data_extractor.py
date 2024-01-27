@@ -41,7 +41,7 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         # In this database each user rates the movie 1-5, we define approval as a rating higher or equal to 4.
         self._approval_threshold = APPROVAL_THRESHOLD
 
-    def extract_data_from_db(self) -> None:
+    def _extract_data_from_db(self) -> None:
         # ----------------------------------------------
         # Extract candidates group size.
         sql_query = f"SELECT DISTINCT {self._candidates_column_name} FROM {self._candidates_table_name} " \
@@ -85,7 +85,7 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
         # ----------------------------------------------
 
-    def convert_to_ilp(self) -> None:
+    def _convert_to_ilp(self) -> None:
         self._abc_convertor.define_abc_setting(
             self._candidates_group_size,
             self._voters_group_size,

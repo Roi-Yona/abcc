@@ -46,16 +46,6 @@ class DenialConstraintExperiment(experiment.Experiment):
             thiele_rule_function_creator(committee_size + 1),
             voting_table_name, candidates_table_name, candidates_column_name, voters_column_name, approval_column_name)
 
-    @staticmethod
-    def create_results_df() -> pd.DataFrame:
-        experiments_results = {
-            'voters_group_size': [],
-            'candidates_group_size': [],
-            'committee_size': [],
-            'solving_time(sec)': []
-        }
-        return pd.DataFrame(experiments_results)
-
     def run_experiment(self):
         # Extract problem data from the database and convert to ILP.
         # NOTE_1: Can alternative convert to ilp directly using the _abc_convertor using a data that already extracted.
@@ -65,11 +55,20 @@ class DenialConstraintExperiment(experiment.Experiment):
         # Run the experiment.
         solved_time = self.run_model()
 
+        # Update the group size after the voters cleaning.
+        self._voters_group_size = self._av_db_data_extractor._abc_convertor._voters_group_size
+
         # Save the results.
         new_result = {'voters_group_size': self._voters_group_size,
                       'candidates_group_size': self._candidates_group_size,
                       'committee_size': self._committee_size,
-                      'solving_time(sec)': solved_time}
+                      'solving_time(sec)': solved_time,
+                      'number_of_solver_variables': self._solver.NumVariables(),
+                      'number_of_solver_constraints': self._solver.NumConstraints(),
+                      'reduction_time(sec)': self._av_db_data_extractor.convert_to_ilp_timer,
+                      'extract_data_time(sec)': self._av_db_data_extractor.extract_data_timer
+                      }
+
         return pd.DataFrame([new_result])
 
 
