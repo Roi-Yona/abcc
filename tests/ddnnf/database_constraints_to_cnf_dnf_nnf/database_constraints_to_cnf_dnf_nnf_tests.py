@@ -1,9 +1,9 @@
 from database.database_server_interface import database_server_interface as db_interface
 import unittest
-import pathlib
+import os
 import ddnnf.database_constraints_to_cnf_dnf_nnf.database_constraints_to_cnf as dbc_to_cnf
 
-CNF_RESULTS_PATH = '..\\CNF_results'
+CNF_RESULTS_PATH = os.path.join('..', 'CNF_results')
 
 
 class TestDatabaseConstraintsConvertor(unittest.TestCase):
@@ -40,7 +40,7 @@ class TestDatabaseConstraintsConvertor(unittest.TestCase):
         self.assertEqual(cnf_string, cnf_string_predicted_outcome)
 
         # Write compilation results to a file.
-        with open(pathlib.Path(f"{CNF_RESULTS_PATH}\\RestrictDenialConstraintTest.txt"), 'w') as file:
+        with open(os.path.join(f"{CNF_RESULTS_PATH}", "RestrictDenialConstraintTest.txt"), 'w') as file:
             file.write(cnf_string)
         print(f"CNF convert results:\n{cnf_string}")
         print('DatabaseConstraintsConvertorRestrictDenialConstraintToCNF - Test completed successfully.')
@@ -57,7 +57,7 @@ class TestDatabaseConstraintsConvertor(unittest.TestCase):
         self.assertEqual(cnf_string, cnf_string_predicted_outcome)
 
         # Write compilation results to a file.
-        with open(pathlib.Path(f"{CNF_RESULTS_PATH}\\RestrictTGDTest.txt"), 'w') as file:
+        with open(os.path.join(f"{CNF_RESULTS_PATH}", "RestrictTGDTest.txt"), 'w') as file:
             file.write(cnf_string)
         print(f"CNF convert results:\n{cnf_string}")
 

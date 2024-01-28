@@ -1,6 +1,6 @@
 from datetime import datetime
 import pandas as pd
-import pathlib
+import os
 
 import config
 from database.database_server_interface import database_server_interface as db_interface
@@ -9,8 +9,8 @@ import ilp.ilp_reduction.abc_to_ilp_convertor as abc_ilp_convertor
 
 MODULE_NAME = 'Experiment'
 MINUTE = 1000 * 60
-RESULTS_PATH = 'results\\'
-DATABASES_PATH = '..\\..\\database\\'
+RESULTS_PATH = 'results'
+DATABASES_PATH = os.path.join('..', '..', 'database')
 SERVER = 'LAPTOP-MO1JPG72'
 
 
@@ -20,8 +20,7 @@ def save_result(experiment_results: pd.DataFrame, new_result: pd.DataFrame) -> p
 
 def experiment_save_excel(df: pd.DataFrame, experiment_name: str, results_file_path: str):
     config.debug_print(MODULE_NAME, f"Experiment results\n{str(df)}")
-    result_path = f'{results_file_path}{experiment_name} {str(datetime.now().date())}.xlsx'
-    result_path = pathlib.Path(result_path)
+    result_path = os.path.join(f'{results_file_path}', f'{experiment_name} {str(datetime.now().date())}.xlsx')
 
     # Save the DataFrame to Excel
     df.to_excel(result_path, index=False)
@@ -37,7 +36,8 @@ class Experiment:
         self._database_name = database_name
         self.results_file_path = RESULTS_PATH
         # self._db_engine = db_interface.database_connect(SERVER, self._database_name)
-        self._db_engine = db_interface.Database(pathlib.Path(f"{DATABASES_PATH}{self._database_name}.db").__str__())
+        db_path = os.path.join(f"{DATABASES_PATH}", f"{self._database_name}.db")
+        self._db_engine = db_interface.Database(db_path)
 
         self._solver = ilp_convertor.create_solver(solver_name, MINUTE * solver_time_limit)
         self._abc_convertor = abc_ilp_convertor.ABCToILPConvertor(self._solver)

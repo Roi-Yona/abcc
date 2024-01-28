@@ -1,7 +1,9 @@
+import os.path
 import sqlite3
 import csv
+import os
 
-THE_MOVIES_DATABASE_PATH = "databases\\the_movies_database\\"
+THE_MOVIES_DATABASE_PATH = os.path.join("databases", "the_movies_database")
 
 
 def extract_list_from_csv(csv_path: str) -> list:
@@ -22,7 +24,7 @@ def create_voting_table():
        )''')
 
     # Extract voting data.
-    voting_data = extract_list_from_csv(f"{THE_MOVIES_DATABASE_PATH}ratings.csv")
+    voting_data = extract_list_from_csv(os.path.join(f"{THE_MOVIES_DATABASE_PATH}", "ratings.csv"))
 
     # Inserting data into the table
     for row in voting_data[1:]:
@@ -59,7 +61,7 @@ def create_candidates_table():
        )''')
 
     # Extract voting data.
-    candidates_data = extract_list_from_csv(f"{THE_MOVIES_DATABASE_PATH}movies_metadata.csv")
+    candidates_data = extract_list_from_csv(os.path.join(f"{THE_MOVIES_DATABASE_PATH}", "movies_metadata.csv"))
 
     # Inserting data into the table
     for row in candidates_data[1:]:
