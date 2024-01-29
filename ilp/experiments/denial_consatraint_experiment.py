@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.join('..', '..'))
 import pandas as pd
 
 import config
