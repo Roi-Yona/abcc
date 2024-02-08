@@ -11,8 +11,8 @@ import experiment
 
 MODULE_NAME = "Denial Constraint Experiment"
 START_EXPERIMENT_RANGE = 5000
-END_EXPERIMENT_RANGE = 100001
-TICK_EXPERIMENT_RANGE = 5000
+END_EXPERIMENT_RANGE = 280000
+TICK_EXPERIMENT_RANGE = 15000
 
 
 class DenialConstraintExperiment(experiment.Experiment):
@@ -27,7 +27,7 @@ class DenialConstraintExperiment(experiment.Experiment):
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
                  approval_column_name='rating',
-                 ):
+                 lifted_inference=False):
         super().__init__(experiment_name, database_name, solver_time_limit, solver_name)
 
         self._voters_group_size = voters_size_limit
@@ -45,7 +45,8 @@ class DenialConstraintExperiment(experiment.Experiment):
             self._abc_convertor, self._db_engine,
             committee_size, voters_size_limit, candidates_size_limit,
             thiele_rule_function_creator(committee_size + 1),
-            voting_table_name, candidates_table_name, candidates_column_name, voters_column_name, approval_column_name)
+            voting_table_name, candidates_table_name, candidates_column_name, voters_column_name, approval_column_name,
+            lifted_inference)
 
     def run_experiment(self):
         # Extract problem data from the database and convert to ILP.
@@ -85,7 +86,7 @@ def denial_constraint_experiment_runner(experiment_name: str, database_name: str
                                         candidates_size_limit: int,
                                         thiele_rule_function_creator,
                                         voting_table_name: str,
-                                        ):
+                                        lifted_inference=False):
     experiments_results = pd.DataFrame()
 
     for voters_size_limit in range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE):
@@ -97,7 +98,7 @@ def denial_constraint_experiment_runner(experiment_name: str, database_name: str
                                                    denial_constraint_dict, committee_members_list, candidates_tables,
                                                    committee_size, voters_size_limit, candidates_size_limit,
                                                    thiele_rule_function_creator,
-                                                   voting_table_name)
+                                                   voting_table_name, lifted_inference=lifted_inference)
         experiments_results = experiment.save_result(experiments_results, cc_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, cc_experiment.results_file_path)
 
@@ -105,12 +106,11 @@ def denial_constraint_experiment_runner(experiment_name: str, database_name: str
 if __name__ == '__main__':
     # Experiments----------------------------------------------------------------
     _database_name = 'the_movies_database'
-    _solver_time_limit = 270
+    _solver_time_limit = 300
     _solver_name = "SAT"
 
     _candidates_size_limit = 30
     _committee_size = 10
-    _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     _voting_table_name = 'voting'
 
@@ -122,7 +122,13 @@ if __name__ == '__main__':
 
     # Define the experiment - CC Thiele Rule:
     # ---------------------------------------------------------------------------
-    _experiment_name = 'CC Thiele Rule AND Denial Constraint'
+    _thiele_rule_name = 'CC Thiele Rule'
+    _constraint_type = 'one Denial Constraint'
+    _lifted_inference = False
+    _experiment_name = f'{_thiele_rule_name} Lifted Inference={_lifted_inference} ' \
+                       f'candidate_size={_candidates_size_limit} committee_size={_committee_size}' \
+                       f' denial_constraint={_constraint_type}'
+    _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     # Run the experiment.
     denial_constraint_experiment_runner(_experiment_name, _database_name,
@@ -131,5 +137,5 @@ if __name__ == '__main__':
                                         _denial_constraint_dict, _committee_members_list, _candidates_tables,
                                         _committee_size, _candidates_size_limit,
                                         _thiele_rule_function_creator,
-                                        _voting_table_name)
+                                        _voting_table_name, _lifted_inference)
     # ---------------------------------------------------------------------------

@@ -10,8 +10,8 @@ import experiment
 
 MODULE_NAME = "Thiele Rule Experiment"
 START_EXPERIMENT_RANGE = 5000
-END_EXPERIMENT_RANGE = 100001
-TICK_EXPERIMENT_RANGE = 5000
+END_EXPERIMENT_RANGE = 280000
+TICK_EXPERIMENT_RANGE = 15000
 
 
 class ThieleRuleExperiment(experiment.Experiment):
@@ -24,7 +24,8 @@ class ThieleRuleExperiment(experiment.Experiment):
                  candidates_table_name='candidates',
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
-                 approval_column_name='rating'
+                 approval_column_name='rating',
+                 lifted_setting=False
                  ):
         super().__init__(experiment_name, database_name, solver_time_limit, solver_name)
 
@@ -37,7 +38,8 @@ class ThieleRuleExperiment(experiment.Experiment):
             self._abc_convertor, self._db_engine,
             committee_size, voters_size_limit, candidates_size_limit,
             thiele_rule_function_creator(committee_size + 1),
-            voting_table_name, candidates_table_name, candidates_column_name, voters_column_name, approval_column_name)
+            voting_table_name, candidates_table_name, candidates_column_name, voters_column_name, approval_column_name,
+            lifted_setting)
 
     def run_experiment(self):
         # Extract problem data from the database and convert to ILP.
@@ -70,7 +72,8 @@ def thiele_rule_experiment_runner(experiment_name: str, database_name: str,
                                   committee_size: int,
                                   candidates_size_limit: int,
                                   thiele_rule_function_creator,
-                                  voting_table_name: str):
+                                  voting_table_name: str,
+                                  lifted_setting=False):
     experiments_results = pd.DataFrame()
 
     for voters_size_limit in range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE):
@@ -81,7 +84,8 @@ def thiele_rule_experiment_runner(experiment_name: str, database_name: str,
                                              solver_time_limit, solver_name,
                                              committee_size, voters_size_limit, candidates_size_limit,
                                              thiele_rule_function_creator,
-                                             voting_table_name)
+                                             voting_table_name=voting_table_name,
+                                             lifted_setting=lifted_setting)
         experiments_results = experiment.save_result(experiments_results, cc_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, cc_experiment.results_file_path)
 
@@ -89,7 +93,7 @@ def thiele_rule_experiment_runner(experiment_name: str, database_name: str,
 if __name__ == '__main__':
     # Experiments----------------------------------------------------------------
     _database_name = 'the_movies_database'
-    _solver_time_limit = 270
+    _solver_time_limit = 300
     _solver_name = "SAT"
 
     _candidates_size_limit = 30
@@ -99,7 +103,10 @@ if __name__ == '__main__':
 
     # Define the experiment - CC Thiele Rule:
     # ---------------------------------------------------------------------------
-    _experiment_name = 'CC Thiele Rule'
+    _thiele_rule_name = 'CC Thiele Rule'
+    _lifted_inference = False
+    _experiment_name = f'{_thiele_rule_name} Lifted Inference={_lifted_inference} ' \
+                       f'candidate_size={_candidates_size_limit} committee_size={_committee_size}'
     _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     # Run the experiment.
@@ -108,5 +115,5 @@ if __name__ == '__main__':
                                   _solver_name,
                                   _committee_size, _candidates_size_limit,
                                   _thiele_rule_function_creator,
-                                  _voting_table_name)
+                                  _voting_table_name, _lifted_inference)
     # ---------------------------------------------------------------------------
