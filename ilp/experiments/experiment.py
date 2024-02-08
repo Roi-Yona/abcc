@@ -11,7 +11,7 @@ import ilp.ilp_reduction.abc_to_ilp_convertor as abc_ilp_convertor
 MODULE_NAME = 'Experiment'
 MINUTE = 1000 * 60
 RESULTS_PATH = 'results'
-DATABASES_PATH = os.path.join('..', '..', 'database')
+DATABASES_PATH = os.path.join('.')
 SERVER = 'LAPTOP-MO1JPG72'
 
 

@@ -6,7 +6,7 @@ import pandas as pd
 import config
 import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
 import ilp.ilp_db_data_extractors.thiele_rule_db_data_extractor as thiele_rule_db_data_extractor
-import experiment
+import ilp.experiments.experiment as experiment
 
 MODULE_NAME = "Thiele Rule Experiment"
 START_EXPERIMENT_RANGE = 5000
