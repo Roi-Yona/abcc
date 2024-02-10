@@ -230,7 +230,7 @@ if __name__ == '__main__':
     THIELE_SCORE_FUNCTION = thiele_functions.create_av_thiele_dict(COMMITTEE_SIZE + 1)
     # ----------------------------------------------------------------
     # Define the ILP solver.
-    SOLVER = pywraplp.Solver.CreateSolver("SAT")
+    SOLVER = pywraplp.Solver.CreateSolver("CP_SAT")
     if not SOLVER:
         print("ERROR: Creating solver failed.")
         exit(1)

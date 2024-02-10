@@ -22,7 +22,8 @@ def save_result(experiment_results: pd.DataFrame, new_result: pd.DataFrame) -> p
 def experiment_save_excel(df: pd.DataFrame, experiment_name: str, results_file_path: str):
     config.debug_print(MODULE_NAME, f"Experiment results\n{str(df)}")
     result_path = os.path.join(f'{results_file_path}', f'{experiment_name} {str(datetime.now().date())}.xlsx')
-
+    if not os.path.exists(results_file_path):
+        os.mkdir(results_file_path)
     # Save the DataFrame to Excel
     df.to_excel(result_path, index=False)
 

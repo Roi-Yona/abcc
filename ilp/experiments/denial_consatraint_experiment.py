@@ -127,7 +127,7 @@ if __name__ == '__main__':
     _lifted_inference = False
     _experiment_name = f'{_thiele_rule_name} Lifted Inference={_lifted_inference} ' \
                        f'candidate_size={_candidates_size_limit} committee_size={_committee_size}' \
-                       f' denial_constraint={_constraint_type}'
+                       f' denial_constraint={_constraint_type} solver_name={_solver_name}'
     _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     # Run the experiment.

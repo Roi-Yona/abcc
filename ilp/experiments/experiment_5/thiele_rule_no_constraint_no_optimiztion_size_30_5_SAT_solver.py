@@ -7,8 +7,8 @@ if __name__ == '__main__':
     _solver_time_limit = 300
     _solver_name = "SAT"
 
-    _candidates_size_limit = 50
-    _committee_size = 10
+    _candidates_size_limit = 30
+    _committee_size = 5
 
     _voting_table_name = 'voting'
 
@@ -17,7 +17,8 @@ if __name__ == '__main__':
     _thiele_rule_name = 'CC Thiele Rule'
     _lifted_inference = False
     _experiment_name = f'{_thiele_rule_name} Lifted Inference={_lifted_inference} ' \
-                       f'candidate_size={_candidates_size_limit} committee_size={_committee_size}'
+                       f'candidate_size={_candidates_size_limit} committee_size={_committee_size} ' \
+                       f'solver_name={_solver_name}'
     _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     # Run the experiment.
