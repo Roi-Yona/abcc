@@ -7,7 +7,7 @@ import config
 import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
 import ilp.ilp_db_data_extractors.thiele_rule_db_data_extractor as thiele_rule_db_data_extractor
 import ilp.ilp_db_data_extractors.denial_constraint_db_data_extractor as denial_constraint_extractor
-import experiment
+import ilp.experiments.experiment as experiment
 
 MODULE_NAME = "Denial Constraint Experiment"
 START_EXPERIMENT_RANGE = 5000
@@ -27,9 +27,12 @@ class DenialConstraintExperiment(experiment.Experiment):
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
                  approval_column_name='rating',
-                 lifted_inference=False):
+                 lifted_inference=False,
+                 denial_constraint_parameters=None):
         super().__init__(experiment_name, database_name, solver_time_limit, solver_name)
 
+        if denial_constraint_parameters is None:
+            denial_constraint_parameters = []
         self._voters_group_size = voters_size_limit
         self._candidates_group_size = candidates_size_limit
         self._committee_size = committee_size
@@ -40,6 +43,17 @@ class DenialConstraintExperiment(experiment.Experiment):
         self._denial_constraint_db_extractor = denial_constraint_extractor.DenialConstraintDBDataExtractor(
             self._abc_convertor, self._db_engine, denial_constraint_dict, committee_members_list, candidates_tables,
             committee_size, voters_size_limit, candidates_size_limit, candidates_column_name, voters_column_name)
+
+        # TODO: This is a patch to add more then one constraint, I can engineer it better.
+        self._denial_constraint_db_extractors = []
+        for param_tuples in denial_constraint_parameters:
+            local_denial_constraint_dict = param_tuples[0]
+            local_committee_members_list = param_tuples[1]
+            local_candidates_tables = param_tuples[2]
+            self._denial_constraint_db_extractors.append(denial_constraint_extractor.DenialConstraintDBDataExtractor(
+                self._abc_convertor, self._db_engine,
+                local_denial_constraint_dict, local_committee_members_list, local_candidates_tables,
+                committee_size, voters_size_limit, candidates_size_limit, candidates_column_name, voters_column_name))
 
         self._av_db_data_extractor = thiele_rule_db_data_extractor.ThieleRuleDBDataExtractor(
             self._abc_convertor, self._db_engine,
@@ -53,6 +67,8 @@ class DenialConstraintExperiment(experiment.Experiment):
         # NOTE_1: Can alternative convert to ilp directly using the _abc_convertor using a data that already extracted.
         self._denial_constraint_db_extractor.extract_and_convert()
         self._av_db_data_extractor.extract_and_convert()
+        for denial_extractor in self._denial_constraint_db_extractors:
+            denial_extractor.extract_and_convert()
 
         # Run the experiment.
         solved_time = self.run_model()
@@ -86,7 +102,10 @@ def denial_constraint_experiment_runner(experiment_name: str, database_name: str
                                         candidates_size_limit: int,
                                         thiele_rule_function_creator,
                                         voting_table_name: str,
-                                        lifted_inference=False):
+                                        lifted_inference=False,
+                                        denial_constraint_parameters=None):
+    if denial_constraint_parameters is None:
+        denial_constraint_parameters = []
     experiments_results = pd.DataFrame()
 
     for voters_size_limit in range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE):
@@ -98,7 +117,8 @@ def denial_constraint_experiment_runner(experiment_name: str, database_name: str
                                                    denial_constraint_dict, committee_members_list, candidates_tables,
                                                    committee_size, voters_size_limit, candidates_size_limit,
                                                    thiele_rule_function_creator,
-                                                   voting_table_name, lifted_inference=lifted_inference)
+                                                   voting_table_name, lifted_inference=lifted_inference,
+                                                   denial_constraint_parameters=denial_constraint_parameters)
         experiments_results = experiment.save_result(experiments_results, cc_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, cc_experiment.results_file_path)
 

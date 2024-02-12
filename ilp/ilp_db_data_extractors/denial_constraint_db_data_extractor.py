@@ -74,7 +74,7 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
         # Create Select phrase.
         select_phrase = 'SELECT '
         for var, table_names in variables_dict.items():
-            table_var_name = 'None'
+            table_var_name = None
             for x, y in tables_dict.items():
                 if x[1] == table_names[0]:
                     for z in y:
@@ -89,14 +89,14 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
         where_phrase = 'WHERE '
         for var, table_names in variables_dict.items():
             for i in range(0, len(table_names) - 1, 2):
-                table_var_name = 'None'
+                table_var_name = None
                 for x, y in tables_dict.items():
                     if x[1] == table_names[i]:
                         for z in y:
                             if z[0] == var:
                                 table_var_name = z[1]
                                 break
-                table_var_name2 = 'None'
+                table_var_name2 = None
                 for x, y in tables_dict.items():
                     if x[1] == table_names[i + 1]:
                         for z in y:
