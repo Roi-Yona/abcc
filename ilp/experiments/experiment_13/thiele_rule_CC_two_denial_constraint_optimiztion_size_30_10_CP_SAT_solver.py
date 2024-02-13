@@ -6,7 +6,7 @@ if __name__ == '__main__':
     # Experiments----------------------------------------------------------------
     _database_name = 'the_movies_database'
     _solver_time_limit = 300
-    _solver_name = "CP_SAT"
+    _solver_name = "SAT"
 
     _candidates_size_limit = 30
     _committee_size = 10
