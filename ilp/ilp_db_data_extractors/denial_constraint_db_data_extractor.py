@@ -48,6 +48,7 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
         self._denial_constraint_candidates_df = None
 
     def join_tables(self, tables_dict: dict) -> pd.DataFrame:
+        # TODO: Fix doc.
         """Extract the DB join between all the tables in the denial constraint dict.
         When there are shared columns join natural inner join, otherwise, cross join.
 
@@ -123,7 +124,7 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
         legal_assignments = self.join_tables(self._denial_constraint_dict)
 
         # Extract the committee members sets out of the resulted join.
-        self._denial_constraint_candidates_df = legal_assignments[self._committee_members_list]
+        self._denial_constraint_candidates_df = legal_assignments[self._committee_members_list] - 1
 
         config.debug_print(MODULE_NAME,
                            f"The denial constraints candidates are: {self._denial_constraint_candidates_df}.")

@@ -45,6 +45,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._model_voters_approval_candidates_sum_variables = dict()
         self._lifted_voters = dict()
         self._lifted_setting = False
+        self._global_counter = 0
 
     def get_model_state(self) -> str:
         """Creates a representation for the model current state.
@@ -114,6 +115,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                         self._lifted_voters[i].append(j)
                         l1.remove(j)
             config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}")
+        # TODO: Save the number of voters combined into one
+        #  on the lifted inference into the experiment data.
 
         self._define_abc_setting_variables()
         self._define_abc_setting_constraints()
@@ -203,10 +206,31 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                 denial_candidates_sets.add(frozenset(current_set))
 
         for candidates_set in denial_candidates_sets:
-            # We check if (i+1) in candidates set, because the ids are 1 to m, and the variables are 0 to m-1.
             self._model.Add(
-                sum([x for i, x in enumerate(self._model_candidates_variables) if (i + 1) in candidates_set])
+                sum([x for i, x in enumerate(self._model_candidates_variables) if i in candidates_set])
                 <= (row_length - 1))
+
+    def define_tgd_constraint(self, element_members_representor_sets: list):
+        for element_members, tgd_representor_set in element_members_representor_sets:
+            # Whether element_members chosen or not.
+            b = self._model.BoolVar('tgd_b_' + str(self._global_counter))
+            self._global_counter += 1
+            self._model.Add(
+                sum([self._model_candidates_variables[x] for x in element_members])
+                <= (b - 1 + len(element_members)))
+
+            # List of possible representor.
+            b_representor_list = []
+            for representor in tgd_representor_set:
+                current_b = self._model.BoolVar('tgd_b_' + str(self._global_counter))
+                self._global_counter += 1
+                b_representor_list.append(current_b)
+                self._model.Add(
+                    sum([self._model_candidates_variables[x] for x in representor])
+                    >= (current_b * len(representor)))
+
+            # If b chosen, chose at least one representor.
+            self._model.Add(sum([x for x in b_representor_list]) >= b)
 
 
 if __name__ == '__main__':
@@ -310,5 +334,123 @@ if __name__ == '__main__':
         print(str(ilp_convertor))
         exit(1)
     # ----------------------------------------------------------------
+    # Adding denial constraints.
+    # ----------------------------------------------------------------
+    # Define the ILP solver.
+    SOLVER = pywraplp.Solver.CreateSolver("SAT")
+    if not SOLVER:
+        print("ERROR: Creating solver failed.")
+        exit(1)
+    # ----------------------------------------------------------------
+    # Convert to ILP domain.
+    ilp_convertor = ABCToILPConvertor(SOLVER)
+    data = {'Column1': [4, 3, 1],
+            'Column2': [1, 2, 3]}
+    denial_df = pd.DataFrame(data)
+    print("The denial constraints candidates are:")
+    print(denial_df)
+
+    ilp_convertor.define_abc_setting(CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+                                     APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
+                                     THIELE_SCORE_FUNCTION, False)
+    ilp_convertor.define_denial_constraint(denial_df)
+    # ----------------------------------------------------------------
+    # Solve the ILP problem.
+    ilp_convertor.solve()
+    # ----------------------------------------------------------------
+    # Test and print.
+    EXPECTED_RESULT = \
+        "Candidate id: 0, Candidate value: 1.0.\n" \
+        "Candidate id: 1, Candidate value: 1.0.\n" \
+        "Candidate id: 2, Candidate value: 1.0.\n" \
+        "Candidate id: 3, Candidate value: 0.0.\n" \
+        "Candidate id: 4, Candidate value: 0.0.\n" \
+        "Voter id: 0, Voter approval sum: 2.0.\n" \
+        "Voter id: 1, Voter approval sum: 1.0.\n" \
+        "Voter id: 2, Voter approval sum: 1.0.\n" \
+        "Voter id: 3, Voter approval sum: 0.0.\n" \
+        "Voter id: 4, Voter approval sum: 2.0.\n" \
+        "Voter id: 5, Voter approval sum: 1.0.\n" \
+        "Voter id: 6, Voter approval sum: 2.0.\n" \
+        "Voter id: 7, Voter approval sum: 1.0.\n" \
+        "Voter id: 0, Voter contribution: 2.0.\n" \
+        "Voter id: 1, Voter contribution: 1.0.\n" \
+        "Voter id: 2, Voter contribution: 1.0.\n" \
+        "Voter id: 3, Voter contribution: 0.0.\n" \
+        "Voter id: 4, Voter contribution: 2.0.\n" \
+        "Voter id: 5, Voter contribution: 1.0.\n" \
+        "Voter id: 6, Voter contribution: 2.0.\n" \
+        "Voter id: 7, Voter contribution: 1.0.\n"
+    if EXPECTED_RESULT != str(ilp_convertor):
+        print("ERROR: The solution is different than expected.")
+        print(str(ilp_convertor))
+        exit(1)
+    # ----------------------------------------------------------------
+    # Adding TGD Constraints.
+    # ----------------------------------------------------------------
+    # Define the ILP solver.
+    SOLVER = pywraplp.Solver.CreateSolver("SAT")
+    if not SOLVER:
+        print("ERROR: Creating solver failed.")
+        exit(1)
+    # ----------------------------------------------------------------
+    # Convert to ILP domain.
+    ilp_convertor = ABCToILPConvertor(SOLVER)
+
+    candidates_set_start = {1}
+
+    option_1 = {2, 4}
+    option_2 = {3, 4}
+    candidates_set_end = [option_1, option_2]
+
+    candidates_set_start_2 = {2}
+
+    option_1_2 = {0, 1}
+    candidates_set_end_2 = [option_1_2]
+
+    represent_sets = [(candidates_set_start, candidates_set_end), (candidates_set_start_2, candidates_set_end_2)]
+    print("The represent TGD input is:")
+    print(represent_sets)
+
+    ilp_convertor.define_abc_setting(CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+                                     APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
+                                     THIELE_SCORE_FUNCTION, False)
+    ilp_convertor.define_tgd_constraint(represent_sets)
+    # ----------------------------------------------------------------
+    # Solve the ILP problem.
+    ilp_convertor.solve()
+    # ----------------------------------------------------------------
+    # Test and print.
+    EXPECTED_RESULT = \
+        "Candidate id: 0, Candidate value: 0.0.\n" \
+        "Candidate id: 1, Candidate value: 1.0.\n" \
+        "Candidate id: 2, Candidate value: 0.0.\n" \
+        "Candidate id: 3, Candidate value: 1.0.\n" \
+        "Candidate id: 4, Candidate value: 1.0.\n" \
+        "Voter id: 0, Voter approval sum: 1.0.\n" \
+        "Voter id: 1, Voter approval sum: 1.0.\n" \
+        "Voter id: 2, Voter approval sum: 2.0.\n" \
+        "Voter id: 3, Voter approval sum: 1.0.\n" \
+        "Voter id: 4, Voter approval sum: 1.0.\n" \
+        "Voter id: 5, Voter approval sum: 1.0.\n" \
+        "Voter id: 6, Voter approval sum: 1.0.\n" \
+        "Voter id: 7, Voter approval sum: 1.0.\n" \
+        "Voter id: 0, Voter contribution: 1.0.\n" \
+        "Voter id: 1, Voter contribution: 1.0.\n" \
+        "Voter id: 2, Voter contribution: 2.0.\n" \
+        "Voter id: 3, Voter contribution: 1.0.\n" \
+        "Voter id: 4, Voter contribution: 1.0.\n" \
+        "Voter id: 5, Voter contribution: 1.0.\n" \
+        "Voter id: 6, Voter contribution: 1.0.\n" \
+        "Voter id: 7, Voter contribution: 1.0.\n"
+    if EXPECTED_RESULT != str(ilp_convertor):
+        print("ERROR: The solution is different than expected.")
+        print(str(ilp_convertor))
+        exit(1)
+    # ----------------------------------------------------------------
+
     print("Sanity tests for thiele_rule_ilp module done successfully.")
     print("---------------------------------------------------------")
+
+    # TODO: Test denial constraints in extractor.
+    # TODO: Test no constraints in extractor.

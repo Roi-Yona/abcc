@@ -42,6 +42,8 @@ class DBDataExtractor:
         # Convert to ILP problem (add the model properties)
         self.convert_to_ilp()
 
+    # TODO: Consider put join tables here.
+
 
 if __name__ == '__main__':
     pass

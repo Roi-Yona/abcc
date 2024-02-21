@@ -37,6 +37,8 @@ class ILPConvertor:
         pass
 
     def __str__(self):
+        """Creates a str depending only on the solver state function if solver,
+        otherwise the solver status"""
         solution = ""
         if self._solved:
             solution = self.get_model_state()

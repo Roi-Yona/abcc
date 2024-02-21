@@ -95,20 +95,41 @@ def create_candidates_table():
     cur.execute("DELETE FROM candidates where rowid IN (Select rowid from candidates limit 1);")
 
 
+def create_example_db(cur):
+    # Create the table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS movies (
+                        movie_id INTEGER PRIMARY KEY,
+                        genres TEXT NOT NULL,
+                        adult TEXT NOT NULL)''')
+    # Insert multiple rows into the table
+    new_data = [
+        (1, 'action', "false"),
+        (2, 'comedy', "true"),
+        (3, 'action', "true"),
+        (4, 'action', "false"),
+        (5, 'drama', "true"),
+        (6, 'action', "false"),
+        (7, 'comedy', "false"),
+    ]
+    cur.executemany("INSERT INTO movies VALUES (?, ?, ?)", new_data)
+
+
 if __name__ == '__main__':
     # Connect the db in the current working directory,
     # implicitly creating one if it does not exist.
-    con = sqlite3.connect('the_movies_database.db')
+    # con = sqlite3.connect('the_movies_database.db')
+    con = sqlite3.connect('the_movies_database_tests.db')
 
     # Creating a curser.
     cur = con.cursor()
 
     # Create the wanted table.
+    create_example_db(cur)
 
-    cur.execute("DROP TABLE candidates;")
-    create_candidates_table()
-    cur.execute("DROP TABLE voting;")
-    create_voting_table()
+    # cur.execute("DROP TABLE candidates;")
+    # create_candidates_table()
+    # cur.execute("DROP TABLE voting;")
+    # create_voting_table()
 
     # Committing changes
     con.commit()

@@ -81,9 +81,7 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         for voter_id in range(0, self._voters_group_size):
             self._approval_profile[voter_id] = set()
         for voter_id, candidates_ids_df in grouped_by_voter_id_column:
-            # The 1 subtraction is because we denote the i voter in the i-1 cell
-            # (the voters id's starts from 1 in the db).
-            self._approval_profile[voter_id - 1] = set(candidates_ids_df[self._candidates_column_name] - 1)
+            self._approval_profile[voter_id] = set(candidates_ids_df[self._candidates_column_name]-1)
         config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
         # ----------------------------------------------
 
