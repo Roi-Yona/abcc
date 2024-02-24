@@ -12,29 +12,23 @@ class TGDDBDataExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
-
                  tgd_constraint_dict_start: dict,
                  committee_members_list_start: list,
-
                  tgd_constraint_dict_end: dict,
                  committee_members_list_end: list,
-
                  candidates_tables_start: list,
                  candidates_tables_end: list,
                  committee_size: int,
                  voters_size_limit: int,
                  candidates_size_limit: int,
-
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
                  ):
 
-        super().__init__(abc_convertor, database_engine)
+        super().__init__(abc_convertor, database_engine, candidates_column_name, candidates_size_limit)
 
         self._committee_size = committee_size
         self._voters_size_limit = voters_size_limit
-        self._candidates_size_limit = candidates_size_limit
-        self._candidates_column_name = candidates_column_name
         self._voters_column_name = voters_column_name
 
         self._tgd_constraint_dict_start = tgd_constraint_dict_start
@@ -45,100 +39,6 @@ class TGDDBDataExtractor(db_data_extractor.DBDataExtractor):
         self._candidates_tables_start = candidates_tables_start
         self._candidates_tables_end = candidates_tables_end
         self._representor_sets = None
-
-    def join_tables(self, candidates_tables: list, tables_dict: dict, constants=None) -> pd.DataFrame:
-        """Extract from the DB a join between all the tables in the tables list.
-        An input tables list example:
-        tables_dict[('candidates', 't1')] = [('x', 'user_id'), ... ]
-        When there are shared columns join natural inner join, otherwise, cross join.
-
-        :param constants:
-        :param tables_dict:
-        :return: The resulted df of the join operation,
-        with names given to the table dict.
-        """
-
-        if constants is None:
-            constants = dict()
-        variables_dict = dict()
-        for table_name_tuple, variables in tables_dict.items():
-            for var in variables:
-                if var[0] not in variables_dict:
-                    variables_dict[var[0]] = []
-                    variables_dict[var[0]].append(table_name_tuple[1])
-                else:
-                    variables_dict[var[0]].append(table_name_tuple[1])
-
-        # Create From phrase.
-        from_phrase = 'FROM '
-        for table_name_tuple in tables_dict:
-            from_phrase += f"{table_name_tuple[0]} AS {table_name_tuple[1]}, "
-        from_phrase = from_phrase[:len(from_phrase) - 2]
-        from_phrase += '\n'
-
-        # Create Select phrase.
-        select_phrase = 'SELECT DISTINCT '
-        for var, table_names in variables_dict.items():
-            table_var_name = None
-            for x, y in tables_dict.items():
-                if x[1] == table_names[0]:
-                    for z in y:
-                        if z[0] == var:
-                            table_var_name = z[1]
-                            break
-            select_phrase += f"{table_names[0]}.{table_var_name} AS {var}, "
-        select_phrase = select_phrase[:len(select_phrase) - 2]
-        select_phrase += '\n'
-
-        # Create  Where phrase.
-        where_phrase = 'WHERE '
-        for var, table_names in variables_dict.items():
-            for i in range(0, len(table_names) - 1, 2):
-                table_var_name = None
-                for x, y in tables_dict.items():
-                    if x[1] == table_names[i]:
-                        for z in y:
-                            if z[0] == var:
-                                table_var_name = z[1]
-                                break
-                table_var_name2 = None
-                for x, y in tables_dict.items():
-                    if x[1] == table_names[i + 1]:
-                        for z in y:
-                            if z[0] == var:
-                                table_var_name2 = z[1]
-                                break
-                if i == len(table_names) - 2:
-                    where_phrase += f"{table_names[i]}.{table_var_name} = " \
-                                    f"{table_names[i + 1]}.{table_var_name2}"
-                else:
-                    where_phrase += f"{table_names[i]}.{table_var_name} = " \
-                                    f"{table_names[i + 1]}.{table_var_name2} AND "
-
-        for table_name in candidates_tables:
-            if where_phrase != "WHERE ":
-                where_phrase += "AND"
-            where_phrase += f" {table_name}.{self._candidates_column_name} <= {self._candidates_size_limit}"
-
-        for constant_name, constant_value in constants.items():
-            for t_name, t_list in tables_dict.items():
-                for var_col_tuple in t_list:
-                    if var_col_tuple[0] == constant_name:
-                        str_val = str(constant_value)
-                        if not str_val.isdigit():
-                            str_val = f"\"{str_val}\""
-                        where_phrase += f" AND {t_name[1]}.{var_col_tuple[1]}={str_val}"
-
-        where_phrase += '\n'
-        if where_phrase.replace(" ", "").replace("\n", "") == "WHERE":
-            where_phrase = ""
-
-        config.debug_print(MODULE_NAME,
-                           "The extract data SQL phrase is: \n" + select_phrase + from_phrase + where_phrase)
-        legal_assignments = self._db_engine.run_query(select_phrase + from_phrase + where_phrase)
-        config.debug_print(MODULE_NAME,
-                           "The legal assignments are: \n" + str(legal_assignments))
-        return legal_assignments
 
     def _extract_data_from_db(self) -> None:
         """
@@ -186,22 +86,22 @@ if __name__ == '__main__':
     _solver = ilp_con.create_solver("SAT", 100)
     _abc_convertor = ilp_convertor.ABCToILPConvertor(_solver)
 
-    tgd_constraint_dict_start = dict()
-    tgd_constraint_dict_start['movies', 't1'] = [('x', 'genres')]
-    committee_members_list_start = []
+    _tgd_constraint_dict_start = dict()
+    _tgd_constraint_dict_start['movies', 't1'] = [('x', 'genres')]
+    _committee_members_list_start = []
 
-    tgd_constraint_dict_end = dict()
-    tgd_constraint_dict_end['movies', 't2'] = [('c1', 'movie_id'), ('x', 'genres')]
-    candidates_tables = ['t2']
-    committee_members_list_end = ['c1']
+    _tgd_constraint_dict_end = dict()
+    _tgd_constraint_dict_end['movies', 't2'] = [('c1', 'movie_id'), ('x', 'genres')]
+    _candidates_tables = ['t2']
+    _committee_members_list_end = ['c1']
 
     tgd_extractor = TGDDBDataExtractor(_abc_convertor, _db_engine,
-                                       tgd_constraint_dict_start,
-                                       committee_members_list_start,
-                                       tgd_constraint_dict_end,
-                                       committee_members_list_end,
+                                       _tgd_constraint_dict_start,
+                                       _committee_members_list_start,
+                                       _tgd_constraint_dict_end,
+                                       _committee_members_list_end,
                                        [],
-                                       candidates_tables,
+                                       _candidates_tables,
                                        3, 15, 7,
                                        candidates_column_name='movie_id')
     tgd_extractor._extract_data_from_db()

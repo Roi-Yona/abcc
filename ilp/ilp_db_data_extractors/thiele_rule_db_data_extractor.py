@@ -21,7 +21,7 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
                  voters_column_name='voter_id',
                  approval_column_name='rating',
                  lifted_setting=True):
-        super().__init__(abc_convertor, database_engine)
+        super().__init__(abc_convertor, database_engine, candidates_column_name, candidates_size_limit)
 
         # Initializing ABC setting variables.
         self._candidates_group_size = 0
@@ -30,13 +30,11 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         self._committee_size = committee_size
         self._thiele_function = thiele_rule_function
         self._voters_size_limit = voters_size_limit
-        self._candidates_size_limit = candidates_size_limit
         self._lifted_setting = lifted_setting
 
         # Initializing DB properties.
         self._voting_table_name = voting_table_name
         self._candidates_table_name = candidates_table_name
-        self._candidates_column_name = candidates_column_name
         self._voters_column_name = voters_column_name
         self._approval_column_name = approval_column_name
 
