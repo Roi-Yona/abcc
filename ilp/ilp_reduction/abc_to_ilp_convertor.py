@@ -34,6 +34,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._approval_profile = {}
         self._committee_size = 0
         self._voters_group = set()
+        self.lifted_voters_group_size = 0
 
         # The voting rule.
         self._thiele_score_function = {}
@@ -114,9 +115,10 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                     if approval_profile[i] == approval_profile[j]:
                         self._lifted_voters[i].append(j)
                         l1.remove(j)
+            self.lifted_voters_group_size = len(self._lifted_voters)
             config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}")
-        # TODO: Save the number of voters combined into one
-        #  on the lifted inference into the experiment data.
+        else:
+            self.lifted_voters_group_size = len(self._voters_group)
 
         self._define_abc_setting_variables()
         self._define_abc_setting_constraints()
