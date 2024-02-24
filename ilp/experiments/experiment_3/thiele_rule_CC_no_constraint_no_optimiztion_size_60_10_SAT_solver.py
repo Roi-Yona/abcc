@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join('..', '..', '..'))
-import ilp.experiments.thiele_rule_experiment as thiele_rule_experiment
+import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
 
 if __name__ == '__main__':
@@ -26,10 +26,12 @@ if __name__ == '__main__':
     _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     # Run the experiment.
-    thiele_rule_experiment.thiele_rule_experiment_runner(_experiment_name, _database_name,
-                                                         _solver_time_limit,
-                                                         _solver_name,
-                                                         _committee_size, _candidates_size_limit,
-                                                         _thiele_rule_function_creator,
-                                                         _voting_table_name, _lifted_inference)
+    combined_constraints_experiment. \
+        combined_constraints_experiment_runner(_experiment_name, _database_name,
+                                               _solver_time_limit,
+                                               _solver_name,
+                                               [], [],
+                                               _committee_size, _candidates_size_limit,
+                                               _thiele_rule_function_creator,
+                                               _voting_table_name, _lifted_inference)
     # ---------------------------------------------------------------------------
