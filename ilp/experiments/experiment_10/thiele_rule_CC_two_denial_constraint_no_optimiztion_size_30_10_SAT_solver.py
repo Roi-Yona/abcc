@@ -1,6 +1,8 @@
+import sys
+import os
+sys.path.append(os.path.join('..', '..', '..'))
 import ilp.experiments.denial_consatraint_experiment as denial_constraint_experiment
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
-from ortools.sat.python import cp_model
 
 if __name__ == '__main__':
     # Experiments----------------------------------------------------------------
@@ -15,11 +17,12 @@ if __name__ == '__main__':
 
     # Define the experiment - CC Thiele Rule:
     # ---------------------------------------------------------------------------
+    _experiment_number = 10
     _thiele_rule_name = 'CC Thiele Rule'
     _lifted_inference = False
-    _experiment_name = f'{_thiele_rule_name} Lifted Inference={_lifted_inference} ' \
+    _experiment_name = f'exp{_experiment_number} {_thiele_rule_name} Lifted Inference={_lifted_inference} ' \
                        f'candidate_size={_candidates_size_limit} committee_size={_committee_size} ' \
-                       f'solver_name={_solver_name} one Denial Constraint'
+                       f'solver_name={_solver_name} two Denial Constraint'
     _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
 
     _denial_constraint_dict = dict()
@@ -33,7 +36,8 @@ if __name__ == '__main__':
     _denial_constraint_dict2[('candidates', 't2')] = [('c2', 'candidate_id'), ('x', 'spoken_languages')]
     _committee_members_list2 = ['c1', 'c2']
     _candidates_tables2 = ['t1', 't2']
-    denial_constraint_parameters = [(_denial_constraint_dict2, _committee_members_list2, _candidates_tables2)]
+    denial_constraint_parameters = [(_denial_constraint_dict2, _committee_members_list2, _candidates_tables2)
+                                    ]
 
     # Run the experiment.
     denial_constraint_experiment.denial_constraint_experiment_runner(_experiment_name, _database_name,
