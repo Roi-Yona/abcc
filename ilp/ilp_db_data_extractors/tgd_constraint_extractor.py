@@ -19,13 +19,15 @@ class TGDDBDataExtractor(db_data_extractor.DBDataExtractor):
                  candidates_tables_start: list,
                  candidates_tables_end: list,
                  committee_size: int,
+                 candidates_starting_point: int,
                  voters_size_limit: int,
                  candidates_size_limit: int,
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
                  ):
 
-        super().__init__(abc_convertor, database_engine, candidates_column_name, candidates_size_limit)
+        super().__init__(abc_convertor, database_engine,
+                         candidates_column_name, candidates_starting_point, candidates_size_limit)
 
         self._committee_size = committee_size
         self._voters_size_limit = voters_size_limit
@@ -59,7 +61,7 @@ class TGDDBDataExtractor(db_data_extractor.DBDataExtractor):
             legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_constraint_dict_end,
                                                      constants)
             for _, r in legal_assignments_end.iterrows():
-                current_element_representor_list.append(set(r[self._committee_members_list_end] - 1))
+                current_element_representor_list.append(set(r[self._committee_members_list_end]))
 
             representor_sets.append((current_element_committee_members, current_element_representor_list))
 
@@ -102,10 +104,10 @@ if __name__ == '__main__':
                                        _committee_members_list_end,
                                        [],
                                        _candidates_tables,
-                                       3, 15, 7,
+                                       3, 0, 15, 7,
                                        candidates_column_name='movie_id')
     tgd_extractor._extract_data_from_db()
-    if "[(set(), [{0}, {2}, {3}, {5}]), (set(), [{1}, {6}]), (set(), [{4}])]" != str(tgd_extractor._representor_sets):
+    if "[(set(), [{1}, {3}, {4}, {6}]), (set(), [{2}, {7}]), (set(), [{5}])]" != str(tgd_extractor._representor_sets):
         print("ERROR: The solution is different than expected.")
         print(str(ilp_convertor))
         exit(1)
@@ -113,3 +115,4 @@ if __name__ == '__main__':
 
     print("Sanity tests for tgd extractor module done successfully.")
     print("---------------------------------------------------------")
+    # TODO: Expend this ut to starting and ending point

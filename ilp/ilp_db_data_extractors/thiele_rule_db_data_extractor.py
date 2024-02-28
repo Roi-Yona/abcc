@@ -12,6 +12,8 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
                  committee_size: int,
+                 voters_starting_point: int,
+                 candidates_starting_point: int,
                  voters_size_limit: int,
                  candidates_size_limit: int,
                  thiele_rule_function: dict,
@@ -21,15 +23,17 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
                  voters_column_name='voter_id',
                  approval_column_name='rating',
                  lifted_setting=True):
-        super().__init__(abc_convertor, database_engine, candidates_column_name, candidates_size_limit)
+        super().__init__(abc_convertor, database_engine,
+                         candidates_column_name, candidates_starting_point, candidates_size_limit)
 
         # Initializing ABC setting variables.
-        self._candidates_group_size = 0
-        self._voters_group_size = 0
+        self._voters_starting_point = voters_starting_point
+        self._voters_size_limit = voters_size_limit
+        self._candidates_ending_point = self._candidates_starting_point + self._candidates_size_limit
+        self._voters_ending_point = self._voters_starting_point + self._voters_size_limit
         self._approval_profile = dict()
         self._committee_size = committee_size
         self._thiele_function = thiele_rule_function
-        self._voters_size_limit = voters_size_limit
         self._lifted_setting = lifted_setting
 
         # Initializing DB properties.
@@ -43,50 +47,53 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
 
     def _extract_data_from_db(self) -> None:
         # ----------------------------------------------
-        # Extract candidates group size.
+        # Extract candidates ending point.
         sql_query = f"SELECT DISTINCT {self._candidates_column_name} FROM {self._candidates_table_name} " \
-                    f"WHERE {self._candidates_column_name} <= {self._candidates_size_limit};"
+                    f"WHERE {self._candidates_column_name} " \
+                    f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
         # candidates_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
         candidates_id_columns = self._db_engine.run_query(sql_query)
-        if len(candidates_id_columns) == 0:
-            self._candidates_group_size = 0
-        else:
-            self._candidates_group_size = int(candidates_id_columns.max().iloc[0])
-        if self._committee_size > self._candidates_group_size:
+        self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
+        if self._committee_size > len(candidates_id_columns):
             config.debug_print(MODULE_NAME, "Note: Candidates group size is lower then committee size, \n"
                                             "due to missing candidates in the data.")
         config.debug_print(MODULE_NAME, f"The candidates id columns are:\n{str(candidates_id_columns.head())}\n"
-                                        f"The number of candidates is {self._candidates_group_size}.")
+                                        f"The number of candidates is {len(candidates_id_columns)}.")
         # ----------------------------------------------
-        # Extract voters group size.
+        # Extract voters ending point.
         sql_query = f"SELECT DISTINCT {self._voters_column_name} FROM {self._voting_table_name} " \
-                    f"WHERE {self._voters_column_name} <= {self._voters_size_limit};"
+                    f"WHERE {self._voters_column_name} " \
+                    f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point};"
         # voters_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
         voters_id_columns = self._db_engine.run_query(sql_query)
-        self._voters_group_size = int(voters_id_columns.max().iloc[0])
+        self._voters_ending_point = int(voters_id_columns.max().iloc[0])
         config.debug_print(MODULE_NAME, f"The voters id columns are:\n{str(voters_id_columns.head())}\n"
-                                        f"The number of voters is {str(self._voters_group_size)}.")
+                                        f"The number of voters is {len(voters_id_columns)}.")
         # ----------------------------------------------
         # Extract approval profile.
         sql_query = f"SELECT DISTINCT {self._voters_column_name}, {self._candidates_column_name} " \
                     f"FROM {self._voting_table_name} " \
                     f"WHERE {self._approval_column_name} > {str(self._approval_threshold)} " \
-                    f"AND {self._voters_column_name} <= {self._voters_size_limit} " \
-                    f"AND {self._candidates_column_name} <= {self._candidates_size_limit};"
+                    f"AND {self._voters_column_name} " \
+                    f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point} " \
+                    f"AND {self._candidates_column_name} " \
+                    f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
         # voter_rating_columns = db_interface.database_run_query(self._db_engine, sql_query)
         voter_rating_columns = self._db_engine.run_query(sql_query)
         grouped_by_voter_id_column = voter_rating_columns.groupby(by=self._voters_column_name)
-        for voter_id in range(0, self._voters_group_size):
+        for voter_id in range(0, self._voters_ending_point):
             self._approval_profile[voter_id] = set()
         for voter_id, candidates_ids_df in grouped_by_voter_id_column:
-            self._approval_profile[voter_id] = set(candidates_ids_df[self._candidates_column_name]-1)
+            self._approval_profile[voter_id] = set(candidates_ids_df[self._candidates_column_name])
         config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
         # ----------------------------------------------
 
     def _convert_to_ilp(self) -> None:
         self._abc_convertor.define_abc_setting(
-            self._candidates_group_size,
-            self._voters_group_size,
+            self._candidates_starting_point,
+            self._voters_starting_point,
+            self._candidates_ending_point,
+            self._voters_ending_point,
             self._approval_profile,
             self._committee_size,
             self._thiele_function,
@@ -95,3 +102,4 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
 
 if __name__ == '__main__':
     pass
+# TODO: Add ut for this module

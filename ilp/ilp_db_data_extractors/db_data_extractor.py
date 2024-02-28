@@ -13,6 +13,7 @@ class DBDataExtractor:
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
                  candidates_column_name: str,
+                 candidates_starting_point: int,
                  candidates_size_limit: int):
         self._abc_convertor = abc_convertor
         self._db_engine = database_engine
@@ -20,6 +21,7 @@ class DBDataExtractor:
         self.extract_data_timer = -1
         self._candidates_column_name = candidates_column_name
         self._candidates_size_limit = candidates_size_limit
+        self._candidates_starting_point = candidates_starting_point
 
     def join_tables(self, candidates_tables: list, tables_dict: dict, constants=None) -> pd.DataFrame:
         """Extract from the DB a join between all the tables in the tables list.
@@ -27,6 +29,7 @@ class DBDataExtractor:
         tables_dict[('candidates', 't1')] = [('x', 'user_id'), ... ]
         When there are shared columns join natural inner join, otherwise, cross join.
 
+        :param candidates_tables:
         :param constants:
         :param tables_dict:
         :return: The resulted df of the join operation,
@@ -93,7 +96,9 @@ class DBDataExtractor:
         for table_name in candidates_tables:
             if where_phrase != "WHERE ":
                 where_phrase += " AND"
-            where_phrase += f" {table_name}.{self._candidates_column_name} <= {self._candidates_size_limit}"
+            where_phrase += f" {table_name}.{self._candidates_column_name} " \
+                            f"BETWEEN {self._candidates_starting_point} AND " \
+                            f"{self._candidates_starting_point + self._candidates_size_limit}"
 
         for constant_name, constant_value in constants.items():
             for t_name, t_list in tables_dict.items():
@@ -142,9 +147,8 @@ class DBDataExtractor:
         # Convert to ILP problem (add the model properties)
         self.convert_to_ilp()
 
-    # TODO: Consider put join tables here.
 
 
 if __name__ == '__main__':
     pass
-
+    # TODO: Add ut to the join tables function.

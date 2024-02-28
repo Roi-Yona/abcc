@@ -1,10 +1,3 @@
-# TODO:
-#  Create a general experiment,
-#  enabling to constraint a general number of both
-#  TGD and DC constraints.
-
-# TODO: After doing so, remove the redundant modules and their use cases.
-
 import sys
 import os
 
@@ -25,6 +18,7 @@ TICK_EXPERIMENT_RANGE = 20000
 
 # TODO: Consider creating a class representing denial constraint.
 # TODO: Consider creating a class representing TGD constraint.
+# TODO: Fix this file starting point and end point. And all of this file usages.
 
 
 class CombinedConstraintsExperiment(experiment.Experiment):
@@ -44,7 +38,10 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  tgd_constraints: list,
 
                  # ABC settings:
-                 committee_size: int, voters_size_limit: int, candidates_size_limit: int,
+                 committee_size: int,
+                 voters_starting_point: int,
+                 candidates_starting_point: int,
+                 voters_size_limit: int, candidates_size_limit: int,
                  thiele_rule_function_creator,
                  voting_table_name='voting',
                  candidates_table_name='candidates',
@@ -54,7 +51,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  lifted_inference=False):
 
         super().__init__(experiment_name, database_name, solver_time_limit, solver_name)
-
+        self._candidates_starting_point = candidates_starting_point
+        self._voters_starting_point = voters_starting_point
         self._voters_group_size = voters_size_limit
         self._candidates_group_size = candidates_size_limit
         self._committee_size = committee_size
@@ -69,7 +67,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             self._denial_constraint_db_extractors.append(denial_constraint_extractor.DenialConstraintDBDataExtractor(
                 self._abc_convertor, self._db_engine,
                 local_denial_constraint_dict, local_committee_members_list, local_candidates_tables,
-                committee_size, voters_size_limit, candidates_size_limit, candidates_column_name, voters_column_name))
+                committee_size, candidates_starting_point, voters_size_limit, candidates_size_limit,
+                candidates_column_name, voters_column_name))
 
         self._tgd_constraint_db_extractors = []
         for param_tuples in tgd_constraints:
@@ -85,11 +84,12 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                 local_tgd_constraint_dict_start, local_committee_members_list_start,
                 local_tgd_constraint_dict_end, local_committee_members_list_end,
                 local_candidates_tables_start, local_candidates_tables_end,
-                committee_size, voters_size_limit, candidates_size_limit, candidates_column_name, voters_column_name))
+                committee_size, candidates_starting_point, voters_size_limit, candidates_size_limit,
+                candidates_column_name, voters_column_name))
 
         self._av_db_data_extractor = thiele_rule_db_data_extractor.ThieleRuleDBDataExtractor(
             self._abc_convertor, self._db_engine,
-            committee_size, voters_size_limit, candidates_size_limit,
+            committee_size, voters_starting_point, candidates_starting_point, voters_size_limit, candidates_size_limit,
             thiele_rule_function_creator(committee_size + 1),
             voting_table_name, candidates_table_name, candidates_column_name, voters_column_name, approval_column_name,
             lifted_inference)
@@ -110,7 +110,9 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         self._voters_group_size = self._av_db_data_extractor._abc_convertor._voters_group_size
 
         # Save the results.
-        new_result = {'voters_group_size': self._voters_group_size,
+        new_result = {'candidates_starting_point': self._candidates_starting_point,
+                      'voters_starting_point': self._voters_starting_point,
+                      'voters_group_size': self._voters_group_size,
                       'lifted_voters_group_size': self._abc_convertor.lifted_voters_group_size,
                       'candidates_group_size': self._candidates_group_size,
                       'committee_size': self._committee_size,
@@ -139,6 +141,8 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                            denial_constraints: list,
                                            tgd_constraints: list,
                                            committee_size: int,
+                                           voters_starting_point: int,
+                                           candidates_starting_point: int,
                                            candidates_size_limit: int,
                                            thiele_rule_function_creator,
                                            voting_table_name: str,
@@ -146,13 +150,17 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
     experiments_results = pd.DataFrame()
 
     for voters_size_limit in range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE):
-        config.debug_print(MODULE_NAME, f"voters_group_size={voters_size_limit}\n"
+        config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
+                                        f"voters_starting_poing={voters_starting_point}\n"
+                                        f"voters_group_size={voters_size_limit}\n"
                                         f"candidates_group_size={candidates_size_limit}\n"
                                         f"committee_size={committee_size}")
         cc_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
                                                       solver_time_limit, solver_name,
                                                       denial_constraints, tgd_constraints,
-                                                      committee_size, voters_size_limit, candidates_size_limit,
+                                                      committee_size,
+                                                      voters_starting_point, candidates_starting_point,
+                                                      voters_size_limit, candidates_size_limit,
                                                       thiele_rule_function_creator,
                                                       voting_table_name, lifted_inference=lifted_inference)
         experiments_results = experiment.save_result(experiments_results, cc_experiment.run_experiment())
@@ -167,6 +175,8 @@ if __name__ == '__main__':
 
     _candidates_size_limit = 30
     _committee_size = 10
+    _voters_starting_point = 40
+    _candidates_starting_point = 38
 
     _voting_table_name = 'voting'
 
@@ -224,7 +234,10 @@ if __name__ == '__main__':
                                            _solver_time_limit,
                                            _solver_name,
                                            [], _tgd_constraints,
-                                           _committee_size, _candidates_size_limit,
+                                           _committee_size,
+                                           _voters_starting_point, _candidates_starting_point,
+                                           _candidates_size_limit,
                                            _thiele_rule_function_creator,
                                            _voting_table_name, _lifted_inference)
     # ---------------------------------------------------------------------------
+    # TODO: Add ut to this module.

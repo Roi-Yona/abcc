@@ -29,6 +29,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         super().__init__(solver)
 
         # ABC data.
+        self._candidates_group_starting_point = 0
+        self._voters_group_starting_point = 0
         self._candidates_group_size = 0
         self._voters_group_size = 0
         self._approval_profile = {}
@@ -41,7 +43,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._max_thiele_function_value = 0
 
         # The model variables.
-        self._model_candidates_variables = []
+        self._model_candidates_variables = dict()
         self._model_voters_score_contribution_variables = dict()
         self._model_voters_approval_candidates_sum_variables = dict()
         self._lifted_voters = dict()
@@ -54,7 +56,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         :return: A string that represents the ABC problem assignment.
         """
         solution = f""
-        for key, value in enumerate(self._model_candidates_variables):
+        for key, value in self._model_candidates_variables.items():
             solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
         for key, value in self._model_voters_approval_candidates_sum_variables.items():
             solution += f"Voter id: {key}, Voter approval sum: {value.solution_value()}.\n"
@@ -62,10 +64,15 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             solution += f"Voter id: {key}, Voter contribution: {value.solution_value()}.\n"
         return solution
 
-    def define_abc_setting(self, candidates_group_size: int, voters_group_size: int, approval_profile: dict,
-                           committee_size: int, thiele_score_function: dict, lifted_setting: bool) -> None:
+    def define_abc_setting(self,
+                           candidates_group_starting_point: int,
+                           voters_group_starting_point: int,
+                           candidates_group_size: int, voters_group_size: int, approval_profile: dict,
+                           committee_size: int, thiele_score_function: dict, lifted_setting: bool,
+                           ) -> None:
         """Set and convert to ILP the ABC problem setting, including the thiele score function.
-
+        :param candidates_group_starting_point: The starting id for the candidates group.
+        :param voters_group_starting_point: The starting id for the voters group.
         :param candidates_group_size:    The input candidates group size.
         :param voters_group_size:        The input voters group size.
         :param approval_profile:         A dict the is key is the voter id,
@@ -76,6 +83,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         :param lifted_setting            A flag indicate whether to use lifted inference optimization setting or not.
         """
         # ABC data.
+        self._candidates_group_starting_point = candidates_group_starting_point
+        self._voters_group_starting_point = voters_group_starting_point
         self._candidates_group_size = candidates_group_size
         self._voters_group_size = voters_group_size
         self._approval_profile = approval_profile
@@ -87,12 +96,15 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             if len(profile_set) != 0:
                 self._voters_group.add(voter_id)
 
-        debug_message = f"Candidates group size = {self._candidates_group_size}.\n" \
+        debug_message = f"Voters starting id = {self._voters_group_starting_point}.\n" \
+                        f"Candidates starting id = {self._candidates_group_starting_point}.\n" \
+                        f"Candidates group size = {self._candidates_group_size}.\n" \
                         f"Voters Group size = {self._voters_group_size}.\n" \
                         f"Real voters group size = {len(self._voters_group)}.\n" \
                         f"Committee size = {self._committee_size}.\n" \
                         f"Approval profile = {self._approval_profile}."
         config.debug_print(MODULE_NAME, debug_message)
+        # Updating for the voter group size after 'cleaning'.
         self._voters_group_size = len(self._voters_group)
 
         # The voting rule.
@@ -133,8 +145,9 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
     def _define_abc_setting_variables(self) -> None:
         # Create the committee ILP variables.
-        for i in range(0, self._candidates_group_size):
-            self._model_candidates_variables.append(self._model.BoolVar("c_" + str(i)))
+        for i in range(self._candidates_group_starting_point,
+                       self._candidates_group_starting_point + self._candidates_group_size):
+            self._model_candidates_variables[i] = (self._model.BoolVar("c_" + str(i)))
 
         # Create the voters approval candidates sum variables.
         for i in self._voters_group:
@@ -150,7 +163,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
     def _define_abc_setting_constraints(self) -> None:
         # Add the constraint about the number of candidates in the committee.
-        self._model.Add(sum(self._model_candidates_variables) == self._committee_size)
+        self._model.Add(sum(self._model_candidates_variables.values()) == self._committee_size)
 
         # Add the constraint for the voters approval candidates sum variables
         # to be equal to the sum of their approved candidates.
@@ -158,7 +171,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             if self._is_lifted_index(voter_index):
                 self._model.Add(self._model_voters_approval_candidates_sum_variables[voter_index] ==
                                 sum([candidate_var for index, candidate_var in
-                                     enumerate(self._model_candidates_variables) if
+                                     self._model_candidates_variables.items() if
                                      (index in self._approval_profile[voter_index])]))
 
         # Add the constraint about the voter score contribution.
@@ -209,7 +222,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         for candidates_set in denial_candidates_sets:
             self._model.Add(
-                sum([x for i, x in enumerate(self._model_candidates_variables) if i in candidates_set])
+                sum([x for i, x in self._model_candidates_variables.items() if i in candidates_set])
                 <= (row_length - 1))
 
     def define_tgd_constraint(self, element_members_representor_sets: list):
@@ -263,7 +276,7 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------
     # Convert to ILP domain.
     ilp_convertor = ABCToILPConvertor(SOLVER)
-    ilp_convertor.define_abc_setting(CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+    ilp_convertor.define_abc_setting(0, 0, CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
                                      APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
                                      THIELE_SCORE_FUNCTION, False)
     # ----------------------------------------------------------------
@@ -308,7 +321,7 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------
     # Convert to ILP domain.
     ilp_convertor = ABCToILPConvertor(SOLVER)
-    ilp_convertor.define_abc_setting(CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+    ilp_convertor.define_abc_setting(0, 0, CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
                                      APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
                                      THIELE_SCORE_FUNCTION, True)
     # ----------------------------------------------------------------
@@ -352,7 +365,7 @@ if __name__ == '__main__':
     print("The denial constraints candidates are:")
     print(denial_df)
 
-    ilp_convertor.define_abc_setting(CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+    ilp_convertor.define_abc_setting(0, 0, CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
                                      APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
                                      THIELE_SCORE_FUNCTION, False)
     ilp_convertor.define_denial_constraint(denial_df)
@@ -414,7 +427,7 @@ if __name__ == '__main__':
     print("The represent TGD input is:")
     print(represent_sets)
 
-    ilp_convertor.define_abc_setting(CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+    ilp_convertor.define_abc_setting(0, 0, CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
                                      APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
                                      THIELE_SCORE_FUNCTION, False)
     ilp_convertor.define_tgd_constraint(represent_sets)
@@ -450,9 +463,68 @@ if __name__ == '__main__':
         print(str(ilp_convertor))
         exit(1)
     # ----------------------------------------------------------------
+    # Adding TGD Constraints and not different voters and candidates groups.
+    # ----------------------------------------------------------------
+    APPROVAL_PROFILE_DICT = {0: {1, 2, 7}, 1: {2, 4, 7}, 2: {3, 1, 7}, 3: {5, 7, 4}, 4: {1, 2, 7}, 5: {1, 7}, 6: {1, 2, 7}, 7: {1, 7}}
+    # Define the ILP solver.
+    SOLVER = pywraplp.Solver.CreateSolver("SAT")
+    if not SOLVER:
+        print("ERROR: Creating solver failed.")
+        exit(1)
+    # ----------------------------------------------------------------
+    # Convert to ILP domain.
+    ilp_convertor = ABCToILPConvertor(SOLVER)
 
+    candidates_set_start = {5}
+
+    option_1 = {3}
+    option_2 = {4}
+    candidates_set_end = [option_1, option_2]
+
+    candidates_set_start_2 = {7}
+
+    option_1_2 = {5}
+    candidates_set_end_2 = [option_1_2]
+
+    represent_sets = [(candidates_set_start, candidates_set_end), (candidates_set_start_2, candidates_set_end_2)]
+    print("The represent TGD input is:")
+    print(represent_sets)
+
+    ilp_convertor.define_abc_setting(3, 3, CANDIDATES_GROUP_SIZE, VOTERS_GROUP_SIZE,
+                                     APPROVAL_PROFILE_DICT, COMMITTEE_SIZE,
+                                     THIELE_SCORE_FUNCTION, False)
+    ilp_convertor.define_tgd_constraint([])
+    # ----------------------------------------------------------------
+    # Solve the ILP problem.
+    ilp_convertor.solve()
+    # ----------------------------------------------------------------
+    # Test and print.
+    EXPECTED_RESULT = \
+        "Candidate id: 3, Candidate value: 0.0.\n" \
+        "Candidate id: 4, Candidate value: 1.0.\n" \
+        "Candidate id: 5, Candidate value: 1.0.\n" \
+        "Candidate id: 6, Candidate value: 0.0.\n" \
+        "Candidate id: 7, Candidate value: 1.0.\n" \
+        "Voter id: 0, Voter approval sum: 1.0.\n" \
+        "Voter id: 1, Voter approval sum: 2.0.\n" \
+        "Voter id: 2, Voter approval sum: 1.0.\n" \
+        "Voter id: 3, Voter approval sum: 3.0.\n" \
+        "Voter id: 4, Voter approval sum: 1.0.\n" \
+        "Voter id: 5, Voter approval sum: 1.0.\n" \
+        "Voter id: 6, Voter approval sum: 1.0.\n" \
+        "Voter id: 7, Voter approval sum: 1.0.\n" \
+        "Voter id: 0, Voter contribution: 1.0.\n" \
+        "Voter id: 1, Voter contribution: 2.0.\n" \
+        "Voter id: 2, Voter contribution: 1.0.\n" \
+        "Voter id: 3, Voter contribution: 3.0.\n" \
+        "Voter id: 4, Voter contribution: 1.0.\n" \
+        "Voter id: 5, Voter contribution: 1.0.\n" \
+        "Voter id: 6, Voter contribution: 1.0.\n" \
+        "Voter id: 7, Voter contribution: 1.0.\n"
+    if EXPECTED_RESULT != str(ilp_convertor):
+        print("ERROR: The solution is different than expected.")
+        print(str(ilp_convertor))
+        exit(1)
+    # ----------------------------------------------------------------
     print("Sanity tests for thiele_rule_ilp module done successfully.")
     print("---------------------------------------------------------")
-
-    # TODO: Test denial constraints in extractor.
-    # TODO: Test no constraints in extractor.

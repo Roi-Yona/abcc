@@ -28,13 +28,15 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
                  committee_members_list: list,
                  candidates_tables: list,
                  committee_size: int,
+                 candidates_starting_point: int,
                  voters_size_limit: int,
                  candidates_size_limit: int,
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
                  ):
 
-        super().__init__(abc_convertor, database_engine, candidates_column_name, candidates_size_limit)
+        super().__init__(abc_convertor, database_engine,
+                         candidates_column_name, candidates_starting_point, candidates_size_limit)
 
         self._committee_size = committee_size
         self._voters_size_limit = voters_size_limit
@@ -49,7 +51,7 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
         legal_assignments = self.join_tables(self._candidates_tables, self._denial_constraint_dict)
 
         # Extract the committee members sets out of the resulted join.
-        self._denial_constraint_candidates_df = legal_assignments[self._committee_members_list] - 1
+        self._denial_constraint_candidates_df = legal_assignments[self._committee_members_list]
 
         config.debug_print(MODULE_NAME,
                            f"The denial constraints candidates are: {self._denial_constraint_candidates_df}.")
@@ -61,3 +63,4 @@ class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
 
 if __name__ == '__main__':
     pass
+    # TODO: Test denial constraints in extractor.

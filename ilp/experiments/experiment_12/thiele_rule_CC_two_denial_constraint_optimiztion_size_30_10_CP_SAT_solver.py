@@ -46,7 +46,9 @@ if __name__ == '__main__':
                                                _solver_time_limit,
                                                _solver_name,
                                                _denial_constraints, [],
-                                               _committee_size, _candidates_size_limit,
+                                               _committee_size,
+                                               0, 0,
+                                               _candidates_size_limit,
                                                _thiele_rule_function_creator,
                                                _voting_table_name, _lifted_inference)
     # ---------------------------------------------------------------------------
