@@ -72,16 +72,17 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         # ----------------------------------------------
         # Extract approval profile.
         sql_query = f"SELECT DISTINCT {self._voters_column_name}, {self._candidates_column_name} " \
-                    f"FROM {self._voting_table_name} " \
-                    f"WHERE {self._approval_column_name} > {str(self._approval_threshold)} " \
-                    f"AND {self._voters_column_name} " \
-                    f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point} " \
-                    f"AND {self._candidates_column_name} " \
-                    f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
+            f"FROM {self._voting_table_name} " \
+            f"WHERE {self._approval_column_name} > {str(self._approval_threshold)} " \
+            f"AND {self._voters_column_name} " \
+            f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point} " \
+            f"AND {self._candidates_column_name} " \
+            f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
+
         # voter_rating_columns = db_interface.database_run_query(self._db_engine, sql_query)
         voter_rating_columns = self._db_engine.run_query(sql_query)
         grouped_by_voter_id_column = voter_rating_columns.groupby(by=self._voters_column_name)
-        for voter_id in range(0, self._voters_ending_point):
+        for voter_id in range(self._voters_starting_point, self._voters_ending_point+1):
             self._approval_profile[voter_id] = set()
         for voter_id, candidates_ids_df in grouped_by_voter_id_column:
             self._approval_profile[voter_id] = set(candidates_ids_df[self._candidates_column_name])
@@ -92,8 +93,8 @@ class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
         self._abc_convertor.define_abc_setting(
             self._candidates_starting_point,
             self._voters_starting_point,
-            self._candidates_ending_point,
-            self._voters_ending_point,
+            self._candidates_size_limit,
+            self._voters_size_limit,
             self._approval_profile,
             self._committee_size,
             self._thiele_function,
