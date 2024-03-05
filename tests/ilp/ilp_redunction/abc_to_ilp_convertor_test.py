@@ -253,8 +253,62 @@ class TestABCToILPConvertor(unittest.TestCase):
                          f"ERROR: The solution is different than expected.\n")
 
     def test_convertor_with_combined_constraints(self):
-        pass
-        # TODO: Add a combined constraints test.
+        # ----------------------------------------------------------------
+        # Define ABC setting.
+        # Denial constraint.
+        data = {'c1': [4],
+                'c2': [1]}
+        denial_df = pd.DataFrame(data)
+
+        candidates_set_start = {1}
+        option_1 = {2, 4}
+        option_2 = {3, 4}
+        candidates_set_end = [option_1, option_2]
+
+        candidates_set_start_2 = {2}
+        option_1_2 = {0}
+        candidates_set_end_2 = [option_1_2]
+
+        represent_sets = [(candidates_set_start, candidates_set_end), (candidates_set_start_2, candidates_set_end_2)]
+        # ----------------------------------------------------------------
+        # Convert to ILP domain.
+        self.ilp_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
+                                              self.candidates_group_size, self.voters_group_size,
+                                              self.approval_profile_dict,
+                                              self.committee_size,
+                                              self.thiele_function_score,
+                                              self.lifted_inference_setting)
+        self.ilp_convertor.define_tgd_constraint(represent_sets)
+        self.ilp_convertor.define_denial_constraint(denial_df)
+        # ----------------------------------------------------------------
+        # Solve the ILP problem.
+        self.ilp_convertor.solve()
+        # ----------------------------------------------------------------
+        # Test the result.
+        expected_result = \
+            'Candidate id: 0, Candidate value: 1.0.\n' \
+            'Candidate id: 1, Candidate value: 0.0.\n' \
+            'Candidate id: 2, Candidate value: 1.0.\n' \
+            'Candidate id: 3, Candidate value: 0.0.\n' \
+            'Candidate id: 4, Candidate value: 1.0.\n' \
+            'Voter id: 0, Voter approval sum: 1.0.\n' \
+            'Voter id: 1, Voter approval sum: 2.0.\n' \
+            'Voter id: 2, Voter approval sum: 0.0.\n' \
+            'Voter id: 3, Voter approval sum: 1.0.\n' \
+            'Voter id: 4, Voter approval sum: 1.0.\n' \
+            'Voter id: 5, Voter approval sum: 0.0.\n' \
+            'Voter id: 6, Voter approval sum: 1.0.\n' \
+            'Voter id: 7, Voter approval sum: 0.0.\n' \
+            'Voter id: 0, Voter contribution: 1.0.\n' \
+            'Voter id: 1, Voter contribution: 2.0.\n' \
+            'Voter id: 2, Voter contribution: 0.0.\n' \
+            'Voter id: 3, Voter contribution: 1.0.\n' \
+            'Voter id: 4, Voter contribution: 1.0.\n' \
+            'Voter id: 5, Voter contribution: 0.0.\n' \
+            'Voter id: 6, Voter contribution: 1.0.\n' \
+            'Voter id: 7, Voter contribution: 0.0.\n'
+        self.assertEqual(expected_result, str(self.ilp_convertor),
+                         f"ERROR: The solution is different than expected.\n")
 
 
 # Test running instructions:

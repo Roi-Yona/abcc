@@ -19,12 +19,12 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
            A(V) - Approval profile.
            k - The committee size.
            r - The thiele rule.
-           gamma - Set of contextual constraints.
+           Gamma - Set of contextual constraints.
     """
 
     def __init__(self, solver: pywraplp.Solver):
         """Initializing the convertor.
-        :param solver:                    The input solver wrapper.
+        :param solver: The input solver wrapper.
         """
         super().__init__(solver)
 
@@ -35,8 +35,15 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._voters_group_size = 0
         self._approval_profile = {}
         self._committee_size = 0
+
+        # The group of the voters id's.
         self._voters_group = set()
+
+        # The key is a voter representative,
+        # and the value is a list of lifted voters (voters with the same approval profile).
+        self._lifted_voters = dict()
         self.lifted_voters_group_size = 0
+        self._lifted_setting = False
 
         # The voting rule.
         self._thiele_score_function = {}
@@ -46,8 +53,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._model_candidates_variables = dict()
         self._model_voters_score_contribution_variables = dict()
         self._model_voters_approval_candidates_sum_variables = dict()
-        self._lifted_voters = dict()
-        self._lifted_setting = False
+
+        # A counter for creating a different module variable names.
         self._global_counter = 0
 
     def get_model_state(self) -> str:
@@ -82,7 +89,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                                          the thiele score as value ({1,..,k}->N).
         :param lifted_setting            A flag indicate whether to use lifted inference optimization setting or not.
         """
-        # ABC data.
+        # Set the ABC data.
         self._candidates_group_starting_point = candidates_group_starting_point
         self._voters_group_starting_point = voters_group_starting_point
         self._candidates_group_size = candidates_group_size
@@ -91,7 +98,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._committee_size = committee_size
         self._lifted_setting = lifted_setting
 
-        # Clean the voters group.
+        # Clean the voters group (only a voters with a none empty approval profile left).
         for voter_id, profile_set in self._approval_profile.items():
             if len(profile_set) != 0:
                 self._voters_group.add(voter_id)
@@ -104,29 +111,35 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                         f"Committee size = {self._committee_size}.\n" \
                         f"Approval profile = {self._approval_profile}."
         config.debug_print(MODULE_NAME, debug_message)
+
         # Updating for the voter group size after 'cleaning'.
         self._voters_group_size = len(self._voters_group)
 
-        # The voting rule.
+        # Set the voting rule.
         self._thiele_score_function = thiele_score_function
-        self._max_thiele_function_value = 0
+
         # Find the max value of the thiele score function.
+        self._max_thiele_function_value = 0
         for score in self._thiele_score_function.values():
             if self._max_thiele_function_value < score:
                 self._max_thiele_function_value = score
 
+        # Union all voters with the same approval profile in order to 'lifted inference' those voters
+        # and represent them as one weighted voter.
         if self._lifted_setting:
-            # Union all voters with the same approval profile in order to 'lifted inference' those voters
-            # and represent them as one weighted voter.
-            l1 = list(range(len(approval_profile)))
-            while l1:
-                i = l1[0]
+            approval_profile_keys_list = list(approval_profile.keys())
+            while approval_profile_keys_list:
+                i = approval_profile_keys_list[0]
                 self._lifted_voters[i] = []
-                l1.remove(i)
-                for j in l1:
+                approval_profile_keys_list.remove(i)
+                approval_profile_keys_list_inner = approval_profile_keys_list.copy()
+                while approval_profile_keys_list_inner:
+                    j = approval_profile_keys_list_inner[0]
+                    approval_profile_keys_list_inner.remove(j)
                     if approval_profile[i] == approval_profile[j]:
                         self._lifted_voters[i].append(j)
-                        l1.remove(j)
+                        approval_profile_keys_list.remove(j)
+
             self.lifted_voters_group_size = len(self._lifted_voters)
             config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}")
         else:
@@ -147,7 +160,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         # Create the committee ILP variables.
         for i in range(self._candidates_group_starting_point,
                        self._candidates_group_starting_point + self._candidates_group_size):
-            self._model_candidates_variables[i] = (self._model.BoolVar("c_" + str(i)))
+            self._model_candidates_variables[i] = self._model.BoolVar("c_" + str(i))
 
         # Create the voters approval candidates sum variables.
         for i in self._voters_group:
@@ -208,22 +221,20 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         """
         config.debug_print(MODULE_NAME, f"The denial constraint settings:\n"
                                         f"The denial candidates sets are: {denial_candidates_df}")
-        row_length = 0
-        if len(denial_candidates_df.values) >= 1:
-            row_length = len(denial_candidates_df.values[0])
+
+        # The set containing the denial constraints candidates sets.
         denial_candidates_sets = set()
 
         for candidates_list in denial_candidates_df.values:
             current_set = set()
             for item in candidates_list:
                 current_set.add(item)
-            if len(current_set) == row_length:
-                denial_candidates_sets.add(frozenset(current_set))
+            denial_candidates_sets.add(frozenset(current_set))
 
         for candidates_set in denial_candidates_sets:
             self._model.Add(
                 sum([x for i, x in self._model_candidates_variables.items() if i in candidates_set])
-                <= (row_length - 1))
+                <= (len(candidates_set) - 1))
 
     def define_tgd_constraint(self, element_members_representor_sets: list):
         for element_members, tgd_representor_set in element_members_representor_sets:

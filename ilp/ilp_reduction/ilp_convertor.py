@@ -20,6 +20,10 @@ class ILPConvertor:
         self.solving_time = -1
 
     def solve(self) -> None:
+        """Solve the ILP problem, and saves the time it took,
+        the status and if it solved indicator
+        :return:
+        """
         # Solve the ILP problem.
         start_time = time.time()
         self.solver_status = self._model.Solve()
@@ -47,12 +51,20 @@ class ILPConvertor:
         return solution
 
     def print_all_model_variables(self) -> None:
+        """Print all the model variables.
+        :return:
+        """
         if self._solved:
             for var in self._model.variables():
                 print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
 
 
 def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:
+    """Create a new pywraplp solver.
+    :param solver_name: The solver name.
+    :param solver_time_limit: The solver time limit in seconds.
+    :return:
+    """
     solver = pywraplp.Solver.CreateSolver(solver_name)
     if not solver:
         print("ERROR: Creating solver failed.")

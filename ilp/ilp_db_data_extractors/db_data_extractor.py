@@ -148,7 +148,6 @@ class DBDataExtractor:
         self.convert_to_ilp()
 
 
-
 if __name__ == '__main__':
     pass
     # TODO: Add ut to the join tables function.
