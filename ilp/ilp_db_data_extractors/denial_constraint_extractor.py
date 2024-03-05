@@ -20,7 +20,7 @@ import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 MODULE_NAME = "Denial Constraint DB Data Extractor"
 
 
-class DenialConstraintDBDataExtractor(db_data_extractor.DBDataExtractor):
+class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,

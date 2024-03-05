@@ -255,7 +255,7 @@ class TestABCToILPConvertor(unittest.TestCase):
     def test_convertor_with_combined_constraints(self):
         pass
         # TODO: Add a combined constraints test.
-    
+
 
 # Test running instructions:
 # python -m unittest .\tests\abc_to_ilp_convertor_test.py

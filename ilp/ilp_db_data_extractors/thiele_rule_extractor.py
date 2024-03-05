@@ -7,7 +7,7 @@ MODULE_NAME = "Thiele Rule DB Data Extractor"
 APPROVAL_THRESHOLD = 4
 
 
-class ThieleRuleDBDataExtractor(db_data_extractor.DBDataExtractor):
+class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,

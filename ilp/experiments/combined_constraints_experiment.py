@@ -6,8 +6,8 @@ import pandas as pd
 
 import config
 import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
-import ilp.ilp_db_data_extractors.thiele_rule_db_data_extractor as thiele_rule_db_data_extractor
-import ilp.ilp_db_data_extractors.denial_constraint_db_data_extractor as denial_constraint_extractor
+import ilp.ilp_db_data_extractors.thiele_rule_extractor as thiele_rule_db_data_extractor
+import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
 import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
 import ilp.experiments.experiment as experiment
 
@@ -63,7 +63,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             local_denial_constraint_dict = param_tuples[0]
             local_committee_members_list = param_tuples[1]
             local_candidates_tables = param_tuples[2]
-            self._denial_constraint_db_extractors.append(denial_constraint_extractor.DenialConstraintDBDataExtractor(
+            self._denial_constraint_db_extractors.append(denial_constraint_extractor.DenialConstraintExtractor(
                 self._abc_convertor, self._db_engine,
                 local_denial_constraint_dict, local_committee_members_list, local_candidates_tables,
                 committee_size, candidates_starting_point, voters_size_limit, candidates_size_limit,
@@ -78,7 +78,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             local_candidates_tables_start = param_tuples[4]
             local_candidates_tables_end = param_tuples[5]
 
-            self._tgd_constraint_db_extractors.append(tgd_constraint_extractor.TGDDBDataExtractor(
+            self._tgd_constraint_db_extractors.append(tgd_constraint_extractor.TGDConstraintExtractor(
                 self._abc_convertor, self._db_engine,
                 local_tgd_constraint_dict_start, local_committee_members_list_start,
                 local_tgd_constraint_dict_end, local_committee_members_list_end,
@@ -86,7 +86,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                 committee_size, candidates_starting_point, voters_size_limit, candidates_size_limit,
                 candidates_column_name, voters_column_name))
 
-        self._av_db_data_extractor = thiele_rule_db_data_extractor.ThieleRuleDBDataExtractor(
+        self._av_db_data_extractor = thiele_rule_db_data_extractor.ThieleRuleExtractor(
             self._abc_convertor, self._db_engine,
             committee_size, voters_starting_point, candidates_starting_point, voters_size_limit, candidates_size_limit,
             thiele_rule_function_creator(committee_size + 1),

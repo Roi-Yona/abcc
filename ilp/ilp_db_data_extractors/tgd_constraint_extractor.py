@@ -8,7 +8,7 @@ import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 MODULE_NAME = "TGD Constraint DB Data Extractor"
 
 
-class TGDDBDataExtractor(db_data_extractor.DBDataExtractor):
+class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
@@ -97,15 +97,15 @@ if __name__ == '__main__':
     _candidates_tables = ['t2']
     _committee_members_list_end = ['c1']
 
-    tgd_extractor = TGDDBDataExtractor(_abc_convertor, _db_engine,
-                                       _tgd_constraint_dict_start,
-                                       _committee_members_list_start,
-                                       _tgd_constraint_dict_end,
-                                       _committee_members_list_end,
-                                       [],
-                                       _candidates_tables,
-                                       3, 0, 15, 7,
-                                       candidates_column_name='movie_id')
+    tgd_extractor = TGDConstraintExtractor(_abc_convertor, _db_engine,
+                                           _tgd_constraint_dict_start,
+                                           _committee_members_list_start,
+                                           _tgd_constraint_dict_end,
+                                           _committee_members_list_end,
+                                           [],
+                                           _candidates_tables,
+                                           3, 0, 15, 7,
+                                           candidates_column_name='movie_id')
     tgd_extractor._extract_data_from_db()
     if "[(set(), [{1}, {3}, {4}, {6}]), (set(), [{2}, {7}]), (set(), [{5}])]" != str(tgd_extractor._representor_sets):
         print("ERROR: The solution is different than expected.")
