@@ -13,7 +13,7 @@ if __name__ == '__main__':
     _candidates_size_limit = 30
     _committee_size = 10
     _voters_starting_point = 0
-    _candidates_starting_point = 31
+    _candidates_starting_point = 64
 
     _voting_table_name = 'voting'
 

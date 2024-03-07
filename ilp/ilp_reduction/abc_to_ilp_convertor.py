@@ -32,7 +32,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._candidates_group_starting_point = 0
         self._voters_group_starting_point = 0
         self._candidates_group_size = 0
-        self._voters_group_size = 0
+        self.voters_group_size = 0
         self._approval_profile = {}
         self._committee_size = 0
 
@@ -93,7 +93,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._candidates_group_starting_point = candidates_group_starting_point
         self._voters_group_starting_point = voters_group_starting_point
         self._candidates_group_size = candidates_group_size
-        self._voters_group_size = voters_group_size
+        self.voters_group_size = voters_group_size
         self._approval_profile = approval_profile
         self._committee_size = committee_size
         self._lifted_setting = lifted_setting
@@ -106,14 +106,14 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         debug_message = f"Voters starting id = {self._voters_group_starting_point}.\n" \
                         f"Candidates starting id = {self._candidates_group_starting_point}.\n" \
                         f"Candidates group size = {self._candidates_group_size}.\n" \
-                        f"Voters Group size = {self._voters_group_size}.\n" \
+                        f"Voters Group size = {self.voters_group_size}.\n" \
                         f"Real voters group size = {len(self._voters_group)}.\n" \
                         f"Committee size = {self._committee_size}.\n" \
                         f"Approval profile = {self._approval_profile}."
         config.debug_print(MODULE_NAME, debug_message)
 
         # Updating for the voter group size after 'cleaning'.
-        self._voters_group_size = len(self._voters_group)
+        self.voters_group_size = len(self._voters_group)
 
         # Set the voting rule.
         self._thiele_score_function = thiele_score_function

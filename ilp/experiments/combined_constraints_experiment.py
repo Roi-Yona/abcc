@@ -106,7 +106,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         solved_time = self.run_model()
 
         # Update the group size after the voters cleaning.
-        self._voters_group_size = self._abc_convertor._voters_group_size
+        self._voters_group_size = self._abc_convertor.voters_group_size
 
         # Save the results.
         new_result = {'candidates_starting_point': self._candidates_starting_point,
