@@ -34,12 +34,12 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.assertIsNotNone(self.solver, f"Couldn't create {solver_name} solver.")
         # ----------------------------------------------------------------
         # Define the ILP convertor.
-        self.ilp_convertor = abc_to_ilp_convertor.ABCToILPConvertor(self.solver)
+        self.abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(self.solver)
 
     def test_convertor_sanity(self):
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.ilp_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
+        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
                                               self.candidates_group_size, self.voters_group_size,
                                               self.approval_profile_dict,
                                               self.committee_size,
@@ -47,7 +47,7 @@ class TestABCToILPConvertor(unittest.TestCase):
                                               self.lifted_inference_setting)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
-        self.ilp_convertor.solve()
+        self.abc_convertor.solve()
         # ----------------------------------------------------------------
         # Test the result.
         expected_result = "Candidate id: 0, Candidate value: 0.0.\n" \
@@ -71,7 +71,7 @@ class TestABCToILPConvertor(unittest.TestCase):
                           "Voter id: 5, Voter contribution: 1.0.\n" \
                           "Voter id: 6, Voter contribution: 2.0.\n" \
                           "Voter id: 7, Voter contribution: 1.0.\n"
-        self.assertEqual(expected_result, str(self.ilp_convertor),
+        self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
     def test_convertor_lifted_inference_on(self):
@@ -80,7 +80,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.lifted_inference_setting = True
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.ilp_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
+        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
                                               self.candidates_group_size, self.voters_group_size,
                                               self.approval_profile_dict,
                                               self.committee_size,
@@ -88,7 +88,7 @@ class TestABCToILPConvertor(unittest.TestCase):
                                               self.lifted_inference_setting)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
-        self.ilp_convertor.solve()
+        self.abc_convertor.solve()
         # ----------------------------------------------------------------
         # Test the result.
         expected_result = "Candidate id: 0, Candidate value: 0.0.\n" \
@@ -106,7 +106,7 @@ class TestABCToILPConvertor(unittest.TestCase):
                           "Voter id: 2, Voter contribution: 1.0.\n" \
                           "Voter id: 3, Voter contribution: 1.0.\n" \
                           "Voter id: 5, Voter contribution: 1.0.\n"
-        self.assertEqual(expected_result, str(self.ilp_convertor),
+        self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
     def test_convertor_with_denial_constraints(self):
@@ -117,16 +117,16 @@ class TestABCToILPConvertor(unittest.TestCase):
         denial_df = pd.DataFrame(data)
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.ilp_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
+        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
                                               self.candidates_group_size, self.voters_group_size,
                                               self.approval_profile_dict,
                                               self.committee_size,
                                               self.thiele_function_score,
                                               self.lifted_inference_setting)
-        self.ilp_convertor.define_denial_constraint(denial_df)
+        self.abc_convertor.define_denial_constraint(denial_df)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
-        self.ilp_convertor.solve()
+        self.abc_convertor.solve()
         # ----------------------------------------------------------------
         # Test the result.
         expected_result = \
@@ -151,7 +151,7 @@ class TestABCToILPConvertor(unittest.TestCase):
             "Voter id: 5, Voter contribution: 1.0.\n" \
             "Voter id: 6, Voter contribution: 2.0.\n" \
             "Voter id: 7, Voter contribution: 1.0.\n"
-        self.assertEqual(expected_result, str(self.ilp_convertor),
+        self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
     def test_convertor_with_tgd_constraints(self):
@@ -170,16 +170,16 @@ class TestABCToILPConvertor(unittest.TestCase):
 
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.ilp_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
+        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
                                               self.candidates_group_size, self.voters_group_size,
                                               self.approval_profile_dict,
                                               self.committee_size,
                                               self.thiele_function_score,
                                               self.lifted_inference_setting)
-        self.ilp_convertor.define_tgd_constraint(represent_sets)
+        self.abc_convertor.define_tgd_constraint(represent_sets)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
-        self.ilp_convertor.solve()
+        self.abc_convertor.solve()
         # ----------------------------------------------------------------
         # Test the result.
         expected_result = \
@@ -204,7 +204,7 @@ class TestABCToILPConvertor(unittest.TestCase):
             "Voter id: 5, Voter contribution: 1.0.\n" \
             "Voter id: 6, Voter contribution: 1.0.\n" \
             "Voter id: 7, Voter contribution: 1.0.\n"
-        self.assertEqual(expected_result, str(self.ilp_convertor),
+        self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
     def test_convertor_with_different_voters_and_candidates_groups(self):
@@ -216,7 +216,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.voters_starting_point = 3
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.ilp_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
+        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
                                               self.candidates_group_size, self.voters_group_size,
                                               self.approval_profile_dict,
                                               self.committee_size,
@@ -224,7 +224,7 @@ class TestABCToILPConvertor(unittest.TestCase):
                                               self.lifted_inference_setting)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
-        self.ilp_convertor.solve()
+        self.abc_convertor.solve()
         # ----------------------------------------------------------------
         # Test the result.
         expected_result = \
@@ -249,7 +249,7 @@ class TestABCToILPConvertor(unittest.TestCase):
             "Voter id: 5, Voter contribution: 1.0.\n" \
             "Voter id: 6, Voter contribution: 1.0.\n" \
             "Voter id: 7, Voter contribution: 1.0.\n"
-        self.assertEqual(expected_result, str(self.ilp_convertor),
+        self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
     def test_convertor_with_combined_constraints(self):
@@ -272,17 +272,17 @@ class TestABCToILPConvertor(unittest.TestCase):
         represent_sets = [(candidates_set_start, candidates_set_end), (candidates_set_start_2, candidates_set_end_2)]
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.ilp_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
+        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
                                               self.candidates_group_size, self.voters_group_size,
                                               self.approval_profile_dict,
                                               self.committee_size,
                                               self.thiele_function_score,
                                               self.lifted_inference_setting)
-        self.ilp_convertor.define_tgd_constraint(represent_sets)
-        self.ilp_convertor.define_denial_constraint(denial_df)
+        self.abc_convertor.define_tgd_constraint(represent_sets)
+        self.abc_convertor.define_denial_constraint(denial_df)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
-        self.ilp_convertor.solve()
+        self.abc_convertor.solve()
         # ----------------------------------------------------------------
         # Test the result.
         expected_result = \
@@ -307,7 +307,7 @@ class TestABCToILPConvertor(unittest.TestCase):
             'Voter id: 5, Voter contribution: 0.0.\n' \
             'Voter id: 6, Voter contribution: 1.0.\n' \
             'Voter id: 7, Voter contribution: 0.0.\n'
-        self.assertEqual(expected_result, str(self.ilp_convertor),
+        self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
 

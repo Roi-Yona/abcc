@@ -1,6 +1,6 @@
 import config
 from database.database_server_interface import database_server_interface as db_interface
-import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
+import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
 MODULE_NAME = "Thiele Rule DB Data Extractor"
@@ -9,7 +9,7 @@ APPROVAL_THRESHOLD = 4
 
 class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
-                 abc_convertor: ilp_convertor.ABCToILPConvertor,
+                 abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
                  committee_size: int,
                  voters_starting_point: int,
@@ -29,8 +29,8 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         # Initializing ABC setting variables.
         self._voters_starting_point = voters_starting_point
         self._voters_size_limit = voters_size_limit
-        self._candidates_ending_point = self._candidates_starting_point + self._candidates_size_limit
-        self._voters_ending_point = self._voters_starting_point + self._voters_size_limit
+        self._candidates_ending_point = self._candidates_starting_point + self._candidates_size_limit - 1
+        self._voters_ending_point = self._voters_starting_point + self._voters_size_limit - 1
         self._approval_profile = dict()
         self._committee_size = committee_size
         self._thiele_function = thiele_rule_function

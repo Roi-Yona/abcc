@@ -6,7 +6,7 @@ import sys
 import config
 from database.database_server_interface import database_server_interface as db_interface
 import ilp.ilp_reduction.ilp_convertor as ilp_convertor
-import ilp.ilp_reduction.abc_to_ilp_convertor as abc_ilp_convertor
+import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 
 MODULE_NAME = 'Experiment'
 MINUTE = 1000 * 60
@@ -42,7 +42,7 @@ class Experiment:
         self._db_engine = db_interface.Database(db_path)
 
         self._solver = ilp_convertor.create_solver(solver_name, MINUTE * solver_time_limit)
-        self._abc_convertor = abc_ilp_convertor.ABCToILPConvertor(self._solver)
+        self._abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(self._solver)
 
     def run_model(self) -> float:
         solved_time_scale = 1

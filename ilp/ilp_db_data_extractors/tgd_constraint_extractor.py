@@ -2,7 +2,7 @@ import pandas as pd
 
 import config
 from database.database_server_interface import database_server_interface as db_interface
-import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
+import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
 MODULE_NAME = "TGD Constraint DB Data Extractor"
@@ -10,7 +10,7 @@ MODULE_NAME = "TGD Constraint DB Data Extractor"
 
 class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
-                 abc_convertor: ilp_convertor.ABCToILPConvertor,
+                 abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
                  tgd_constraint_dict_start: dict,
                  committee_members_list_start: list,
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     print(db_path)
     _db_engine = db_interface.Database(db_path)
     _solver = ilp_con.create_solver("SAT", 100)
-    _abc_convertor = ilp_convertor.ABCToILPConvertor(_solver)
+    _abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(_solver)
 
     _tgd_constraint_dict_start = dict()
     _tgd_constraint_dict_start['movies', 't1'] = [('x', 'genres')]
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     tgd_extractor._extract_data_from_db()
     if "[(set(), [{1}, {3}, {4}, {6}]), (set(), [{2}, {7}]), (set(), [{5}])]" != str(tgd_extractor._representor_sets):
         print("ERROR: The solution is different than expected.")
-        print(str(ilp_convertor))
+        print(str(abc_to_ilp_convertor))
         exit(1)
     # ----------------------------------------------------------------
 

@@ -2,7 +2,7 @@ import time
 import config
 import pandas as pd
 import database.database_server_interface.database_server_interface as db_interface
-import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
+import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 MODULE_NAME = "Database Extractor"
 
 
@@ -10,7 +10,7 @@ class DBDataExtractor:
     """An abstract class for an ILP experiment.
     """
     def __init__(self,
-                 abc_convertor: ilp_convertor.ABCToILPConvertor,
+                 abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
                  candidates_column_name: str,
                  candidates_starting_point: int,
@@ -98,7 +98,7 @@ class DBDataExtractor:
                 where_phrase += " AND"
             where_phrase += f" {table_name}.{self._candidates_column_name} " \
                             f"BETWEEN {self._candidates_starting_point} AND " \
-                            f"{self._candidates_starting_point + self._candidates_size_limit}"
+                            f"{self._candidates_starting_point + self._candidates_size_limit - 1}"
 
         for constant_name, constant_value in constants.items():
             for t_name, t_list in tables_dict.items():

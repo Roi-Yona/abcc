@@ -14,7 +14,7 @@ import pandas as pd
 
 import config
 from database.database_server_interface import database_server_interface as db_interface
-import ilp.ilp_reduction.abc_to_ilp_convertor as ilp_convertor
+import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
 MODULE_NAME = "Denial Constraint DB Data Extractor"
@@ -22,7 +22,7 @@ MODULE_NAME = "Denial Constraint DB Data Extractor"
 
 class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
-                 abc_convertor: ilp_convertor.ABCToILPConvertor,
+                 abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
                  denial_constraint_dict: dict,
                  committee_members_list: list,
