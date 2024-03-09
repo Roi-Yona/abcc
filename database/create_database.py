@@ -96,12 +96,11 @@ def create_candidates_table():
 
 
 def create_example_db(cur):
-    # Create the table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS movies (
-                        movie_id INTEGER PRIMARY KEY,
+    # Create the candidates table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
+                        candidate_id INTEGER PRIMARY KEY,
                         genres TEXT NOT NULL,
                         adult TEXT NOT NULL)''')
-    # Insert multiple rows into the table
     new_data = [
         (1, 'action', "false"),
         (2, 'comedy', "true"),
@@ -111,7 +110,44 @@ def create_example_db(cur):
         (6, 'action', "false"),
         (7, 'comedy', "false"),
     ]
-    cur.executemany("INSERT INTO movies VALUES (?, ?, ?)", new_data)
+    cur.executemany("INSERT INTO candidates VALUES (?, ?, ?)", new_data)
+
+    # Create the voters table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS voters (
+                        voter_id INTEGER NOT NULL,
+                        candidate_id INTEGER NOT NULL,
+                        rating FLOAT NOT NULL)''')
+
+    # Insert multiple rows into the table
+    new_data = [
+        (1, 3, 4.1),
+        (1, 4, 3.1),
+        (1, 5, 2.1),
+        (1, 7, 5.1),
+
+        (2, 1, 4.1),
+        (2, 4, 3.1),
+        (2, 5, 2.1),
+        (2, 2, 5.1),
+
+        (3, 3, 4.1),
+        (3, 7, 3.1),
+        (3, 5, 2.1),
+        (3, 1, 5.1),
+    ]
+
+    """
+    Candidate : Candidate AV total score : Relative_Place
+    1         : 2                        : 1
+    2         : 1                        : 2
+    3         : 2                        : 1
+    4         : 0                        : 3
+    5         : 0                        : 3
+    6         : 0                        : 3
+    7         : 1                        : 2
+
+    """
+    cur.executemany("INSERT INTO voters VALUES (?, ?, ?)", new_data)
 
 
 if __name__ == '__main__':
