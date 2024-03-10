@@ -214,22 +214,13 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         else:
             self._model.Maximize(sum(self._model_voters_score_contribution_variables.values()))
 
-    def define_denial_constraint(self, denial_candidates_df: pd.DataFrame):
+    def define_denial_constraint(self, denial_candidates_sets: set):
         """Set and convert to ILP a denial constraint.
 
-        :param denial_candidates_df: A df of denial candidates groups.
+        :param denial_candidates_sets: A set of all denial candidates groups.
         """
         config.debug_print(MODULE_NAME, f"The denial constraint settings:\n"
-                                        f"The denial candidates sets are: {denial_candidates_df}")
-
-        # The set containing the denial constraints candidates sets.
-        denial_candidates_sets = set()
-
-        for candidates_list in denial_candidates_df.values:
-            current_set = set()
-            for item in candidates_list:
-                current_set.add(item)
-            denial_candidates_sets.add(frozenset(current_set))
+                                        f"The denial candidates sets are: {denial_candidates_sets}")
 
         for candidates_set in denial_candidates_sets:
             self._model.Add(

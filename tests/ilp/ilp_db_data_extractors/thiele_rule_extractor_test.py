@@ -55,7 +55,10 @@ class TestThieleRuleExtractor(unittest.TestCase):
                                                               self.candidates_column_name, self.voters_column_name,
                                                               self.approval_column_name,
                                                               self.lifted_inference_setting)
+
         extractor._extract_data_from_db()
+
+        # Test the result.
         self.assertEqual(extractor._candidates_ending_point, 4)
         self.assertEqual(extractor._voters_ending_point, 3)
         expected_approval_profile = dict()
