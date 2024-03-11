@@ -56,14 +56,14 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
             constants = row.to_dict()
             config.debug_print(MODULE_NAME, "The current constants are: " + str(constants))
             current_element_committee_members = set(row[self._committee_members_list_start])
-            current_element_representor_list = []
+            current_element_representor_set = set()
 
             legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_constraint_dict_end,
                                                      constants)
             for _, r in legal_assignments_end.iterrows():
-                current_element_representor_list.append(set(r[self._committee_members_list_end]))
+                current_element_representor_set.add(frozenset(r[self._committee_members_list_end]))
 
-            representor_sets.append((current_element_committee_members, current_element_representor_list))
+            representor_sets.append((current_element_committee_members, current_element_representor_set))
 
         self._representor_sets = representor_sets
 

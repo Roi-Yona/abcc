@@ -10,7 +10,6 @@ import unittest
 
 
 class TestThieleRuleExtractor(unittest.TestCase):
-
     def setUp(self):
         # ----------------------------------------------------------------
         # Define ABC setting.

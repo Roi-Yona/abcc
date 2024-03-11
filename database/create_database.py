@@ -109,6 +109,7 @@ def create_example_db(cur):
         (5, 'drama', "true"),
         (6, 'action', "false"),
         (7, 'comedy', "false"),
+        (8, 'new_category', "false"),
     ]
     cur.executemany("INSERT INTO candidates VALUES (?, ?, ?)", new_data)
 

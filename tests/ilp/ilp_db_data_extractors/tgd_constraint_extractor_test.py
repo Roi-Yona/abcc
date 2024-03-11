@@ -1,4 +1,4 @@
-import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
+import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface.database_server_interface as db_interface
@@ -7,14 +7,14 @@ import os
 import unittest
 
 
-class TestDenialConstraintExtractor(unittest.TestCase):
+class TestTGDConstraintExtractor(unittest.TestCase):
     def setUp(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
         self.candidates_starting_point = 0
         self.candidates_group_size = 10
         self.voters_group_size = 8
-        self.committee_size = 3
+        self.committee_size = 4
         # ----------------------------------------------------------------
         # Define the ILP solver.
         solver_name = "CP_SAT"
@@ -36,35 +36,37 @@ class TestDenialConstraintExtractor(unittest.TestCase):
 
     def test_extract_data_from_db_sanity(self):
         # Define the denial constraint.
-        denial_constraint_dict = dict()
-        denial_constraint_dict[('candidates', 't1')] = \
-            [('c1', 'candidate_id'), ('x', 'genres')]
-        denial_constraint_dict[('candidates', 't2')] = \
-            [('c2', 'candidate_id'), ('x', 'genres')]
-        committee_members_list = ['c1', 'c2']
-        candidates_tables = ['t1', 't2']
+        tgd_constraint_dict_start = dict()
+        tgd_constraint_dict_start['candidates', 't1'] = [('x', 'genres')]
+        committee_members_list_start = []
+        candidates_tables_start = ['t1']
+
+        tgd_constraint_dict_end = dict()
+        tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'genres')]
+        committee_members_list_end = ['c1']
+        candidates_tables_end = ['t2']
+
         # Define the denial constraint extractor.
-        extractor = denial_constraint_extractor.DenialConstraintExtractor(
+        extractor = tgd_constraint_extractor.TGDConstraintExtractor(
             self.abc_convertor, self.db_engine,
-            denial_constraint_dict,
-            committee_members_list,
-            candidates_tables,
+            tgd_constraint_dict_start,
+            committee_members_list_start,
+            tgd_constraint_dict_end,
+            committee_members_list_end,
+            candidates_tables_start,
+            candidates_tables_end,
             self.committee_size,
             self.candidates_starting_point,
-            self.voters_group_size,
-            self.candidates_group_size,
-            self.candidates_column_name,
-            self.voters_column_name)
+            self.voters_group_size, self.candidates_group_size,
+            self.candidates_column_name, self.voters_column_name)
 
         extractor._extract_data_from_db()
 
         # Test the result.
-        expected_denial_constraint_sets = \
-            {frozenset({1, 3}),
-             frozenset({1, 4}),
-             frozenset({1, 6}),
-             frozenset({3, 4}),
-             frozenset({3, 6}),
-             frozenset({4, 6}),
-             frozenset({2, 7})}
-        self.assertEqual(expected_denial_constraint_sets, extractor._denial_candidates_sets)
+        expected_representor_sets = [
+            (set(), {frozenset([1]), frozenset([3]), frozenset([4]), frozenset([6])}),
+            (set(), {frozenset([2]), frozenset([7])}),
+            (set(), {frozenset([5])}),
+            (set(), {frozenset([8])})
+        ]
+        self.assertEqual(expected_representor_sets, extractor._representor_sets)
