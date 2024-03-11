@@ -69,4 +69,3 @@ class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
 
 if __name__ == '__main__':
     pass
-    # TODO: Test denial constraints in extractor.

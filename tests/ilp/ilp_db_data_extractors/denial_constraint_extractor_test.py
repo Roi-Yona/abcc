@@ -4,11 +4,10 @@ import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface.database_server_interface as db_interface
 
 import os
-import pandas as pd
 import unittest
 
 
-class TestThieleRuleExtractor(unittest.TestCase):
+class TestDenialConstraintExtractor(unittest.TestCase):
 
     def setUp(self):
         # ----------------------------------------------------------------
