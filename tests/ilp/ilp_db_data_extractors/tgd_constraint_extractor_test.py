@@ -35,7 +35,7 @@ class TestTGDConstraintExtractor(unittest.TestCase):
         self.voters_column_name = 'voter_id'
 
     def test_extract_data_from_db_sanity(self):
-        # Define the denial constraint.
+        # Define the tgd constraint.
         tgd_constraint_dict_start = dict()
         tgd_constraint_dict_start['candidates', 't1'] = [('x', 'genres')]
         committee_members_list_start = []
@@ -46,7 +46,7 @@ class TestTGDConstraintExtractor(unittest.TestCase):
         committee_members_list_end = ['c1']
         candidates_tables_end = ['t2']
 
-        # Define the denial constraint extractor.
+        # Define the tgd constraint extractor.
         extractor = tgd_constraint_extractor.TGDConstraintExtractor(
             self.abc_convertor, self.db_engine,
             tgd_constraint_dict_start,

@@ -113,6 +113,18 @@ def create_example_db(cur):
     ]
     cur.executemany("INSERT INTO candidates VALUES (?, ?, ?)", new_data)
 
+    # Join test table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS popular (
+                            genres TEXT NOT NULL,
+                            adult TEXT NOT NULL)''')
+    new_data = [
+        ('drama', "false"),
+        ('comedy', "false"),
+        ('action', "true"),
+
+    ]
+    cur.executemany("INSERT INTO popular VALUES (?, ?)", new_data)
+
     # Create the voters table.
     cur.execute('''CREATE TABLE IF NOT EXISTS voters (
                         voter_id INTEGER NOT NULL,

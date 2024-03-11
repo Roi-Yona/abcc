@@ -30,7 +30,7 @@ class DBDataExtractor:
         When there are shared columns join natural inner join, otherwise, cross join.
 
         :param candidate_tables: All the tables containing self._candidates_column_name.
-        :param constants: A constants variables.
+        :param constants: A constants variables, dict with the new variable name and his const value.
         :param tables_dict: A dict as described in the brief.
         :return: The resulted df of the join operation,
         with names given to the tables_dict.
@@ -134,4 +134,3 @@ class DBDataExtractor:
 
 if __name__ == '__main__':
     pass
-    # TODO: Add ut to the join tables function.
