@@ -48,16 +48,15 @@ class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
         self._denial_candidates_sets = set()
 
     def _extract_data_from_db(self) -> None:
-        legal_assignments = self.join_tables(self._candidates_tables, self._denial_constraint_dict)
+        legal_assignments = self.join_tables(self._candidates_tables, self._denial_constraint_dict,
+                                             self._committee_members_list)
 
         # Extract the committee members sets out of the resulted join.
         denial_constraint_candidates_df = legal_assignments[self._committee_members_list]
 
         # Save all denial groups in one set.
         for candidates_list in denial_constraint_candidates_df.values:
-            current_set = set(candidates_list)
-            if len(current_set) == len(candidates_list):
-                self._denial_candidates_sets.add(frozenset(current_set))
+            self._denial_candidates_sets.add(frozenset(candidates_list))
 
         config.debug_print(MODULE_NAME,
                            f"The denial constraints candidates are: {self._denial_candidates_sets}.")

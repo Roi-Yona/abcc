@@ -24,6 +24,7 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
                  candidates_size_limit: int,
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
+                 different_variables=None
                  ):
 
         super().__init__(abc_convertor, database_engine,
@@ -35,6 +36,7 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
 
         self._tgd_constraint_dict_start = tgd_constraint_dict_start
         self._committee_members_list_start = committee_members_list_start
+        self._different_variables = different_variables
 
         self._tgd_constraint_dict_end = tgd_constraint_dict_end
         self._committee_members_list_end = committee_members_list_end
@@ -59,7 +61,7 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
             current_element_representor_set = set()
 
             legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_constraint_dict_end,
-                                                     constants)
+                                                     constants, self._different_variables)
             for _, r in legal_assignments_end.iterrows():
                 current_element_representor_set.add(frozenset(r[self._committee_members_list_end]))
 

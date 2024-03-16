@@ -58,3 +58,24 @@ class TestDBDataExtractor(unittest.TestCase):
         }
         expected_result_legal_assignments = pd.DataFrame(data)
         self.assertTrue(expected_result_legal_assignments.equals(legal_assignments))
+
+    def test_extract_data_from_db__different_variables_sanity(self):
+        # Define the join tables input.
+        tables_dict = dict()
+        tables_dict[('candidates', 't1')] = [('c1', 'candidate_id'), ('x', 'genres')]
+        tables_dict[('candidates', 't2')] = [('c2', 'candidate_id'), ('y', 'adult')]
+        candidate_tables = ['t1', 't2']
+        different_variables = ['c1', 'c2']
+
+        # Define the data constraint extractor.
+        extractor = db_data_extractor.DBDataExtractor(
+            self.abc_convertor, self.db_engine,
+            self.candidates_column_name,
+            self.candidates_starting_point,
+            self.candidates_group_size)
+
+        legal_assignments = extractor.join_tables(candidate_tables, tables_dict, constants=None,
+                                                  different_variables=different_variables)
+
+        print(legal_assignments)
+        # Make sure manually that there are no same c1 and c2 rows.

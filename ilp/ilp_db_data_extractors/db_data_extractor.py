@@ -3,12 +3,14 @@ import config
 import pandas as pd
 import database.database_server_interface.database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
+
 MODULE_NAME = "Database Extractor"
 
 
 class DBDataExtractor:
     """An abstract class for an ILP experiment.
     """
+
     def __init__(self,
                  abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
@@ -23,7 +25,8 @@ class DBDataExtractor:
         self._candidates_size_limit = candidates_size_limit
         self._candidates_starting_point = candidates_starting_point
 
-    def join_tables(self, candidate_tables: list, tables_dict: dict, constants=None) -> pd.DataFrame:
+    def join_tables(self, candidate_tables: list, tables_dict: dict, constants=None,
+                    different_variables=None) -> pd.DataFrame:
         """Extract from the DB a join between all the tables in the tables list.
         An input tables list example:
         tables_dict[('candidates', 't1')] = [('x', 'user_id'), ... ]
@@ -32,6 +35,7 @@ class DBDataExtractor:
         :param candidate_tables: All the tables containing self._candidates_column_name.
         :param constants: A constants variables, dict with the new variable name and his const value.
         :param tables_dict: A dict as described in the brief.
+        :param different_variables: A list of variables (with the new naming) that should differ from one another.
         :return: The resulted df of the join operation,
         with names given to the tables_dict.
         """
@@ -100,6 +104,13 @@ class DBDataExtractor:
         config.debug_print(MODULE_NAME,
                            "The extract data SQL phrase is: \n" + select_phrase + from_phrase + where_phrase)
         legal_assignments = self._db_engine.run_query(select_phrase + from_phrase + where_phrase)
+
+        if different_variables is not None:
+            # Create a boolean mask to identify rows where values in all columns are equal
+            mask = legal_assignments[different_variables].apply(lambda row: row.nunique() == 1, axis=1)
+            # Filter out rows where values in all specified columns are equal
+            legal_assignments = legal_assignments[~mask]
+
         config.debug_print(MODULE_NAME,
                            "The legal assignments are: \n" + str(legal_assignments))
         return legal_assignments
