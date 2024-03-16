@@ -29,9 +29,9 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         super().__init__(solver)
 
         # ABC data.
-        self._candidates_group_starting_point = 0
-        self._voters_group_starting_point = 0
-        self._candidates_group_size = 0
+        self.candidates_starting_point = 0
+        self.voters_starting_point = 0
+        self.candidates_group_size = 0
         self.voters_group_size = 0
         self._approval_profile = {}
         self._committee_size = 0
@@ -90,9 +90,9 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         :param lifted_setting            A flag indicate whether to use lifted inference optimization setting or not.
         """
         # Set the ABC data.
-        self._candidates_group_starting_point = candidates_group_starting_point
-        self._voters_group_starting_point = voters_group_starting_point
-        self._candidates_group_size = candidates_group_size
+        self.candidates_starting_point = candidates_group_starting_point
+        self.voters_starting_point = voters_group_starting_point
+        self.candidates_group_size = candidates_group_size
         self.voters_group_size = voters_group_size
         self._approval_profile = approval_profile
         self._committee_size = committee_size
@@ -103,9 +103,9 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             if len(profile_set) != 0:
                 self._voters_group.add(voter_id)
 
-        debug_message = f"Voters starting id = {self._voters_group_starting_point}.\n" \
-                        f"Candidates starting id = {self._candidates_group_starting_point}.\n" \
-                        f"Candidates group size = {self._candidates_group_size}.\n" \
+        debug_message = f"Voters starting id = {self.voters_starting_point}.\n" \
+                        f"Candidates starting id = {self.candidates_starting_point}.\n" \
+                        f"Candidates group size = {self.candidates_group_size}.\n" \
                         f"Voters Group size = {self.voters_group_size}.\n" \
                         f"Real voters group size = {len(self._voters_group)}.\n" \
                         f"Committee size = {self._committee_size}.\n" \
@@ -158,8 +158,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
     def _define_abc_setting_variables(self) -> None:
         # Create the committee ILP variables.
-        for i in range(self._candidates_group_starting_point,
-                       self._candidates_group_starting_point + self._candidates_group_size):
+        for i in range(self.candidates_starting_point,
+                       self.candidates_starting_point + self.candidates_group_size):
             self._model_candidates_variables[i] = self._model.BoolVar("c_" + str(i))
 
         # Create the voters approval candidates sum variables.

@@ -54,6 +54,8 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         # candidates_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
         candidates_id_columns = self._db_engine.run_query(sql_query)
         self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
+        self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
+
         if self._committee_size > len(candidates_id_columns):
             config.debug_print(MODULE_NAME, "Note: Candidates group size is lower then committee size, \n"
                                             "due to missing candidates in the data.")
@@ -67,6 +69,7 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         # voters_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
         voters_id_columns = self._db_engine.run_query(sql_query)
         self._voters_ending_point = int(voters_id_columns.max().iloc[0])
+        self._voters_starting_point = int(voters_id_columns.min().iloc[0])
         config.debug_print(MODULE_NAME, f"The voters id columns are:\n{str(voters_id_columns.head())}\n"
                                         f"The number of voters is {len(voters_id_columns)}.")
         # ----------------------------------------------
@@ -90,6 +93,8 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         # ----------------------------------------------
 
     def _convert_to_ilp(self) -> None:
+        self._candidates_size_limit = self._candidates_ending_point - self._candidates_starting_point + 1
+        self._voters_size_limit = self._voters_ending_point - self._voters_starting_point + 1
         self._abc_convertor.define_abc_setting(
             self._candidates_starting_point,
             self._voters_starting_point,
@@ -103,5 +108,3 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
 
 if __name__ == '__main__':
     pass
-# TODO: Add ut for this module.
-# TODO: Check if between is inclusive.

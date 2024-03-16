@@ -35,7 +35,7 @@ class TestThieleRuleExtractor(unittest.TestCase):
         db_path = os.path.join(f"{db_path}", f"{db_name}.db")
         self.db_engine = db_interface.Database(db_path)
         # ----------------------------------------------------------------
-        # Define the databases column names.
+        # Define the databases table and column names.
         self.voting_table_name = 'voters'
         self.candidates_table_name = 'candidates'
         self.candidates_column_name = 'candidate_id'

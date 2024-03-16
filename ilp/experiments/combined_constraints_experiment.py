@@ -16,6 +16,7 @@ START_EXPERIMENT_RANGE = 5000
 END_EXPERIMENT_RANGE = 280000
 TICK_EXPERIMENT_RANGE = 20000
 
+
 # TODO: Consider creating a class representing denial constraint.
 # TODO: Consider creating a class representing TGD constraint.
 
@@ -33,7 +34,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  # TGD constraints parameters are:
                  # (tgd_constraint_dict_start: dict, committee_members_list_start: list,
                  #  tgd_constraint_dict_end: dict, committee_members_list_end: list,
-                 #  candidates_tables_start: list, candidates_tables_end: list,
+                 #  candidates_tables_start: list, candidates_tables_end: list)
                  tgd_constraints: list,
 
                  # ABC settings:
@@ -109,11 +110,11 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         self._voters_group_size = self._abc_convertor.voters_group_size
 
         # Save the results.
-        new_result = {'candidates_starting_point': self._candidates_starting_point,
-                      'voters_starting_point': self._voters_starting_point,
-                      'voters_group_size': self._voters_group_size,
+        new_result = {'candidates_starting_point': self._abc_convertor.candidates_starting_point,
+                      'voters_starting_point': self._abc_convertor.voters_starting_point,
+                      'voters_group_size': self._abc_convertor.voters_group_size,
                       'lifted_voters_group_size': self._abc_convertor.lifted_voters_group_size,
-                      'candidates_group_size': self._candidates_group_size,
+                      'candidates_group_size': self._abc_convertor.candidates_group_size,
                       'committee_size': self._committee_size,
                       'solving_time(sec)': solved_time,
                       'number_of_solver_variables': self._solver.NumVariables(),
@@ -167,76 +168,4 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
 
 
 if __name__ == '__main__':
-    # Experiments----------------------------------------------------------------
-    _database_name = 'the_movies_database'
-    _solver_time_limit = 300
-    _solver_name = "SAT"
-
-    _candidates_size_limit = 30
-    _committee_size = 10
-    _voters_starting_point = 40
-    _candidates_starting_point = 38
-
-    _voting_table_name = 'voting'
-
-    _denial_constraint_dict = dict()
-    _denial_constraint_dict[('candidates', 't1')] = [('c1', 'candidate_id'), ('x', 'genres')]
-    _denial_constraint_dict[('candidates', 't2')] = [('c2', 'candidate_id'), ('x', 'genres')]
-    _committee_members_list = ['c1', 'c2']
-    _candidates_tables = ['t1', 't2']
-
-    # Define TGD constraints:
-    # _tgd_constraint_dict_start = dict()
-    # _tgd_constraint_dict_start['candidates', 't1'] = [('x', 'genres')]
-    #
-    # _committee_members_list_start = []
-    #
-    # _tgd_constraint_dict_end = dict()
-    # _tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'genres')]
-    #
-    # _committee_members_list_end = ['c1']
-    #
-    # _candidates_tables_start = ['t1']
-    #
-    # _candidates_tables_end = ['t2']
-
-    _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['candidates', 't1'] = [('x', 'original_language')]
-
-    _committee_members_list_start = []
-
-    _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'original_language')]
-
-    _committee_members_list_end = ['c1']
-
-    _candidates_tables_start = ['t1']
-
-    _candidates_tables_end = ['t2']
-
-    _tgd_constraints = [
-        (_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
-         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end)]
-
-    # Define the experiment - CC Thiele Rule:
-    # ---------------------------------------------------------------------------
-    _thiele_rule_name = 'CC Thiele Rule'
-    _constraint_type = 'one TGD Constraint'
-    _lifted_inference = True
-    _experiment_name = f'{_thiele_rule_name} Lifted Inference={_lifted_inference} ' \
-                       f'candidate_size={_candidates_size_limit} committee_size={_committee_size}' \
-                       f' denial_constraint={_constraint_type} solver_name={_solver_name}'
-    _thiele_rule_function_creator = thiele_functions.create_cc_thiele_dict
-
-    # Run the experiment.
-    combined_constraints_experiment_runner(_experiment_name, _database_name,
-                                           _solver_time_limit,
-                                           _solver_name,
-                                           [], _tgd_constraints,
-                                           _committee_size,
-                                           _voters_starting_point, _candidates_starting_point,
-                                           _candidates_size_limit,
-                                           _thiele_rule_function_creator,
-                                           _voting_table_name, _lifted_inference)
-    # ---------------------------------------------------------------------------
-    # TODO: Add ut to this module.
+    pass

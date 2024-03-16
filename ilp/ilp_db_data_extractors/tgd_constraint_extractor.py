@@ -75,44 +75,4 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
 
 
 if __name__ == '__main__':
-    print("---------------------------------------------------------")
-    print("Sanity tests for tgd extractor module starting...")
-    # ----------------------------------------------------------------
-    import os
-    import ilp.ilp_reduction.ilp_convertor as ilp_con
-
-    _database_name = "the_movies_database_tests"
-    db_path = os.path.join("..", "..", f"database", f"{_database_name}.db")
-    print(db_path)
-    _db_engine = db_interface.Database(db_path)
-    _solver = ilp_con.create_solver("SAT", 100)
-    _abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(_solver)
-
-    _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['movies', 't1'] = [('x', 'genres')]
-    _committee_members_list_start = []
-
-    _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end['movies', 't2'] = [('c1', 'movie_id'), ('x', 'genres')]
-    _candidates_tables = ['t2']
-    _committee_members_list_end = ['c1']
-
-    tgd_extractor = TGDConstraintExtractor(_abc_convertor, _db_engine,
-                                           _tgd_constraint_dict_start,
-                                           _committee_members_list_start,
-                                           _tgd_constraint_dict_end,
-                                           _committee_members_list_end,
-                                           [],
-                                           _candidates_tables,
-                                           3, 0, 15, 7,
-                                           candidates_column_name='movie_id')
-    tgd_extractor._extract_data_from_db()
-    if "[(set(), [{1}, {3}, {4}, {6}]), (set(), [{2}, {7}]), (set(), [{5}])]" != str(tgd_extractor._representor_sets):
-        print("ERROR: The solution is different than expected.")
-        print(str(abc_to_ilp_convertor))
-        exit(1)
-    # ----------------------------------------------------------------
-
-    print("Sanity tests for tgd extractor module done successfully.")
-    print("---------------------------------------------------------")
-    # TODO: Expend this ut to starting and ending point
+    pass
