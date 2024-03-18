@@ -27,12 +27,13 @@ def write_data_to_csv(file_path: str, data: list):
     :param data: list of list, each list is a csv row including the columns names.
     :return:
     """
-    with open(file_path, 'a') as csv_file:
+    with open(file_path, 'w') as csv_file:
         for row in data:
             csv_file.write(','.join(map(str, row)) + '\n')
 
 
 if __name__ == '__main__':
-    _soi_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', '00008-00000001.soi.txt')
-    _new_csv_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', '00008-00000001.csv')
-    soi_to_csv(_soi_file_path, _new_csv_file_path)
+    for i in range(1, 5):
+        _soi_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-0000000{i}.soi.txt')
+        _new_csv_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-0000000{i}.csv')
+        soi_to_csv(_soi_file_path, _new_csv_file_path)
