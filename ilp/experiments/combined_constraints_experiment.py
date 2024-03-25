@@ -154,8 +154,7 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                         f"voters_group_size={voters_size_limit}\n"
                                         f"candidates_group_size={candidates_size_limit}\n"
                                         f"committee_size={committee_size}")
-        # TODO: Change this name.
-        cc_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
+        current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
                                                       solver_time_limit, solver_name,
                                                       denial_constraints, tgd_constraints,
                                                       committee_size,
@@ -163,8 +162,8 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                                       voters_size_limit, candidates_size_limit,
                                                       thiele_rule_function_creator,
                                                       voting_table_name, lifted_inference=lifted_inference)
-        experiments_results = experiment.save_result(experiments_results, cc_experiment.run_experiment())
-        experiment.experiment_save_excel(experiments_results, experiment_name, cc_experiment.results_file_path)
+        experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
+        experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 
 
 if __name__ == '__main__':
