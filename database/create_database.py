@@ -164,12 +164,12 @@ def create_example_db(cur):
     cur.executemany("INSERT INTO voters VALUES (?, ?, ?)", new_data)
 
 
-def create_glasgow_voting_table(district_index: int):
+def create_glasgow_voting_table(cur, district_index: int):
     # Creating the voting table.
     cur.execute('''CREATE TABLE IF NOT EXISTS voting (
-    voter_id int, 
-    candidate_id int, 
-    rating float)''')
+    voter_id INTEGER NOT NULL,
+    candidate_id INTEGER NOT NULL,
+    rating FLOAT NOT NULL)''')
 
     # Extract voting data.
     voting_data = extract_list_from_csv(
@@ -178,6 +178,21 @@ def create_glasgow_voting_table(district_index: int):
     # Inserting data into the table
     for row in voting_data[1:]:
         cur.execute("INSERT INTO voting (voter_id, candidate_id, rating) values (?, ?, ?)", row)
+
+
+def create_glasgow_candidates_table(cur):
+    # Creating the candidates table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
+    candidate_id INTEGER PRIMARY KEY,
+    district INTEGER NOT NULL)''')
+
+    # Extract voting data.
+    candidates_data = extract_list_from_csv(
+        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-00000000_candidates.csv"))
+
+    # Inserting data into the table
+    for row in candidates_data[1:]:
+        cur.execute("INSERT INTO candidates (candidate_id, district) values (?, ?)", row[0:2])
 
 
 if __name__ == '__main__':
@@ -191,14 +206,15 @@ if __name__ == '__main__':
     cur = con.cursor()
 
     # Create the wanted table.
-    create_example_db(cur)
+    # create_example_db(cur)
 
     # cur.execute("DROP TABLE candidates;")
     # create_candidates_table()
     # cur.execute("DROP TABLE voting;")
     # create_voting_table()
     for i in range(1, 5):
-        create_glasgow_voting_table(i)
+        create_glasgow_voting_table(cur, i)
+    create_glasgow_candidates_table(cur)
 
     # Committing changes
     con.commit()

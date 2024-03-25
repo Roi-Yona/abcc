@@ -5,7 +5,6 @@ sys.path.append(os.path.join('..', '..'))
 import pandas as pd
 
 import config
-import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
 import ilp.ilp_db_data_extractors.thiele_rule_extractor as thiele_rule_db_data_extractor
 import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
 import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
@@ -151,10 +150,11 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
 
     for voters_size_limit in range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE):
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
-                                        f"voters_starting_poing={voters_starting_point}\n"
+                                        f"voters_starting_point={voters_starting_point}\n"
                                         f"voters_group_size={voters_size_limit}\n"
                                         f"candidates_group_size={candidates_size_limit}\n"
                                         f"committee_size={committee_size}")
+        # TODO: Change this name.
         cc_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
                                                       solver_time_limit, solver_name,
                                                       denial_constraints, tgd_constraints,
