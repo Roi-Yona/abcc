@@ -24,6 +24,9 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
                  candidates_size_limit: int,
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
+                 # TODO: Fix the old movie exp that doesn't have this parameter.
+                 # Different variables indicates that the representing committee members should be different.
+                 # For example, different committee members should represent district 1 if I demand three represents.
                  different_variables=None
                  ):
 

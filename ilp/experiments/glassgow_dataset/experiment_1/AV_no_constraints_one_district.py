@@ -18,12 +18,17 @@ if __name__ == '__main__':
     _voting_table_name = 'voting'
 
     # Define the experiment:
+    # The voting rule is approval voting.
+    # We find a committee where there is 1 representor from 1 district.
     # ---------------------------------------------------------------------------
     _number_of_districts = 1
     _candidates_starting_point = 1
-    _candidates_size_limit = 9
+    _candidates_size_limit = 0
     _voters_starting_point = 1
-    _voters_size_limit = 6900
+    _voters_size_limit = 0
+    for district_number in range(1, _number_of_districts + 1):
+        _candidates_size_limit += config.DISTRICTS_NUMBER_OF_CANDIDATES[district_number]
+        _voters_size_limit += config.DISTRICTS_NUMBER_OF_VOTERS[district_number]
     _committee_size = 1
     _tgd_constraints = []
     _denial_constrains = []
@@ -31,14 +36,13 @@ if __name__ == '__main__':
     _lifted_inference = True
 
     _experiment_name = f'exp{_experiment_number}{_thiele_rule_name} Lifted={_lifted_inference} ' \
-                       f'candidate_size={_candidates_size_limit} committee_size={_committee_size} ' \
                        f'solver={_solver_name} district_count={_number_of_districts}'
     _thiele_rule_function_creator = thiele_functions.create_av_thiele_dict
 
     config.debug_print(MODULE_NAME, f"candidates_starting_point={_candidates_starting_point}\n"
+                                    f"candidates_group_size={_candidates_size_limit}\n"
                                     f"voters_starting_point={_voters_starting_point}\n"
                                     f"voters_group_size={_voters_size_limit}\n"
-                                    f"candidates_group_size={_candidates_size_limit}\n"
                                     f"committee_size={_committee_size}")
     experiments_results = pd.DataFrame()
     av_experiment = combined_constraints_experiment. \

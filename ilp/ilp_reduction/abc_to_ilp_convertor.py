@@ -141,7 +141,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                         approval_profile_keys_list.remove(j)
 
             self.lifted_voters_group_size = len(self._lifted_voters)
-            config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}")
+            config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}\n"
+                                            f"The number of lifted voters is {self.lifted_voters_group_size}\n")
         else:
             self.lifted_voters_group_size = len(self._voters_group)
 

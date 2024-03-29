@@ -106,10 +106,8 @@ class DBDataExtractor:
         legal_assignments = self._db_engine.run_query(select_phrase + from_phrase + where_phrase)
 
         if different_variables is not None:
-            # Create a boolean mask to identify rows where values in all columns are equal
-            mask = legal_assignments[different_variables].apply(lambda row: row.nunique() == 1, axis=1)
             # Filter out rows where values in all specified columns are equal
-            legal_assignments = legal_assignments[~mask]
+            legal_assignments = legal_assignments[~legal_assignments.duplicated(keep=False)]
 
         config.debug_print(MODULE_NAME,
                            "The legal assignments are: \n" + str(legal_assignments))
