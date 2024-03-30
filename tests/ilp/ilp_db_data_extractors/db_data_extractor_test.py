@@ -48,7 +48,7 @@ class TestDBDataExtractor(unittest.TestCase):
             self.candidates_starting_point,
             self.candidates_group_size)
 
-        legal_assignments = extractor.join_tables(candidate_tables, tables_dict, constants)
+        legal_assignments = extractor.join_tables(candidate_tables, tables_dict, constants=constants)
 
         # Test the result.
         data = {

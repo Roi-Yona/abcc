@@ -61,7 +61,6 @@ class TestThieleRuleExtractor(unittest.TestCase):
         self.assertEqual(extractor._candidates_ending_point, 4)
         self.assertEqual(extractor._voters_ending_point, 3)
         expected_approval_profile = dict()
-        expected_approval_profile[0] = set()
         expected_approval_profile[1] = {3}
         expected_approval_profile[2] = {1, 2}
         expected_approval_profile[3] = {3, 1}

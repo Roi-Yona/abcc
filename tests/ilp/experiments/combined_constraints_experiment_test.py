@@ -46,9 +46,11 @@ class TestCombinedExperiment(unittest.TestCase):
         tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'genres')]
         committee_members_list_end = ['c1']
         candidates_tables_end = ['t2']
+
+        different_variables = committee_members_list_end
         self.tgd_constraints = [(tgd_constraint_dict_start, committee_members_list_start,
                                  tgd_constraint_dict_end, committee_members_list_end,
-                                 candidates_tables_start, candidates_tables_end)]
+                                 candidates_tables_start, candidates_tables_end, different_variables)]
         # TGD representor sets: ()->(1, 3, 4, 6); ()->(2, 7); ()->(5); ()->(8)
         # ----------------------------------------------------------------
         # Define the denial constraint.
