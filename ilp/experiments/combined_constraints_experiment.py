@@ -33,7 +33,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  # TGD constraints parameters are:
                  # (tgd_constraint_dict_start: dict, committee_members_list_start: list,
                  #  tgd_constraint_dict_end: dict, committee_members_list_end: list,
-                 #  candidates_tables_start: list, candidates_tables_end: list, different_variables: bool)
+                 #  candidates_tables_start: list, candidates_tables_end: list, different_variables: list)
                  tgd_constraints: list,
 
                  # ABC settings:

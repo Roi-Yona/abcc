@@ -25,7 +25,8 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
                  # TODO: Fix the old movie exp that doesn't have this parameter.
-                 # Different variables indicates that the representing committee members should be different.
+                 # Different variables indicates that this vars in the join should be different.
+                 # Usually used for committee_members_list_end.
                  # For example, different committee members should represent district 1 if I demand three represents.
                  different_variables=None
                  ):

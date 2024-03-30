@@ -33,7 +33,7 @@ if __name__ == '__main__':
     _committee_members_list_end = ['c1']
     _candidates_tables_end = ['t2']
 
-    _different_variables = True
+    _different_variables = _committee_members_list_end
 
     _tgd_constraints = [(_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
                          _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,

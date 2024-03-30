@@ -49,7 +49,7 @@ class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
 
     def _extract_data_from_db(self) -> None:
         legal_assignments = self.join_tables(self._candidates_tables, self._denial_constraint_dict,
-                                             self._committee_members_list)
+                                             constants=None, different_variables=self._committee_members_list)
 
         # Extract the committee members sets out of the resulted join.
         denial_constraint_candidates_df = legal_assignments[self._committee_members_list]
