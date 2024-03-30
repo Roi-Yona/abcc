@@ -1,6 +1,9 @@
 import os
 
 DATABASE_PATH = os.path.join('..', 'databases')
+# The first number of approved candidate in the ranked-choice ballot will consider as approved
+# candidates of the voter.
+NUMBER_OF_APPROVED_CANDIDATE = 1
 
 
 def soi_to_csv(soi_file_path: str, new_csv_file_path: str, candidate_starting_index=0, voter_starting_index=0):
@@ -16,8 +19,10 @@ def soi_to_csv(soi_file_path: str, new_csv_file_path: str, candidate_starting_in
             candidate_ids = line[1].split(',')
             for _ in range(number_of_voters):
                 current_voter_id += 1
-                # Take only the first place candidate as an approval.
-                for candidate_id in candidate_ids[:1]:
+                # In the original elections the election setting was STV, where there is a  ranked-choice ballot.
+                # Because we convert the problem to an ABC, we need to convert the ranked ballot to an approval
+                # profile, we do so by taking only the first candidate in the ballot.
+                for candidate_id in candidate_ids[:NUMBER_OF_APPROVED_CANDIDATE]:
                     current_row = [current_voter_id,
                                    int(candidate_id) + candidate_starting_index,
                                    approval_rate]
