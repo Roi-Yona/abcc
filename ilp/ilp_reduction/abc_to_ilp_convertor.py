@@ -109,7 +109,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                         f"Voters Group size = {self.voters_group_size}.\n" \
                         f"Real voters group size = {len(self._voters_group)}.\n" \
                         f"Committee size = {self._committee_size}.\n" \
-                        f"Approval profile = {self._approval_profile}."
+                        # f"Approval profile = {self._approval_profile}."
         config.debug_print(MODULE_NAME, debug_message)
 
         # Updating for the voter group size after 'cleaning'.
@@ -141,8 +141,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                         approval_profile_keys_list.remove(j)
 
             self.lifted_voters_group_size = len(self._lifted_voters)
-            config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}\n"
-                                            f"The number of lifted voters is {self.lifted_voters_group_size}\n")
+            # config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}\n")
+            config.debug_print(MODULE_NAME, f"The number of lifted voters is {self.lifted_voters_group_size}\n")
         else:
             self.lifted_voters_group_size = len(self._voters_group)
 

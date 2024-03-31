@@ -57,3 +57,4 @@ if __name__ == '__main__':
     experiments_results = experiment.save_result(experiments_results, av_experiment.run_experiment())
     experiment.experiment_save_excel(experiments_results, _experiment_name, av_experiment.results_file_path)
     # ---------------------------------------------------------------------------
+    # Sanity result: Candidate 7.

@@ -184,7 +184,8 @@ def create_glasgow_candidates_table(cur):
     # Creating the candidates table.
     cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
     candidate_id INTEGER PRIMARY KEY,
-    district INTEGER NOT NULL)''')
+    district INTEGER NOT NULL, 
+    party TEXT NOT NULL)''')
 
     # Extract voting data.
     candidates_data = extract_list_from_csv(
@@ -192,7 +193,20 @@ def create_glasgow_candidates_table(cur):
 
     # Inserting data into the table
     for row in candidates_data[1:]:
-        cur.execute("INSERT INTO candidates (candidate_id, district) values (?, ?)", row[0:2])
+        cur.execute("INSERT INTO candidates (candidate_id, district, party) values (?, ?, ?)", row[0:3])
+
+
+def create_important_parties_db(cur):
+    # Create the important parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS important_parties (
+                        party TEXT PRIMARY KEY)''')
+
+    # Insert multiple rows into the table
+    new_data = [
+        ('Scottish Green',)
+    ]
+
+    cur.executemany("INSERT INTO important_parties (party) values (?)", new_data)
 
 
 if __name__ == '__main__':
@@ -215,6 +229,7 @@ if __name__ == '__main__':
     for i in range(1, 5):
         create_glasgow_voting_table(cur, i)
     create_glasgow_candidates_table(cur)
+    create_important_parties_db(cur)
 
     # Committing changes
     con.commit()
