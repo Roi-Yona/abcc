@@ -181,6 +181,7 @@ def create_glasgow_voting_table(cur, district_index: int):
 
 
 def create_glasgow_candidates_table(cur):
+    # TODO: In order to enable different number of candidates per district, I should add a table per district.
     # Creating the candidates table.
     cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
     candidate_id INTEGER PRIMARY KEY,
@@ -209,6 +210,36 @@ def create_important_parties_db(cur):
     cur.executemany("INSERT INTO important_parties (party) values (?)", new_data)
 
 
+def create_context_degree_db(cur):
+    # Create the important parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS context_degree (
+                        candidate_id TEXT NOT NULL'
+                        degree_status text NOT NULL)''')
+
+    # Extract voting data.
+    candidates_data = extract_list_from_csv(
+        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-00000000_candidates.csv"))
+
+    # Inserting data into the table
+    for row in candidates_data[1:]:
+        cur.executemany("INSERT INTO context_degree (candidate_id, degree_status) values (?, ?)", [row[0], row[5]])
+
+
+def create_context_domain_db(cur):
+    # Create the important parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS context_domain (
+                        candidate_id TEXT NOT NULL'
+                        domain text NOT NULL)''')
+
+    # Extract voting data.
+    candidates_data = extract_list_from_csv(
+        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-00000000_candidates.csv"))
+
+    # Inserting data into the table
+    for row in candidates_data[1:]:
+        cur.executemany("INSERT INTO context_degree (candidate_id, degree_status) values (?, ?)", [row[0], row[6]])
+
+
 if __name__ == '__main__':
     # Connect the db in the current working directory,
     # implicitly creating one if it does not exist.
@@ -230,6 +261,7 @@ if __name__ == '__main__':
         create_glasgow_voting_table(cur, i)
     create_glasgow_candidates_table(cur)
     create_important_parties_db(cur)
+    create_context_domain_db(cur)
 
     # Committing changes
     con.commit()
