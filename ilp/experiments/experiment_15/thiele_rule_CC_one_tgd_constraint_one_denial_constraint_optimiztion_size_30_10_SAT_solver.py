@@ -39,9 +39,11 @@ if __name__ == '__main__':
 
     _candidates_tables_end = ['t2']
 
+    _different_variables = None
+
     _tgd_constraints = [
         (_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
-         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end)]
+         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]
 
     _denial_constraint_dict = dict()
     _denial_constraint_dict[('candidates', 't1')] = [('c1', 'candidate_id'), ('x', 'genres')]
