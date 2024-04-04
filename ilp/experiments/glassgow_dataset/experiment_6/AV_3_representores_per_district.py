@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append(os.path.join('..', '..', '..'))
+sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
