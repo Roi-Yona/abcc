@@ -217,8 +217,8 @@ def create_important_parties_db(cur):
 def create_context_degree_db(cur):
     # Create the important parties table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_degree (
-                        candidate_id TEXT NOT NULL'
-                        degree_status text NOT NULL)''')
+                        candidate_id INTEGER NOT NULL,
+                        degree_status TEXT NOT NULL)''')
 
     # Extract voting data.
     candidates_data = extract_list_from_csv(
@@ -226,14 +226,14 @@ def create_context_degree_db(cur):
 
     # Inserting data into the table
     for row in candidates_data[1:]:
-        cur.executemany("INSERT INTO context_degree (candidate_id, degree_status) values (?, ?)", [row[0], row[5]])
+        cur.execute("INSERT INTO context_degree (candidate_id, degree_status) values (?, ?)", [row[0], row[5]])
 
 
 def create_context_domain_db(cur):
     # Create the important parties table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_domain (
-                        candidate_id TEXT NOT NULL'
-                        domain text NOT NULL)''')
+                        candidate_id INTEGER NOT NULL,
+                        domain TEXT NOT NULL)''')
 
     # Extract voting data.
     candidates_data = extract_list_from_csv(
@@ -241,7 +241,8 @@ def create_context_domain_db(cur):
 
     # Inserting data into the table
     for row in candidates_data[1:]:
-        cur.executemany("INSERT INTO context_degree (candidate_id, degree_status) values (?, ?)", [row[0], row[6]])
+        if row[6] != 'NULL' and row[6] is not None and row[6] != '':
+            cur.execute("INSERT INTO context_domain (candidate_id, domain) values (?, ?)", [row[0], row[6]])
 
 
 if __name__ == '__main__':
@@ -265,7 +266,7 @@ if __name__ == '__main__':
         create_glasgow_voting_table(cur, i)
     create_glasgow_candidates_table(cur)
     create_important_parties_db(cur)
-    # create_context_domain_db(cur)
+    create_context_domain_db(cur)
 
     # Committing changes
     con.commit()

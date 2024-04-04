@@ -60,9 +60,9 @@ if __name__ == '__main__':
 
     # First denial constraint:
     denial_constraint_dict = dict()
-    denial_constraint_dict[('context', 't1')] = \
+    denial_constraint_dict[('context_domain', 't1')] = \
         [('c1', 'candidate_id'), ('x', 'domain')]
-    denial_constraint_dict[('context', 't2')] = \
+    denial_constraint_dict[('context_domain', 't2')] = \
         [('c2', 'candidate_id'), ('x', 'domain')]
     committee_members_list = ['c1', 'c2']
     candidates_tables = ['t1', 't2']
