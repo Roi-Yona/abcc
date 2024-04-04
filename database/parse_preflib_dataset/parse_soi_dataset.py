@@ -3,7 +3,7 @@ import os
 DATABASE_PATH = os.path.join('..', 'databases')
 # The first number of approved candidate in the ranked-choice ballot will consider as approved
 # candidates of the voter.
-NUMBER_OF_APPROVED_CANDIDATE = 1
+NUMBER_OF_APPROVED_CANDIDATE = 3
 
 
 def soi_to_csv(soi_file_path: str, new_csv_file_path: str, candidate_starting_index=0, voter_starting_index=0):

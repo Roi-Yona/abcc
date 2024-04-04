@@ -11,6 +11,10 @@ NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT = {1: 1,
                                            2: 1,
                                            3: 1,
                                            4: 1}
+NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3 = {1: 3,
+                                             2: 3,
+                                             3: 3,
+                                             4: 3}
 
 
 def debug_print(module_name, input_str):

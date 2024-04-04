@@ -7,7 +7,7 @@ import config
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 2
+_experiment_number = 6
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # Define the experiment:
     # The voting rule is approval voting.
-    # We find a committee where there is 1 representor from each district (enforce as a TGD).
+    # We find a committee where there are 3 representor from each district (enforce as a TGD).
     # ---------------------------------------------------------------------------
     _max_number_of_districts = 4
 
@@ -55,5 +55,5 @@ if __name__ == '__main__':
         _thiele_rule_function_creator,
         _lifted_inference,
         _max_number_of_districts,
-        config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)
+        config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3)
     # ---------------------------------------------------------------------------

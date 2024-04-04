@@ -7,7 +7,7 @@ import config
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 3
+_experiment_number = 4
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':

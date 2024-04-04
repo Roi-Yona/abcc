@@ -203,8 +203,12 @@ def create_important_parties_db(cur):
                         party TEXT PRIMARY KEY)''')
 
     # Insert multiple rows into the table
+    # The parties that left out: Solidarity, Liberal Democrats, Scottish Socialist, Scottish Unionist
     new_data = [
-        ('Scottish Green',)
+        ('Scottish Green',),
+        ('SNP',),
+        ('Labour',),
+        ('Conservative',)
     ]
 
     cur.executemany("INSERT INTO important_parties (party) values (?)", new_data)
@@ -261,7 +265,7 @@ if __name__ == '__main__':
         create_glasgow_voting_table(cur, i)
     create_glasgow_candidates_table(cur)
     create_important_parties_db(cur)
-    create_context_domain_db(cur)
+    # create_context_domain_db(cur)
 
     # Committing changes
     con.commit()
