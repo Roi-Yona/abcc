@@ -12,7 +12,7 @@ MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     _database_name = 'glasgow_city_council'
-    _solver_time_limit = 300
+    _solver_time_limit = 500
     _solver_name = "SAT"
     _voting_table_name = 'voting'
 
