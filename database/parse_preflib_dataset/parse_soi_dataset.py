@@ -1,4 +1,5 @@
 import os
+import config
 
 DATABASE_PATH = os.path.join('..', 'databases')
 # The first number of approved candidate in the ranked-choice ballot will consider as approved
@@ -65,29 +66,6 @@ def write_data_to_csv(file_path: str, data: list):
 
 
 if __name__ == '__main__':
-    starting_points_dict = dict()
-    starting_points_dict[1] = (9, 6900)
-    starting_points_dict[2] = (11, 10376)
-    starting_points_dict[3] = (10, 5199)
-    starting_points_dict[4] = (11, 8624)
-    starting_points_dict[5] = (10, 11052)
-    starting_points_dict[6] = (10, 8680)
-    starting_points_dict[7] = (13, 9078)
-    starting_points_dict[8] = (10, 70160)
-    starting_points_dict[9] = (11, 9650)
-    starting_points_dict[10] = (9, 8682)
-    starting_points_dict[11] = (10, 8984)
-    starting_points_dict[12] = (8, 9334)
-    starting_points_dict[13] = (11, 9567)
-    starting_points_dict[14] = (8, 9901)
-    starting_points_dict[15] = (9, 8654)
-    starting_points_dict[16] = (10, 8363)
-    starting_points_dict[17] = (9, 12744)
-    starting_points_dict[18] = (9, 9567)
-    starting_points_dict[19] = (11, 8803)
-    starting_points_dict[20] = (9, 8783)
-    starting_points_dict[21] = (10, 5410)
-
     candidates_starting_point = 0
     voters_starting_point = 0
 
@@ -112,5 +90,5 @@ if __name__ == '__main__':
                                                                                              f'_candidates.csv')
         soi_to_csv(_soi_file_path, _new_csv_file_path, candidates_starting_point, voters_starting_point)
         soi_to_csv_candidates(_soi_file_path, _new_csv_file_path_c, candidates_starting_point)
-        voters_starting_point += starting_points_dict[i][1]
-        candidates_starting_point += starting_points_dict[i][0]
+        voters_starting_point += config.DISTRICTS_NUMBER_OF_VOTERS[i]
+        candidates_starting_point += config.DISTRICTS_NUMBER_OF_CANDIDATES[i]
