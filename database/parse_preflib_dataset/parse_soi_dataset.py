@@ -15,6 +15,8 @@ def soi_to_csv(soi_file_path: str, new_csv_file_path: str, candidate_starting_in
             # Parse data.
             line = line.split(':')
             # The number of voter with this voter profile.
+            if not line[0].isdigit():
+                continue
             number_of_voters = int(line[0])
             candidate_ids = line[1].split(',')
             for _ in range(number_of_voters):
@@ -27,6 +29,25 @@ def soi_to_csv(soi_file_path: str, new_csv_file_path: str, candidate_starting_in
                                    int(candidate_id) + candidate_starting_index,
                                    approval_rate]
                     csv_rows.append(current_row)
+    print(csv_rows)
+    # Write data to the CSV file
+    write_data_to_csv(new_csv_file_path, csv_rows)
+
+
+def soi_to_csv_candidates(soi_file_path: str, new_csv_file_path: str, candidate_starting_index=0):
+    csv_rows = [['candidate_id', 'candidate_name']]
+    current_candidate_id = candidate_starting_index
+    with open(soi_file_path) as soi_file:
+        for line in soi_file:
+            # Parse data.
+            line = line.split(':')
+            # The number of voter with this voter profile.
+            if not line[0][0:18] == "# ALTERNATIVE NAME":
+                continue
+            current_candidate_id += 1
+            current_row = [current_candidate_id,
+                           line[1][1:][:-1]]
+            csv_rows.append(current_row)
     print(csv_rows)
     # Write data to the CSV file
     write_data_to_csv(new_csv_file_path, csv_rows)
@@ -49,18 +70,47 @@ if __name__ == '__main__':
     starting_points_dict[2] = (11, 10376)
     starting_points_dict[3] = (10, 5199)
     starting_points_dict[4] = (11, 8624)
+    starting_points_dict[5] = (10, 11052)
+    starting_points_dict[6] = (10, 8680)
+    starting_points_dict[7] = (13, 9078)
+    starting_points_dict[8] = (10, 70160)
+    starting_points_dict[9] = (11, 9650)
+    starting_points_dict[10] = (9, 8682)
+    starting_points_dict[11] = (10, 8984)
+    starting_points_dict[12] = (8, 9334)
+    starting_points_dict[13] = (11, 9567)
+    starting_points_dict[14] = (8, 9901)
+    starting_points_dict[15] = (9, 8654)
+    starting_points_dict[16] = (10, 8363)
+    starting_points_dict[17] = (9, 12744)
+    starting_points_dict[18] = (9, 9567)
+    starting_points_dict[19] = (11, 8803)
+    starting_points_dict[20] = (9, 8783)
+    starting_points_dict[21] = (10, 5410)
 
     candidates_starting_point = 0
     voters_starting_point = 0
 
-    for i in range(1, 5):
-        _soi_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-0000000{i}.soi.txt')
-        _new_csv_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-0000000{i}_pre.csv')
+    for i in range(1, 22):
+        t = str(i)
+        if i < 10:
+            t = '0' + t
+        _soi_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'data\\00008-000000{t}.soi')
+        _new_csv_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-000000{t}_pre.csv')
+        _new_csv_file_path_c = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-000000{t}'
+                                                                                             f'_pre_candidates.csv')
         soi_to_csv(_soi_file_path, _new_csv_file_path, candidates_starting_point, voters_starting_point)
+        soi_to_csv_candidates(_soi_file_path, _new_csv_file_path_c)
 
-    for i in range(1, 5):
-        _soi_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-0000000{i}.soi.txt')
-        _new_csv_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-0000000{i}.csv')
+    for i in range(1, 22):
+        t = str(i)
+        if i < 10:
+            t = '0' + t
+        _soi_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'data\\00008-000000{t}.soi')
+        _new_csv_file_path = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-000000{t}.csv')
+        _new_csv_file_path_c = os.path.join(DATABASE_PATH, 'glasgow_city_council_elections', f'00008-000000{t}'
+                                                                                             f'_candidates.csv')
         soi_to_csv(_soi_file_path, _new_csv_file_path, candidates_starting_point, voters_starting_point)
+        soi_to_csv_candidates(_soi_file_path, _new_csv_file_path_c, candidates_starting_point)
         voters_starting_point += starting_points_dict[i][1]
         candidates_starting_point += starting_points_dict[i][0]

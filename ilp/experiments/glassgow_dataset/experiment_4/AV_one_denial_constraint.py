@@ -12,16 +12,16 @@ MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     _database_name = 'glasgow_city_council'
-    _solver_time_limit = 500
+    _solver_time_limit = 1000
     _solver_name = "SAT"
     _voting_table_name = 'voting'
 
     # Define the experiment:
     # The voting rule is approval voting.
     # We find a committee where there is 1 representor from each district (enforce as a TGD).
-    # We find committee where there is representation for all the parties in the table important parties.
+    # We find committee where there is no two representors from the same domain.
     # ---------------------------------------------------------------------------
-    _max_number_of_districts = 4
+    _max_number_of_districts = 21
 
     # First TGD:
     _tgd_constraint_dict_start = dict()

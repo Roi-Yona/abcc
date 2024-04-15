@@ -172,8 +172,10 @@ def create_glasgow_voting_table(cur, district_index: int):
     rating FLOAT NOT NULL)''')
 
     # Extract voting data.
+    if district_index < 10:
+        district_index = '0' + str(district_index)
     voting_data = extract_list_from_csv(
-        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-0000000{district_index}.csv"))
+        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-000000{district_index}.csv"))
 
     # Inserting data into the table
     for row in voting_data[1:]:
@@ -242,7 +244,9 @@ def create_context_domain_db(cur):
     # Inserting data into the table
     for row in candidates_data[1:]:
         if row[6] != 'NULL' and row[6] is not None and row[6] != '':
-            cur.execute("INSERT INTO context_domain (candidate_id, domain) values (?, ?)", [row[0], row[6]])
+            l = row[6].strip().split(',')
+            for x in l:
+                cur.execute("INSERT INTO context_domain (candidate_id, domain) values (?, ?)", [row[0], x])
 
 
 if __name__ == '__main__':
@@ -262,7 +266,7 @@ if __name__ == '__main__':
     # create_candidates_table()
     # cur.execute("DROP TABLE voting;")
     # create_voting_table()
-    for i in range(1, 5):
+    for i in range(1, 22):
         create_glasgow_voting_table(cur, i)
     create_glasgow_candidates_table(cur)
     create_important_parties_db(cur)

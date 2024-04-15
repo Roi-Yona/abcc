@@ -7,7 +7,7 @@ import config
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 5
+_experiment_number = 8
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -19,8 +19,8 @@ if __name__ == '__main__':
     # Define the experiment:
     # The voting rule is approval voting.
     # We find a committee where there is 1 representor from each district (enforce as a TGD).
-    # We find committee where there is no two representors from the same domain (Denial).
-    # We find committee where there is candidate from each party in the important parties (TGD).
+    # We find committee where there is representation for all the parties.
+    # The valid committee should be from size 15 up, because there are 15 important parties.
     # ---------------------------------------------------------------------------
     _max_number_of_districts = 21
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     # Second TGD:
     _tgd_constraint_dict_start2 = dict()
-    _tgd_constraint_dict_start2['important_parties', 't1'] = [('x', 'party')]
+    _tgd_constraint_dict_start2['candidates', 't1'] = [('x', 'party')]
     _committee_members_list_start2 = []
     _candidates_tables_start2 = []
 
@@ -52,24 +52,13 @@ if __name__ == '__main__':
     _different_variables2 = _committee_members_list_end2
 
     _tgd_constraints = [(_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
-                         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,
+                        _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,
                          _different_variables),
                         (_tgd_constraint_dict_start2, _committee_members_list_start2, _tgd_constraint_dict_end2,
                          _committee_members_list_end2, _candidates_tables_start2, _candidates_tables_end2,
                          _different_variables2)
                         ]
-
-    # First denial constraint:
-    denial_constraint_dict = dict()
-    denial_constraint_dict[('context_domain', 't1')] = \
-        [('c1', 'candidate_id'), ('x', 'domain')]
-    denial_constraint_dict[('context_domain', 't2')] = \
-        [('c2', 'candidate_id'), ('x', 'domain')]
-    committee_members_list = ['c1', 'c2']
-    candidates_tables = ['t1', 't2']
-
-    _denial_constraints = [(denial_constraint_dict, committee_members_list, candidates_tables)]
-
+    _denial_constraints = []
     _thiele_rule_name = 'AV'
     _lifted_inference = True
 

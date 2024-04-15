@@ -12,7 +12,7 @@ MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     _database_name = 'glasgow_city_council'
-    _solver_time_limit = 500
+    _solver_time_limit = 1000
     _solver_name = "SAT"
     _voting_table_name = 'voting'
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # The voting rule is approval voting.
     # We find a committee where there is 1 representor from each district (enforce as a TGD).
     # ---------------------------------------------------------------------------
-    _max_number_of_districts = 4
+    _max_number_of_districts = 21
 
     _tgd_constraint_dict_start = dict()
     _tgd_constraint_dict_start['candidates', 't1'] = [('x', 'district')]
