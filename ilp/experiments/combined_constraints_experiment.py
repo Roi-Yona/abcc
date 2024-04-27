@@ -116,19 +116,29 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                       'lifted_voters_group_size': self._abc_convertor.lifted_voters_group_size,
                       'candidates_group_size': self._abc_convertor.candidates_group_size,
                       'committee_size': self._committee_size,
-                      'solving_time(sec)': solved_time,
+                      'ilp_solving_time(sec)': solved_time,
                       'number_of_solver_variables': self._solver.NumVariables(),
                       'number_of_solver_constraints': self._solver.NumConstraints(),
-                      'reduction_time(sec)': self._av_db_data_extractor.convert_to_ilp_timer +
-                                             sum([x.convert_to_ilp_timer for x in
-                                                  self._denial_constraint_db_extractors]) +
-                                             sum([x.convert_to_ilp_timer for x in
-                                                  self._tgd_constraint_db_extractors]),
+                      'ilp_construction_time(sec)': self._av_db_data_extractor.convert_to_ilp_timer +
+                                                    sum([x.convert_to_ilp_timer for x in
+                                                         self._denial_constraint_db_extractors]) +
+                                                    sum([x.convert_to_ilp_timer for x in
+                                                         self._tgd_constraint_db_extractors]),
                       'extract_data_time(sec)': self._av_db_data_extractor.extract_data_timer +
                                                 sum([x.extract_data_timer for x in
                                                      self._denial_constraint_db_extractors]) +
                                                 sum([x.extract_data_timer for x in
-                                                     self._tgd_constraint_db_extractors])
+                                                     self._tgd_constraint_db_extractors]),
+                      'total_solution_time(sec)': self._av_db_data_extractor.extract_data_timer +
+                                                  sum([x.extract_data_timer for x in
+                                                       self._denial_constraint_db_extractors]) +
+                                                  sum([x.extract_data_timer for x in
+                                                       self._tgd_constraint_db_extractors]) +
+                                                  sum([x.convert_to_ilp_timer for x in
+                                                       self._denial_constraint_db_extractors]) +
+                                                  sum([x.convert_to_ilp_timer for x in
+                                                       self._tgd_constraint_db_extractors]) +
+                                                  solved_time
                       }
 
         return pd.DataFrame([new_result])

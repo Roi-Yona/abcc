@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # The voting rule is approval voting.
     # We find a committee where there is 1 representor from each district (enforce as a TGD).
     # We find committee where there is representation for all the parties.
-    # The valid committee should be from size 15 up, because there are 15 important parties.
+    # The valid committee should be from size 15 up, because there are 15 parties.
     # ---------------------------------------------------------------------------
     _max_number_of_districts = 21
 
