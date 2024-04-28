@@ -12,7 +12,6 @@ MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     _database_name = 'glasgow_city_council'
-    _solver_time_limit = 1000
     _solver_name = "SAT"
     _voting_table_name = 'voting'
 
@@ -48,7 +47,7 @@ if __name__ == '__main__':
 
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
         _experiment_name, _database_name,
-        _solver_time_limit, _solver_name,
+        config.SOLVER_TIME_LIMIT, _solver_name,
         _denial_constraints, _tgd_constraints,
         _thiele_rule_function_creator,
         _lifted_inference,

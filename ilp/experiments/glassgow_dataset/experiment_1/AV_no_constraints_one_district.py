@@ -13,7 +13,6 @@ MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     _database_name = 'glasgow_city_council'
-    _solver_time_limit = 300
     _solver_name = "SAT"
     _voting_table_name = 'voting'
 
@@ -47,7 +46,7 @@ if __name__ == '__main__':
     experiments_results = pd.DataFrame()
     av_experiment = combined_constraints_experiment. \
         CombinedConstraintsExperiment(_experiment_name, _database_name,
-                                      _solver_time_limit, _solver_name,
+                                      config.SOLVER_TIME_LIMIT, _solver_name,
                                       _denial_constrains, _tgd_constraints,
                                       _committee_size,
                                       _voters_starting_point, _candidates_starting_point,

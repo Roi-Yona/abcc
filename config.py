@@ -19,6 +19,8 @@ for i in range(1, 22):
     NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT[i] = 1
     NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3[i] = 3
 
+SOLVER_TIME_LIMIT = 250
+
 
 def debug_print(module_name, input_str):
     if DEBUG:
