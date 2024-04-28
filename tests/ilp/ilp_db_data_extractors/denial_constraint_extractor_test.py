@@ -1,3 +1,5 @@
+import numpy as np
+
 import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ortools.linear_solver.pywraplp as pywraplp
@@ -60,11 +62,12 @@ class TestDenialConstraintExtractor(unittest.TestCase):
 
         # Test the result.
         expected_denial_constraint_sets = \
-            {frozenset({1, 3}),
-             frozenset({1, 4}),
-             frozenset({1, 6}),
-             frozenset({3, 4}),
-             frozenset({3, 6}),
-             frozenset({4, 6}),
-             frozenset({2, 7})}
-        self.assertEqual(expected_denial_constraint_sets, extractor._denial_candidates_sets)
+            [[1, 3],
+             [1, 4],
+             [1, 6],
+             [2, 7],
+             [3, 4],
+             [3, 6],
+             [4, 6],
+             ]
+        self.assertEqual(np.array_equal(expected_denial_constraint_sets, extractor._denial_candidates_sets), True)

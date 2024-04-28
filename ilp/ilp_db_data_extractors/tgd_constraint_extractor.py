@@ -24,7 +24,7 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
                  candidates_size_limit: int,
                  candidates_column_name='candidate_id',
                  voters_column_name='voter_id',
-                 # Different variables indicates that this vars in the join should be different.
+                 # Different variables indicates that these vars in the join should be different.
                  # Usually used for committee_members_list_end.
                  # For example, different committee members should represent district 1 if I demand three represents.
                  different_variables=None
@@ -54,6 +54,7 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
         Meaning that for each of 'possible representing groups'
         at least one of their elements 'committee members set' are in committee.
         """
+        # TODO: Add here different variables as option as well (currently not needed).
         legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_constraint_dict_start)
         # Extract the committee members sets out of the resulted join.
         representor_sets = []
@@ -61,19 +62,18 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
             constants = row.to_dict()
             config.debug_print(MODULE_NAME, "The current constants are: " + str(constants))
             current_element_committee_members = set(row[self._committee_members_list_start])
-            current_element_representor_set = set()
 
             legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_constraint_dict_end,
                                                      constants, self._different_variables)
-            for _, r in legal_assignments_end.iterrows():
-                current_element_representor_set.add(frozenset(r[self._committee_members_list_end]))
+            current_element_representor_set = legal_assignments_end[self._committee_members_list_end].values
 
             representor_sets.append((current_element_committee_members, current_element_representor_set))
 
         self._representor_sets = representor_sets
 
-        config.debug_print(MODULE_NAME,
-                           f"The tgd representor set: {self._representor_sets}.")
+        # This is commented because it might be time-consuming.
+        # config.debug_print(MODULE_NAME,
+        #                    f"The tgd representor set: {self._representor_sets}.")
 
     def _convert_to_ilp(self) -> None:
         self._abc_convertor.define_tgd_constraint(self._representor_sets)

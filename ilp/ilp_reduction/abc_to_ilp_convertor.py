@@ -67,8 +67,12 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
         for key, value in self._model_voters_approval_candidates_sum_variables.items():
             solution += f"Voter id: {key}, Voter approval sum: {value.solution_value()}.\n"
+            if key > 50:
+                break
         for key, value in self._model_voters_score_contribution_variables.items():
             solution += f"Voter id: {key}, Voter contribution: {value.solution_value()}.\n"
+            if key > 50:
+                break
         return solution
 
     def define_abc_setting(self,
@@ -132,6 +136,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                 i = approval_profile_keys_list[0]
                 self._lifted_voters[i] = []
                 approval_profile_keys_list.remove(i)
+
                 approval_profile_keys_list_inner = approval_profile_keys_list.copy()
                 while approval_profile_keys_list_inner:
                     j = approval_profile_keys_list_inner[0]
@@ -215,14 +220,11 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         else:
             self._model.Maximize(sum(self._model_voters_score_contribution_variables.values()))
 
-    def define_denial_constraint(self, denial_candidates_sets: set):
+    def define_denial_constraint(self, denial_candidates_sets):
         """Set and convert to ILP a denial constraint.
 
-        :param denial_candidates_sets: A set of all denial candidates groups.
+        :param denial_candidates_sets: A denial candidates groups.
         """
-        config.debug_print(MODULE_NAME, f"The denial constraint settings:\n"
-                                        f"The denial candidates sets are: {denial_candidates_sets}")
-
         for candidates_set in denial_candidates_sets:
             self._model.Add(
                 sum([x for i, x in self._model_candidates_variables.items() if i in candidates_set])

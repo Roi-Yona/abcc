@@ -30,7 +30,7 @@ class ILPConvertor:
         end_time = time.time()
         if self.solver_status == pywraplp.Solver.OPTIMAL:
             self._solved = True
-            self.solving_time = end_time - start_time
+        self.solving_time = end_time - start_time
 
     def get_model_state(self) -> str:
         """Creates a representation for the model current state.

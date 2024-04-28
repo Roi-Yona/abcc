@@ -119,11 +119,16 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                       'ilp_solving_time(sec)': solved_time,
                       'number_of_solver_variables': self._solver.NumVariables(),
                       'number_of_solver_constraints': self._solver.NumConstraints(),
-                      'ilp_construction_time(sec)': self._av_db_data_extractor.convert_to_ilp_timer +
-                                                    sum([x.convert_to_ilp_timer for x in
-                                                         self._denial_constraint_db_extractors]) +
-                                                    sum([x.convert_to_ilp_timer for x in
-                                                         self._tgd_constraint_db_extractors]),
+                      'ilp_construction_time_abc(sec)': self._av_db_data_extractor.convert_to_ilp_timer,
+                      'ilp_construction_time_denial_constraint(sec)': sum([x.convert_to_ilp_timer for x in
+                                                                           self._denial_constraint_db_extractors]),
+                      'ilp_construction_time_tgd(sec)': sum([x.convert_to_ilp_timer for x in
+                                                             self._tgd_constraint_db_extractors]),
+                      'ilp_construction_time_total(sec)': self._av_db_data_extractor.convert_to_ilp_timer +
+                                                          sum([x.convert_to_ilp_timer for x in
+                                                               self._denial_constraint_db_extractors]) +
+                                                          sum([x.convert_to_ilp_timer for x in
+                                                               self._tgd_constraint_db_extractors]),
                       'extract_data_time(sec)': self._av_db_data_extractor.extract_data_timer +
                                                 sum([x.extract_data_timer for x in
                                                      self._denial_constraint_db_extractors]) +
@@ -134,11 +139,15 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                        self._denial_constraint_db_extractors]) +
                                                   sum([x.extract_data_timer for x in
                                                        self._tgd_constraint_db_extractors]) +
+
+                                                  self._av_db_data_extractor.convert_to_ilp_timer +
                                                   sum([x.convert_to_ilp_timer for x in
                                                        self._denial_constraint_db_extractors]) +
                                                   sum([x.convert_to_ilp_timer for x in
                                                        self._tgd_constraint_db_extractors]) +
-                                                  solved_time
+
+                                                  solved_time,
+                      'solving_status': self._abc_convertor.solver_status
                       }
 
         return pd.DataFrame([new_result])

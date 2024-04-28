@@ -45,7 +45,6 @@ class Experiment:
         self._abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(self._solver)
 
     def run_model(self) -> float:
-        solved_time_scale = 1
         print("----------------------------------------------------------------------------")
         print(f"Experiment Name - {self._experiment_name} | Database Name - {self._database_name} start.")
 
@@ -59,8 +58,7 @@ class Experiment:
         print(f"Experiment Name - {self._experiment_name} | Database Name - {self._database_name} end.")
         print("----------------------------------------------------------------------------\n")
 
-        return self._abc_convertor.solving_time * solved_time_scale if self._abc_convertor.solving_time != -1 \
-            else -self._abc_convertor.solver_status
+        return self._abc_convertor.solving_time
 
     def run_experiment(self):
         pass

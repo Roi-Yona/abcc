@@ -98,11 +98,12 @@ class DBDataExtractor:
 
         # Add the different variable constraint.
         if different_variables is not None:
-            for i in range(len(different_variables)):
-                for j in range(i+1, len(different_variables)):
-                    if where_phrase != "WHERE ":
-                        where_phrase += " AND "
-                    where_phrase += f"{different_variables[i]}!={different_variables[j]}"
+            # Make sure they differ.
+            # Make sure they don't repeat in different order.
+            for i in range(len(different_variables)-1):
+                if where_phrase != "WHERE ":
+                    where_phrase += " AND "
+                where_phrase += f"{different_variables[i]}<{different_variables[i+1]}"
 
         where_phrase += '\n'
 
@@ -115,7 +116,7 @@ class DBDataExtractor:
         legal_assignments = self._db_engine.run_query(select_phrase + from_phrase + where_phrase)
 
         config.debug_print(MODULE_NAME,
-                           "The legal assignments are: \n" + str(legal_assignments))
+                           "The legal assignments are: \n" + str(legal_assignments.head()))
         return legal_assignments
 
     def _extract_data_from_db(self) -> None:
