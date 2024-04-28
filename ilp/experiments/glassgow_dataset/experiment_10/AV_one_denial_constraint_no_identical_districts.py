@@ -7,7 +7,7 @@ import config
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 7
+_experiment_number = 10
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -18,38 +18,19 @@ if __name__ == '__main__':
 
     # Define the experiment:
     # The voting rule is approval voting.
-    # We find a committee where there is 1 representor from each district (enforce as a TGD).
-    # We find committee where there is a denial constraint making sure there are no two candidates in the committee from
-    # the same party. The number of different parties is 15, therefore this is the max size of a legal committee in
-    # this settings.
+    # We find committee where using a denial constraint we enforce there are no two candidates in the committee from
+    # the district. The number of different districts is 21, therefore this will be the max size of a committee.
     # ---------------------------------------------------------------------------
     _max_number_of_districts = 21
 
-    # First TGD:
-    _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['candidates', 't1'] = [('x', 'district')]
-    _committee_members_list_start = []
-    # This indicates that the id limitation applies here as well.
-    _candidates_tables_start = ['t1']
-
-    _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'district')]
-    _committee_members_list_end = ['c1']
-    _candidates_tables_end = ['t2']
-
-    _different_variables = _committee_members_list_end
-
-    _tgd_constraints = [(_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
-                        _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,
-                         _different_variables),
-                        ]
+    _tgd_constraints = []
 
     # First denial constraint:
     denial_constraint_dict = dict()
     denial_constraint_dict[('candidates', 't1')] = \
-        [('c1', 'candidate_id'), ('x', 'party')]
+        [('c1', 'candidate_id'), ('x', 'district')]
     denial_constraint_dict[('candidates', 't2')] = \
-        [('c2', 'candidate_id'), ('x', 'party')]
+        [('c2', 'candidate_id'), ('x', 'district')]
     committee_members_list = ['c1', 'c2']
     candidates_tables = ['t1', 't2']
 
