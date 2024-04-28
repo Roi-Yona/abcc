@@ -64,8 +64,10 @@ class TestDBDataExtractor(unittest.TestCase):
         tables_dict = dict()
         tables_dict[('candidates', 't1')] = [('c1', 'candidate_id'), ('x', 'genres')]
         tables_dict[('candidates', 't2')] = [('c2', 'candidate_id'), ('y', 'adult')]
-        candidate_tables = ['t1', 't2']
-        different_variables = ['c1', 'c2']
+        tables_dict[('candidates', 't3')] = [('c3', 'candidate_id'), ('z', 'genres')]
+        tables_dict[('candidates', 't4')] = [('c4', 'candidate_id'), ('g', 'genres')]
+        candidate_tables = ['t1', 't2', 't3', 't4']
+        different_variables = ['c1', 'c2', 'c3', 'c4']
 
         # Define the data constraint extractor.
         extractor = db_data_extractor.DBDataExtractor(
@@ -78,4 +80,4 @@ class TestDBDataExtractor(unittest.TestCase):
                                                   different_variables=different_variables)
 
         print(legal_assignments)
-        # Make sure manually that there are no same c1 and c2 rows.
+        # Make sure manually that there are no same candidates.

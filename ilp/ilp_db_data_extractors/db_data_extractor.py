@@ -95,6 +95,15 @@ class DBDataExtractor:
                     if where_phrase != "WHERE ":
                         where_phrase += " AND "
                     where_phrase += f"{new_table_name}.{original_variable_name}={str_value}"
+
+        # Add the different variable constraint.
+        if different_variables is not None:
+            for i in range(len(different_variables)):
+                for j in range(i+1, len(different_variables)):
+                    if where_phrase != "WHERE ":
+                        where_phrase += " AND "
+                    where_phrase += f"{different_variables[i]}!={different_variables[j]}"
+
         where_phrase += '\n'
 
         # If trim WHERE phrase is empty, remove it.
@@ -104,12 +113,6 @@ class DBDataExtractor:
         config.debug_print(MODULE_NAME,
                            "The extract data SQL phrase is: \n" + select_phrase + from_phrase + where_phrase)
         legal_assignments = self._db_engine.run_query(select_phrase + from_phrase + where_phrase)
-
-        if different_variables is not None and len(different_variables) > 1:
-            # Create a boolean mask to identify rows where values in all columns are equal
-            mask = (legal_assignments[different_variables].nunique(axis=1) > 1)
-            # Filter out rows where values in all specified columns are equal
-            legal_assignments = legal_assignments[mask]
 
         config.debug_print(MODULE_NAME,
                            "The legal assignments are: \n" + str(legal_assignments))
