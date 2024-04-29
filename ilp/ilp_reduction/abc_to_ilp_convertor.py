@@ -44,6 +44,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._lifted_voters = dict()
         self.lifted_voters_group_size = 0
         self._lifted_setting = False
+        self._new_voters = None
 
         # The voting rule.
         self._thiele_score_function = {}
@@ -113,7 +114,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                         f"Voters Group size = {self.voters_group_size}.\n" \
                         f"Real voters group size = {len(self._voters_group)}.\n" \
                         f"Committee size = {self._committee_size}.\n" \
-                        # f"Approval profile = {self._approval_profile}."
+            # f"Approval profile = {self._approval_profile}."
         config.debug_print(MODULE_NAME, debug_message)
 
         # Updating for the voter group size after 'cleaning'.
@@ -148,19 +149,14 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             self.lifted_voters_group_size = len(self._lifted_voters)
             # config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}\n")
             config.debug_print(MODULE_NAME, f"The number of lifted voters is {self.lifted_voters_group_size}\n")
+            self._new_voters = self._lifted_voters.keys()
         else:
+            self._new_voters = self._voters_group
             self.lifted_voters_group_size = len(self._voters_group)
 
         self._define_abc_setting_variables()
         self._define_abc_setting_constraints()
         self._define_abc_setting_objective()
-
-    def _is_lifted_index(self, index: int) -> bool:
-        if self._lifted_setting is False:
-            return True
-        if index in self._lifted_voters.keys():
-            return True
-        return False
 
     def _define_abc_setting_variables(self) -> None:
         # Create the committee ILP variables.
@@ -169,16 +165,14 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             self._model_candidates_variables[i] = self._model.BoolVar("c_" + str(i))
 
         # Create the voters approval candidates sum variables.
-        for i in self._voters_group:
-            if self._is_lifted_index(i):
-                self._model_voters_approval_candidates_sum_variables[i] = \
-                    self._model.IntVar(0, self._committee_size, "v_" + str(i) + "_approved_candidates_sum")
+        for i in self._new_voters:
+            self._model_voters_approval_candidates_sum_variables[i] = \
+                self._model.IntVar(0, self._committee_size, "v_" + str(i) + "_approved_candidates_sum")
 
         # Create the voters score contribution ILP variables.
-        for i in self._voters_group:
-            if self._is_lifted_index(i):
-                self._model_voters_score_contribution_variables[i] = \
-                    self._model.NumVar(0, self._max_thiele_function_value, "v_" + str(i) + "_score")
+        for i in self._new_voters:
+            self._model_voters_score_contribution_variables[i] = \
+                self._model.NumVar(0, self._max_thiele_function_value, "v_" + str(i) + "_score")
 
     def _define_abc_setting_constraints(self) -> None:
         # Add the constraint about the number of candidates in the committee.
@@ -186,31 +180,28 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         # Add the constraint for the voters approval candidates sum variables
         # to be equal to the sum of their approved candidates.
-        for voter_index in self._voters_group:
-            if self._is_lifted_index(voter_index):
-                self._model.Add(self._model_voters_approval_candidates_sum_variables[voter_index] ==
-                                sum([candidate_var for index, candidate_var in
-                                     self._model_candidates_variables.items() if
-                                     (index in self._approval_profile[voter_index])]))
+        for voter_index in self._new_voters:
+            self._model.Add(self._model_voters_approval_candidates_sum_variables[voter_index] ==
+                            sum([self._model_candidates_variables[candidate_index] for candidate_index in
+                                 self._approval_profile[voter_index]]))
 
         # Add the constraint about the voter score contribution.
-        for voter_index in self._voters_group:
-            if self._is_lifted_index(voter_index):
-                for i in range(0, self._committee_size + 1):
-                    # Define the abs value replacement y_plus + y_minus = abs(i-voter_approval_sum).
-                    b = self._model.BoolVar('v_b_' + str(voter_index) + "_" + str(i))
-                    y_plus = self._model.IntVar(0, self._committee_size + 1,
-                                                'v_y_plus_' + str(voter_index) + "_" + str(i))
-                    y_minus = self._model.IntVar(0, self._committee_size + 1,
-                                                 'v_y_minus_' + str(voter_index) + "_" + str(i))
-                    self._model.Add(y_minus <= ((1 - b) * (self._committee_size + 1)))
-                    self._model.Add(y_plus <= (b * (self._committee_size + 1)))
-                    self._model.Add((y_plus - y_minus) ==
-                                    (i - self._model_voters_approval_candidates_sum_variables[voter_index]))
-                    # Add the constraint voter_contribution <= abs(i-voter_approval_sum)*(Max_Thiele+1) + thiele(i).
-                    self._model.Add(self._model_voters_score_contribution_variables[voter_index] <=
-                                    ((y_plus + y_minus) * (self._max_thiele_function_value + 1) +
-                                     self._thiele_score_function[i]))
+        for voter_index in self._new_voters:
+            for i in range(0, self._committee_size + 1):
+                # Define the abs value replacement y_plus + y_minus = abs(i-voter_approval_sum).
+                b = self._model.BoolVar('v_b_' + str(voter_index) + "_" + str(i))
+                y_plus = self._model.IntVar(0, self._committee_size + 1,
+                                            'v_y_plus_' + str(voter_index) + "_" + str(i))
+                y_minus = self._model.IntVar(0, self._committee_size + 1,
+                                             'v_y_minus_' + str(voter_index) + "_" + str(i))
+                self._model.Add(y_minus <= ((1 - b) * (self._committee_size + 1)))
+                self._model.Add(y_plus <= (b * (self._committee_size + 1)))
+                self._model.Add((y_plus - y_minus) ==
+                                (i - self._model_voters_approval_candidates_sum_variables[voter_index]))
+                # Add the constraint voter_contribution <= abs(i-voter_approval_sum)*(Max_Thiele+1) + thiele(i).
+                self._model.Add(self._model_voters_score_contribution_variables[voter_index] <=
+                                ((y_plus + y_minus) * (self._max_thiele_function_value + 1) +
+                                 self._thiele_score_function[i]))
 
     def _define_abc_setting_objective(self) -> None:
         if self._lifted_setting:
@@ -227,7 +218,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         """
         for candidates_set in denial_candidates_sets:
             self._model.Add(
-                sum([x for i, x in self._model_candidates_variables.items() if i in candidates_set])
+                sum([self._model_candidates_variables[candidate_index] for candidate_index in candidates_set])
                 <= (len(candidates_set) - 1))
 
     def define_tgd_constraint(self, element_members_representor_sets: list):
