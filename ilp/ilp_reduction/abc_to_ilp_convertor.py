@@ -1,9 +1,7 @@
-import pandas as pd
-
+import time
 import config
 import ortools.linear_solver.pywraplp as pywraplp
 import ilp.ilp_reduction.ilp_convertor as ilp_convertor
-import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
 
 MODULE_NAME = "ABC to ILP Convertor"
 
@@ -27,6 +25,11 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         :param solver: The input solver wrapper.
         """
         super().__init__(solver)
+
+        self.time_part_1 = 0
+        self.time_part_2 = 0
+        self.time_part_3 = 0
+        self.time_part_4 = 0
 
         # ABC data.
         self.candidates_starting_point = 0
@@ -94,6 +97,12 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                                          the thiele score as value ({1,..,k}->N).
         :param lifted_setting            A flag indicate whether to use lifted inference optimization setting or not.
         """
+        self.start_time = time.time()
+        self.time_part_1 = 0
+        self.time_part_2 = 0
+        self.time_part_3 = 0
+        self.time_part_4 = 0
+
         # Set the ABC data.
         self.candidates_starting_point = candidates_group_starting_point
         self.voters_starting_point = voters_group_starting_point
@@ -154,9 +163,23 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             self._new_voters = self._voters_group
             self.lifted_voters_group_size = len(self._voters_group)
 
+        self.end_time = time.time()
+        self.time_part_1 = self.start_time - self.end_time
+
+        self.start_time = time.time()
         self._define_abc_setting_variables()
+        self.end_time = time.time()
+        self.time_part_2 = self.start_time - self.end_time
+
+        self.start_time = time.time()
         self._define_abc_setting_constraints()
+        self.end_time = time.time()
+        self.time_part_3 = self.start_time - self.end_time
+
+        self.start_time = time.time()
         self._define_abc_setting_objective()
+        self.end_time = time.time()
+        self.time_part_4 = self.start_time - self.end_time
 
     def _define_abc_setting_variables(self) -> None:
         # Create the committee ILP variables.
