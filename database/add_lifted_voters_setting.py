@@ -1,6 +1,6 @@
-import sqlite3
 import os
-
+import sys
+sys.path.append(os.path.join('..'))
 import config
 from database.database_server_interface import database_server_interface as db_interface
 
