@@ -71,7 +71,7 @@ def create_lifted_voting_table(
 if __name__ == '__main__':
     # Create a db engine in order to extract the regular approval profile.
     db_engine = db_interface.Database(GLASGOW_CITY_COUNCIL_DATABASE_PATH)
-    db_engine._cur.execute("DROP TABLE lifted_voting")
+    db_engine._cur.execute("DROP TABLE IF EXISTS lifted_voting")
     # Save changes and close connection.
     db_engine._con.commit()
     db_engine._con.close()
