@@ -145,7 +145,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                        self._denial_constraint_db_extractors]) +
                                                   sum([x.convert_to_ilp_timer for x in
                                                        self._tgd_constraint_db_extractors]) +
-                      
+
                                                   solved_time,
                       'time_part_1(sec)': self._abc_convertor.time_part_1,
                       'time_part_2(sec)': self._abc_convertor.time_part_2,

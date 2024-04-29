@@ -164,22 +164,22 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             self.lifted_voters_group_size = len(self._voters_group)
 
         self.end_time = time.time()
-        self.time_part_1 = self.start_time - self.end_time
+        self.time_part_1 = self.end_time - self.start_time
 
         self.start_time = time.time()
         self._define_abc_setting_variables()
         self.end_time = time.time()
-        self.time_part_2 = self.start_time - self.end_time
+        self.time_part_2 = self.end_time - self.start_time
 
         self.start_time = time.time()
         self._define_abc_setting_constraints()
         self.end_time = time.time()
-        self.time_part_3 = self.start_time - self.end_time
+        self.time_part_3 = self.end_time - self.start_time
 
         self.start_time = time.time()
         self._define_abc_setting_objective()
         self.end_time = time.time()
-        self.time_part_4 = self.start_time - self.end_time
+        self.time_part_4 = self.end_time - self.start_time
 
     def _define_abc_setting_variables(self) -> None:
         # Create the committee ILP variables.
