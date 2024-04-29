@@ -1,7 +1,6 @@
 from datetime import datetime
 import pandas as pd
 import os
-import sys
 
 import config
 from database.database_server_interface import database_server_interface as db_interface

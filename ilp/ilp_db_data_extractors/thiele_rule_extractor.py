@@ -4,7 +4,6 @@ import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
 MODULE_NAME = "Thiele Rule DB Data Extractor"
-APPROVAL_THRESHOLD = 4
 
 
 class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
@@ -17,12 +16,16 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
                  voters_size_limit: int,
                  candidates_size_limit: int,
                  thiele_rule_function: dict,
-                 voting_table_name='voting',
-                 candidates_table_name='candidates',
-                 candidates_column_name='candidate_id',
-                 voters_column_name='voter_id',
-                 approval_column_name='rating',
-                 lifted_setting=True):
+                 voting_table_name=config.VOTING_TABLE_NAME,
+                 candidates_table_name=config.CANDIDATES_TABLE_NAME,
+                 candidates_column_name=config.CANDIDATES_COLUMN_NAME,
+                 voters_column_name=config.VOTERS_COLUMN_NAME,
+                 approval_column_name=config.APPROVAL_COLUMN_NAME,
+                 # lifted_setting == 0 than it is off.
+                 # lifted_setting == 1 than it is calculated in the experiment.
+                 # lifted_setting == 2 than there is an upfront lifted table.
+                 # TODO: Fix this parameter input in the experiment of Glasgow to be equal to 2.
+                 lifted_setting=1):
         super().__init__(abc_convertor, database_engine,
                          candidates_column_name, candidates_starting_point, candidates_size_limit)
 
@@ -35,6 +38,7 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         self._committee_size = committee_size
         self._thiele_function = thiele_rule_function
         self._lifted_setting = lifted_setting
+        self._lifted_voters = dict()
 
         # Initializing DB properties.
         self._voting_table_name = voting_table_name
@@ -43,7 +47,7 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         self._approval_column_name = approval_column_name
 
         # In this database each user rates the movie 1-5, we define approval as a rating higher or equal to 4.
-        self._approval_threshold = APPROVAL_THRESHOLD
+        self._approval_threshold = config.APPROVAL_THRESHOLD
 
     def _extract_data_from_db(self) -> None:
         # ----------------------------------------------
@@ -51,7 +55,6 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         sql_query = f"SELECT DISTINCT {self._candidates_column_name} FROM {self._candidates_table_name} " \
                     f"WHERE {self._candidates_column_name} " \
                     f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
-        # candidates_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
         candidates_id_columns = self._db_engine.run_query(sql_query)
         self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
         self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
@@ -66,7 +69,6 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         sql_query = f"SELECT DISTINCT {self._voters_column_name} FROM {self._voting_table_name} " \
                     f"WHERE {self._voters_column_name} " \
                     f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point};"
-        # voters_id_columns = db_interface.database_run_query(self._db_engine, sql_query)
         voters_id_columns = self._db_engine.run_query(sql_query)
         self._voters_ending_point = int(voters_id_columns.max().iloc[0])
         self._voters_starting_point = int(voters_id_columns.min().iloc[0])
@@ -82,7 +84,6 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
             f"AND {self._candidates_column_name} " \
             f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
 
-        # voter_rating_columns = db_interface.database_run_query(self._db_engine, sql_query)
         voter_rating_columns = self._db_engine.run_query(sql_query)
         grouped_by_voter_id_column = voter_rating_columns.groupby(by=self._voters_column_name)
         for voter_id in range(self._voters_starting_point, self._voters_ending_point+1):
@@ -90,6 +91,17 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         for voter_id, candidates_ids_df in grouped_by_voter_id_column:
             self._approval_profile[voter_id] = set(candidates_ids_df[self._candidates_column_name])
         config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
+
+        if self._lifted_setting == 2:
+            # There is an up-front lifted table.
+            sql_query = f"SELECT {config.LIFTED_VOTERS_COLUMN_NAME}, {config.LIFTED_VOTERS_ARRAY_LENGTH} " \
+                        f"FROM {config.LIFTED_TABLE_NAME} " \
+                        f"WHERE {config.LIFTED_VOTERS_COLUMN_NAME} " \
+                        f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point};"
+            lifted_voters_rating_columns = self._db_engine.run_query(sql_query)
+            for row in lifted_voters_rating_columns:
+                self._lifted_voters[row[config.LIFTED_VOTERS_COLUMN_NAME]] = \
+                    [None] * row[config.LIFTED_VOTERS_ARRAY_LENGTH]
         # ----------------------------------------------
 
     def _convert_to_ilp(self) -> None:
@@ -103,7 +115,8 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
             self._approval_profile,
             self._committee_size,
             self._thiele_function,
-            self._lifted_setting)
+            self._lifted_setting,
+            self._lifted_voters)
 
 
 if __name__ == '__main__':

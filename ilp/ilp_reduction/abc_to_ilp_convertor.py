@@ -83,8 +83,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                            candidates_group_starting_point: int,
                            voters_group_starting_point: int,
                            candidates_group_size: int, voters_group_size: int, approval_profile: dict,
-                           committee_size: int, thiele_score_function: dict, lifted_setting: bool,
-                           ) -> None:
+                           committee_size: int, thiele_score_function: dict, lifted_setting: int,
+                           lifted_voters=None) -> None:
         """Set and convert to ILP the ABC problem setting, including the thiele score function.
         :param candidates_group_starting_point: The starting id for the candidates group.
         :param voters_group_starting_point: The starting id for the voters group.
@@ -95,7 +95,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         :param committee_size:           The committee size.
         :param thiele_score_function:    A dict with the number of approved candidates as key,
                                          the thiele score as value ({1,..,k}->N).
-        :param lifted_setting            A flag indicate whether to use lifted inference optimization setting or not.
+        :param lifted_setting:           Indicate whether to use lifted inference optimization setting or not.
+        :param lifted_voters:            If there is, an upfront lifted voters group.
         """
         self.start_time = time.time()
         self.time_part_1 = 0
@@ -111,6 +112,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._approval_profile = approval_profile
         self._committee_size = committee_size
         self._lifted_setting = lifted_setting
+        self._lifted_voters = lifted_voters
 
         # Clean the voters group (only a voters with a none empty approval profile left).
         for voter_id, profile_set in self._approval_profile.items():
@@ -140,7 +142,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         # Union all voters with the same approval profile in order to 'lifted inference' those voters
         # and represent them as one weighted voter.
-        if self._lifted_setting:
+        if self._lifted_setting == 1:
+            # Calculate based on the approval profile.
             approval_profile_keys_list = list(approval_profile.keys())
             while approval_profile_keys_list:
                 i = approval_profile_keys_list[0]
@@ -155,6 +158,12 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                         self._lifted_voters[i].append(j)
                         approval_profile_keys_list.remove(j)
 
+            self.lifted_voters_group_size = len(self._lifted_voters)
+            # config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}\n")
+            config.debug_print(MODULE_NAME, f"The number of lifted voters is {self.lifted_voters_group_size}\n")
+            self._new_voters = self._lifted_voters.keys()
+        elif self._lifted_setting == 2:
+            # There is already a lifted voters calculated.
             self.lifted_voters_group_size = len(self._lifted_voters)
             # config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}\n")
             config.debug_print(MODULE_NAME, f"The number of lifted voters is {self.lifted_voters_group_size}\n")

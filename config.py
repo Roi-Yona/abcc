@@ -20,6 +20,18 @@ for i in range(1, 22):
     NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3[i] = 3
 
 SOLVER_TIME_LIMIT = 250
+# Every candidate rated > approval_threshold consider as approved by the voter.
+APPROVAL_THRESHOLD = 4
+
+VOTING_TABLE_NAME = 'voting'
+CANDIDATES_TABLE_NAME = 'candidates'
+VOTERS_COLUMN_NAME = 'voter_id'
+CANDIDATES_COLUMN_NAME = 'candidate_id'
+APPROVAL_COLUMN_NAME = 'rating'
+
+LIFTED_TABLE_NAME = 'lifted_voting'
+LIFTED_VOTERS_COLUMN_NAME = 'voter_id'
+LIFTED_VOTERS_ARRAY_LENGTH = 'lifted_voters_array_length'
 
 
 def debug_print(module_name, input_str):
