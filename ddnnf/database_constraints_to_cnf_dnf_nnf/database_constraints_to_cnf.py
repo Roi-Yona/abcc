@@ -168,7 +168,7 @@ if __name__ == '__main__':
     server = 'LAPTOP-MO1JPG72'
     database = 'the_basketball_synthetic_db'
     # db_engine = db_interface.database_connect(server, database)
-    # TODO: Fix the database path and create the proper database.
+    # TODO*: Fix the database path and create the proper database.
     db_engine = db_interface.Database(database)
 
     # Restrict denial convert sanity test.

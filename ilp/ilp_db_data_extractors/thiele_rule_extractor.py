@@ -23,8 +23,7 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
                  approval_column_name=config.APPROVAL_COLUMN_NAME,
                  # lifted_setting == 0 than it is off.
                  # lifted_setting == 1 than it is calculated in the experiment.
-                 # lifted_setting == 2 than there is an upfront lifted table.
-                 # TODO: Fix this parameter input in the experiment of Glasgow to be equal to 2.
+                 # lifted_setting == 2 than there is an up-front lifted table.
                  lifted_setting=1):
         super().__init__(abc_convertor, database_engine,
                          candidates_column_name, candidates_starting_point, candidates_size_limit)

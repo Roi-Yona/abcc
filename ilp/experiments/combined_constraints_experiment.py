@@ -16,8 +16,8 @@ END_EXPERIMENT_RANGE = 280000
 TICK_EXPERIMENT_RANGE = 20000
 
 
-# TODO: Consider creating a class representing denial constraint.
-# TODO: Consider creating a class representing TGD constraint.
+# TODO*: Consider creating a class representing denial constraint.
+# TODO*: Consider creating a class representing TGD constraint.
 
 
 class CombinedConstraintsExperiment(experiment.Experiment):
