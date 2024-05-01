@@ -21,10 +21,7 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
                  candidates_column_name=config.CANDIDATES_COLUMN_NAME,
                  voters_column_name=config.VOTERS_COLUMN_NAME,
                  approval_column_name=config.APPROVAL_COLUMN_NAME,
-                 # lifted_setting == 0 than it is off.
-                 # lifted_setting == 1 than it is calculated in the experiment.
-                 # lifted_setting == 2 than there is an up-front lifted table.
-                 lifted_setting=1):
+                 lifted_setting=True):
         super().__init__(abc_convertor, database_engine,
                          candidates_column_name, candidates_starting_point, candidates_size_limit)
 
@@ -90,17 +87,6 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         for voter_id, candidates_ids_df in grouped_by_voter_id_column:
             self._approval_profile[voter_id] = set(candidates_ids_df[self._candidates_column_name])
         config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
-
-        if self._lifted_setting == 2:
-            # There is an up-front lifted table.
-            sql_query = f"SELECT {config.LIFTED_VOTERS_COLUMN_NAME}, {config.LIFTED_VOTERS_ARRAY_LENGTH} " \
-                        f"FROM {config.LIFTED_TABLE_NAME} " \
-                        f"WHERE {config.LIFTED_VOTERS_COLUMN_NAME} " \
-                        f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point};"
-            lifted_voters_rating_columns = self._db_engine.run_query(sql_query)
-            for row in lifted_voters_rating_columns:
-                self._lifted_voters[row[config.LIFTED_VOTERS_COLUMN_NAME]] = \
-                    [None] * row[config.LIFTED_VOTERS_ARRAY_LENGTH]
         # ----------------------------------------------
 
     def _convert_to_ilp(self) -> None:
@@ -114,8 +100,7 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
             self._approval_profile,
             self._committee_size,
             self._thiele_function,
-            self._lifted_setting,
-            self._lifted_voters)
+            self._lifted_setting)
 
 
 if __name__ == '__main__':

@@ -16,8 +16,8 @@ END_EXPERIMENT_RANGE = 280000
 TICK_EXPERIMENT_RANGE = 20000
 
 
-# TODO*: Consider creating a class representing denial constraint.
-# TODO*: Consider creating a class representing TGD constraint.
+# FIXME: Consider a class representing denial constraint.
+# FIXME: Consider creating a class representing TGD constraint.
 
 
 class CombinedConstraintsExperiment(experiment.Experiment):
@@ -147,10 +147,6 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                        self._tgd_constraint_db_extractors]) +
 
                                                   solved_time,
-                      'time_part_1(sec)': self._abc_convertor.time_part_1,
-                      'time_part_2(sec)': self._abc_convertor.time_part_2,
-                      'time_part_3(sec)': self._abc_convertor.time_part_3,
-                      'time_part_4(sec)': self._abc_convertor.time_part_4,
                       'solving_status': self._abc_convertor.solver_status
                       }
 

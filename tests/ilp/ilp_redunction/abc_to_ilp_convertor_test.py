@@ -14,7 +14,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.voters_starting_point = 0
         self.candidates_group_size = 5
         self.voters_group_size = 8
-        self.approval_profile_dict = {0: {1, 2}, 1: {2, 4}, 2: {3, 1}, 3: {5, 7, 4}, 4: {1, 2}, 5: {1}, 6: {1, 2},
+        self.approval_profile_dict = {0: {1, 2}, 1: {2, 4}, 2: {3, 1}, 3: {4}, 4: {1, 2}, 5: {1}, 6: {1, 2},
                                       7: {1}}
         """
         Candidate : Candidate AV total score : Relative_Place
@@ -23,6 +23,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         2         : 4                        : 2
         3         : 1                        : 4
         4         : 2                        : 3
+        
         """
         self.lifted_inference_setting = False
         self.committee_size = 3
@@ -55,6 +56,14 @@ class TestABCToILPConvertor(unittest.TestCase):
                           "Candidate id: 2, Candidate value: 1.0.\n" \
                           "Candidate id: 3, Candidate value: 0.0.\n" \
                           "Candidate id: 4, Candidate value: 1.0.\n" \
+                          "Voter id: 0, Voter weight: 1.\n" \
+                          "Voter id: 1, Voter weight: 1.\n" \
+                          "Voter id: 2, Voter weight: 1.\n" \
+                          "Voter id: 3, Voter weight: 1.\n" \
+                          "Voter id: 4, Voter weight: 1.\n" \
+                          "Voter id: 5, Voter weight: 1.\n" \
+                          "Voter id: 6, Voter weight: 1.\n" \
+                          "Voter id: 7, Voter weight: 1.\n" \
                           "Voter id: 0, Voter approval sum: 2.0.\n" \
                           "Voter id: 1, Voter approval sum: 2.0.\n" \
                           "Voter id: 2, Voter approval sum: 1.0.\n" \
@@ -75,6 +84,9 @@ class TestABCToILPConvertor(unittest.TestCase):
                          f"ERROR: The solution is different than expected.\n")
 
     def test_convertor_lifted_inference_on(self):
+        self.approval_profile_dict[8] = {3}
+        self.approval_profile_dict[9] = {3}
+        self.voters_group_size = 10
         # ----------------------------------------------------------------
         # Define ABC setting.
         self.lifted_inference_setting = True
@@ -94,17 +106,25 @@ class TestABCToILPConvertor(unittest.TestCase):
         expected_result = "Candidate id: 0, Candidate value: 0.0.\n" \
                           "Candidate id: 1, Candidate value: 1.0.\n" \
                           "Candidate id: 2, Candidate value: 1.0.\n" \
-                          "Candidate id: 3, Candidate value: 0.0.\n" \
-                          "Candidate id: 4, Candidate value: 1.0.\n" \
+                          "Candidate id: 3, Candidate value: 1.0.\n" \
+                          "Candidate id: 4, Candidate value: 0.0.\n" \
+                          "Voter id: 0, Voter weight: 3.\n" \
+                          "Voter id: 1, Voter weight: 1.\n" \
+                          "Voter id: 2, Voter weight: 1.\n" \
+                          "Voter id: 3, Voter weight: 1.\n" \
+                          "Voter id: 4, Voter weight: 2.\n" \
+                          "Voter id: 5, Voter weight: 2.\n" \
                           "Voter id: 0, Voter approval sum: 2.0.\n" \
-                          "Voter id: 1, Voter approval sum: 2.0.\n" \
-                          "Voter id: 2, Voter approval sum: 1.0.\n" \
-                          "Voter id: 3, Voter approval sum: 1.0.\n" \
+                          "Voter id: 1, Voter approval sum: 1.0.\n" \
+                          "Voter id: 2, Voter approval sum: 2.0.\n" \
+                          "Voter id: 3, Voter approval sum: 0.0.\n" \
+                          "Voter id: 4, Voter approval sum: 1.0.\n" \
                           "Voter id: 5, Voter approval sum: 1.0.\n" \
                           "Voter id: 0, Voter contribution: 2.0.\n" \
-                          "Voter id: 1, Voter contribution: 2.0.\n" \
-                          "Voter id: 2, Voter contribution: 1.0.\n" \
-                          "Voter id: 3, Voter contribution: 1.0.\n" \
+                          "Voter id: 1, Voter contribution: 1.0.\n" \
+                          "Voter id: 2, Voter contribution: 2.0.\n" \
+                          "Voter id: 3, Voter contribution: 0.0.\n" \
+                          "Voter id: 4, Voter contribution: 1.0.\n" \
                           "Voter id: 5, Voter contribution: 1.0.\n"
         self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
@@ -123,7 +143,7 @@ class TestABCToILPConvertor(unittest.TestCase):
                                               self.committee_size,
                                               self.thiele_function_score,
                                               self.lifted_inference_setting)
-        self.abc_convertor.define_denial_constraint(denial_df)
+        self.abc_convertor.define_denial_constraint(denial_df.values)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -135,6 +155,14 @@ class TestABCToILPConvertor(unittest.TestCase):
             "Candidate id: 2, Candidate value: 1.0.\n" \
             "Candidate id: 3, Candidate value: 0.0.\n" \
             "Candidate id: 4, Candidate value: 0.0.\n" \
+            "Voter id: 0, Voter weight: 1.\n" \
+            "Voter id: 1, Voter weight: 1.\n" \
+            "Voter id: 2, Voter weight: 1.\n" \
+            "Voter id: 3, Voter weight: 1.\n" \
+            "Voter id: 4, Voter weight: 1.\n" \
+            "Voter id: 5, Voter weight: 1.\n" \
+            "Voter id: 6, Voter weight: 1.\n" \
+            "Voter id: 7, Voter weight: 1.\n" \
             "Voter id: 0, Voter approval sum: 2.0.\n" \
             "Voter id: 1, Voter approval sum: 1.0.\n" \
             "Voter id: 2, Voter approval sum: 1.0.\n" \
@@ -188,6 +216,14 @@ class TestABCToILPConvertor(unittest.TestCase):
             "Candidate id: 2, Candidate value: 0.0.\n" \
             "Candidate id: 3, Candidate value: 1.0.\n" \
             "Candidate id: 4, Candidate value: 1.0.\n" \
+            "Voter id: 0, Voter weight: 1.\n" \
+            "Voter id: 1, Voter weight: 1.\n" \
+            "Voter id: 2, Voter weight: 1.\n" \
+            "Voter id: 3, Voter weight: 1.\n" \
+            "Voter id: 4, Voter weight: 1.\n" \
+            "Voter id: 5, Voter weight: 1.\n" \
+            "Voter id: 6, Voter weight: 1.\n" \
+            "Voter id: 7, Voter weight: 1.\n" \
             "Voter id: 0, Voter approval sum: 1.0.\n" \
             "Voter id: 1, Voter approval sum: 1.0.\n" \
             "Voter id: 2, Voter approval sum: 2.0.\n" \
@@ -210,8 +246,8 @@ class TestABCToILPConvertor(unittest.TestCase):
     def test_convertor_with_different_voters_and_candidates_groups(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
-        self.approval_profile_dict = {0: {1, 2, 7}, 1: {2, 4, 7}, 2: {3, 1, 7}, 3: {5, 7, 4}, 4: {1, 2, 7}, 5: {1, 7},
-                                      6: {1, 2, 7}, 7: {1, 7}}
+        self.approval_profile_dict = {3: {5, 7, 4}, 4: {7}, 5: {7},
+                                      6: {7}, 7: {7}}
         self.candidates_starting_point = 3
         self.voters_starting_point = 3
         # ----------------------------------------------------------------
@@ -233,17 +269,16 @@ class TestABCToILPConvertor(unittest.TestCase):
             "Candidate id: 5, Candidate value: 1.0.\n" \
             "Candidate id: 6, Candidate value: 0.0.\n" \
             "Candidate id: 7, Candidate value: 1.0.\n" \
-            "Voter id: 0, Voter approval sum: 1.0.\n" \
-            "Voter id: 1, Voter approval sum: 2.0.\n" \
-            "Voter id: 2, Voter approval sum: 1.0.\n" \
+            "Voter id: 3, Voter weight: 1.\n" \
+            "Voter id: 4, Voter weight: 1.\n" \
+            "Voter id: 5, Voter weight: 1.\n" \
+            "Voter id: 6, Voter weight: 1.\n" \
+            "Voter id: 7, Voter weight: 1.\n" \
             "Voter id: 3, Voter approval sum: 3.0.\n" \
             "Voter id: 4, Voter approval sum: 1.0.\n" \
             "Voter id: 5, Voter approval sum: 1.0.\n" \
             "Voter id: 6, Voter approval sum: 1.0.\n" \
             "Voter id: 7, Voter approval sum: 1.0.\n" \
-            "Voter id: 0, Voter contribution: 1.0.\n" \
-            "Voter id: 1, Voter contribution: 2.0.\n" \
-            "Voter id: 2, Voter contribution: 1.0.\n" \
             "Voter id: 3, Voter contribution: 3.0.\n" \
             "Voter id: 4, Voter contribution: 1.0.\n" \
             "Voter id: 5, Voter contribution: 1.0.\n" \
@@ -279,7 +314,7 @@ class TestABCToILPConvertor(unittest.TestCase):
                                               self.thiele_function_score,
                                               self.lifted_inference_setting)
         self.abc_convertor.define_tgd_constraint(represent_sets)
-        self.abc_convertor.define_denial_constraint(denial_df)
+        self.abc_convertor.define_denial_constraint(denial_df.values)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -291,6 +326,14 @@ class TestABCToILPConvertor(unittest.TestCase):
             'Candidate id: 2, Candidate value: 1.0.\n' \
             'Candidate id: 3, Candidate value: 0.0.\n' \
             'Candidate id: 4, Candidate value: 1.0.\n' \
+            "Voter id: 0, Voter weight: 1.\n" \
+            "Voter id: 1, Voter weight: 1.\n" \
+            "Voter id: 2, Voter weight: 1.\n" \
+            "Voter id: 3, Voter weight: 1.\n" \
+            "Voter id: 4, Voter weight: 1.\n" \
+            "Voter id: 5, Voter weight: 1.\n" \
+            "Voter id: 6, Voter weight: 1.\n" \
+            "Voter id: 7, Voter weight: 1.\n" \
             'Voter id: 0, Voter approval sum: 1.0.\n' \
             'Voter id: 1, Voter approval sum: 2.0.\n' \
             'Voter id: 2, Voter approval sum: 0.0.\n' \

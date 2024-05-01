@@ -18,7 +18,6 @@ def create_lifted_voting_table(
     # Create a db engine in order to extract the regular approval profile.
     db_engine = db_interface.Database(database_path)
 
-    # TODO: This is code duplication.
     # Extract approval profile.
     sql_query = f"SELECT DISTINCT {voters_column_name}, {candidates_column_name} " \
                 f"FROM {voting_table_name} " \
@@ -97,3 +96,21 @@ if __name__ == '__main__':
             _candidates_ending_point = _candidates_starting_point + config.DISTRICTS_NUMBER_OF_CANDIDATES[i+1] - 1
         print(f"Done working on {i} district.")
         print(f"------------------------------------------------------")
+
+        # elif self._lifted_setting == 2:
+        #     # There is already a lifted voters calculated.
+        #     self.lifted_voters_group_size = len(self._lifted_voters)
+        #     # config.debug_print(MODULE_NAME, f"The lifted inference voters are\n{str(self._lifted_voters)}\n")
+        #     config.debug_print(MODULE_NAME, f"The number of lifted voters is {self.lifted_voters_group_size}\n")
+        #     self._new_voters = self._lifted_voters.keys()
+
+        # if self._lifted_setting == 2:
+        #     # There is an up-front lifted table.
+        #     sql_query = f"SELECT {config.LIFTED_VOTERS_COLUMN_NAME}, {config.LIFTED_VOTERS_ARRAY_LENGTH} " \
+        #                 f"FROM {config.LIFTED_TABLE_NAME} " \
+        #                 f"WHERE {config.LIFTED_VOTERS_COLUMN_NAME} " \
+        #                 f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point};"
+        #     lifted_voters_rating_columns = self._db_engine.run_query(sql_query)
+        #     for row in lifted_voters_rating_columns:
+        #         self._lifted_voters[row[config.LIFTED_VOTERS_COLUMN_NAME]] = \
+        #             [None] * row[config.LIFTED_VOTERS_ARRAY_LENGTH]

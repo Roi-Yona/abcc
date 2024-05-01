@@ -231,5 +231,5 @@ class TestCombinedExperiment(unittest.TestCase):
         # Test the result.
         print(f"The resulted experiment df:\n{resulted_df}\n")
         # A valid committee: None.
-# TODO: Add test that use different starting point.
-# TODO: Add test that use lifted inference setting.
+# FIXME: Add test that use different starting point.
+# FIXME: Add test that use lifted inference setting.

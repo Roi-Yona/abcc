@@ -183,7 +183,7 @@ def create_glasgow_voting_table(cur, district_index: int):
 
 
 def create_glasgow_candidates_table(cur):
-    # TODO: In order to enable different number of candidates per district, I should add a table per district.
+    # FIXME: In order to enable different number of candidates per district, I should add a table per district.
     # Creating the candidates table.
     cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
     candidate_id INTEGER PRIMARY KEY,
