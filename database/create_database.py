@@ -15,7 +15,7 @@ def extract_list_from_csv(csv_path: str) -> list:
     return data
 
 
-def create_voting_table():
+def create_movies_voting_table():
     # Creating the voting table.
     cur.execute('''CREATE TABLE voting (
        voter_id int,
@@ -32,7 +32,7 @@ def create_voting_table():
         cur.execute("INSERT INTO voting (voter_id, candidate_id, rating, timestamp) values (?, ?, ?, ?)", row)
 
 
-def create_candidates_table():
+def create_movies_candidates_table():
     # Creating the voting table.
     cur.execute('''CREATE TABLE candidates (
        adult NVARCHAR(50),
@@ -199,7 +199,7 @@ def create_glasgow_candidates_table(cur):
         cur.execute("INSERT INTO candidates (candidate_id, district, party) values (?, ?, ?)", row[0:3])
 
 
-def create_important_parties_db(cur):
+def create_glasgow_important_parties_db(cur):
     # Create the important parties table.
     cur.execute('''CREATE TABLE IF NOT EXISTS important_parties (
                         party TEXT PRIMARY KEY)''')
@@ -216,7 +216,7 @@ def create_important_parties_db(cur):
     cur.executemany("INSERT INTO important_parties (party) values (?)", new_data)
 
 
-def create_context_degree_db(cur):
+def create_glasgow_context_degree_db(cur):
     # Create the important parties table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_degree (
                         candidate_id INTEGER NOT NULL,
@@ -231,7 +231,7 @@ def create_context_degree_db(cur):
         cur.execute("INSERT INTO context_degree (candidate_id, degree_status) values (?, ?)", [row[0], row[5]])
 
 
-def create_context_domain_db(cur):
+def create_glasgow_context_domain_db(cur):
     # Create the important parties table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_domain (
                         candidate_id INTEGER NOT NULL,
@@ -252,25 +252,16 @@ def create_context_domain_db(cur):
 if __name__ == '__main__':
     # Connect the db in the current working directory,
     # implicitly creating one if it does not exist.
-    # con = sqlite3.connect('the_movies_database.db')
-    # con = sqlite3.connect('the_movies_database_tests.db')
     con = sqlite3.connect('glasgow_city_council.db')
 
     # Creating a curser.
     cur = con.cursor()
 
-    # Create the wanted table.
-    # create_example_db(cur)
-
-    # cur.execute("DROP TABLE candidates;")
-    # create_candidates_table()
-    # cur.execute("DROP TABLE voting;")
-    # create_voting_table()
     for i in range(1, 22):
         create_glasgow_voting_table(cur, i)
     create_glasgow_candidates_table(cur)
-    create_important_parties_db(cur)
-    create_context_domain_db(cur)
+    create_glasgow_important_parties_db(cur)
+    create_glasgow_context_domain_db(cur)
 
     # Committing changes
     con.commit()

@@ -13,8 +13,8 @@ pd.set_option('display.max_columns', None)  # None means unlimited columns
 # --------------------------------------------------------------------------------
 SOLVER_TIME_LIMIT = 250
 SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK"
-THIELE_RULE = thiele_functions.create_cc_thiele_dict
-THIELE_RULE_NAME = 'CC'
+THIELE_RULE = thiele_functions.create_av_thiele_dict
+THIELE_RULE_NAME = 'AV'
 LIFTED_INFERENCE = True
 
 MOVIES_CANDIDATES_STARTING_POINT = 1  # 31, 64
