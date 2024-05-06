@@ -5,7 +5,7 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
-_experiment_number = 5
+_experiment_number = 8
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -13,8 +13,11 @@ if __name__ == '__main__':
     # Experiment summary:
     # The voting rule is approval voting.
     # We find a committee where there is 1 representor from each district (enforce as a TGD).
-    # We find committee where there is no two representors from the same domain (Denial).
-    # We find committee where there is candidate from each party in the important parties (TGD).
+    # We find committee where there is representation for all the parties.
+    # The valid committee should be from size 14 up, because there are 14 parties.
+
+    # Because district 7 is the only one with CPA party and also the only one with Scottish Christian from district 7 up
+    # we cannot achieve such a committee.
     # ---------------------------------------------------------------------------
 
     _database_name = 'glasgow_city_council'
@@ -36,9 +39,10 @@ if __name__ == '__main__':
 
     # Second TGD:
     _tgd_constraint_dict_start2 = dict()
-    _tgd_constraint_dict_start2['important_parties', 't1'] = [('x', 'party')]
+    _tgd_constraint_dict_start2['candidates', 't1'] = [('x', 'party')]
     _committee_members_list_start2 = []
-    _candidates_tables_start2 = []
+    # This indicates that the id limitation applies here as well.
+    _candidates_tables_start2 = ['t1']
 
     _tgd_constraint_dict_end2 = dict()
     _tgd_constraint_dict_end2['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'party')]
@@ -54,17 +58,7 @@ if __name__ == '__main__':
                          _committee_members_list_end2, _candidates_tables_start2, _candidates_tables_end2,
                          _different_variables2)
                         ]
-
-    # First denial constraint:
-    denial_constraint_dict = dict()
-    denial_constraint_dict[('context_domain', 't1')] = \
-        [('c1', 'candidate_id'), ('x', 'domain')]
-    denial_constraint_dict[('context_domain', 't2')] = \
-        [('c2', 'candidate_id'), ('x', 'domain')]
-    committee_members_list = ['c1', 'c2']
-    candidates_tables = ['t1', 't2']
-
-    _denial_constraints = [(denial_constraint_dict, committee_members_list, candidates_tables)]
+    _denial_constraints = []
 
     _experiment_name = f'exp{_experiment_number}_{config.THIELE_RULE_NAME}_lifted={config.LIFTED_INFERENCE}_' \
                        f'solver={config.SOLVER_NAME}_district_count={_max_number_of_districts}'
@@ -78,4 +72,3 @@ if __name__ == '__main__':
         config.LIFTED_INFERENCE,
         _max_number_of_districts,
         config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)
-    # ---------------------------------------------------------------------------

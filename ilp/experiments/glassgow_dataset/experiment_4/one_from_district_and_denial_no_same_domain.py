@@ -5,7 +5,7 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
-_experiment_number = 5
+_experiment_number = 4
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -13,8 +13,7 @@ if __name__ == '__main__':
     # Experiment summary:
     # The voting rule is approval voting.
     # We find a committee where there is 1 representor from each district (enforce as a TGD).
-    # We find committee where there is no two representors from the same domain (Denial).
-    # We find committee where there is candidate from each party in the important parties (TGD).
+    # We find committee where there is no two representors from the same domain.
     # ---------------------------------------------------------------------------
 
     _database_name = 'glasgow_city_council'
@@ -34,25 +33,9 @@ if __name__ == '__main__':
 
     _different_variables = _committee_members_list_end
 
-    # Second TGD:
-    _tgd_constraint_dict_start2 = dict()
-    _tgd_constraint_dict_start2['important_parties', 't1'] = [('x', 'party')]
-    _committee_members_list_start2 = []
-    _candidates_tables_start2 = []
-
-    _tgd_constraint_dict_end2 = dict()
-    _tgd_constraint_dict_end2['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'party')]
-    _committee_members_list_end2 = ['c1']
-    _candidates_tables_end2 = ['t2']
-
-    _different_variables2 = _committee_members_list_end2
-
     _tgd_constraints = [(_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
-                         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,
+                        _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,
                          _different_variables),
-                        (_tgd_constraint_dict_start2, _committee_members_list_start2, _tgd_constraint_dict_end2,
-                         _committee_members_list_end2, _candidates_tables_start2, _candidates_tables_end2,
-                         _different_variables2)
                         ]
 
     # First denial constraint:
@@ -78,4 +61,3 @@ if __name__ == '__main__':
         config.LIFTED_INFERENCE,
         _max_number_of_districts,
         config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)
-    # ---------------------------------------------------------------------------

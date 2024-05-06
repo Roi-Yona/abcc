@@ -164,7 +164,6 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                            candidates_starting_point: int,
                                            candidates_size_limit: int,
                                            thiele_rule_function_creator,
-                                           voting_table_name: str,
                                            lifted_inference=False):
     experiments_results = pd.DataFrame()
 
@@ -181,7 +180,7 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                                            voters_starting_point, candidates_starting_point,
                                                            voters_size_limit, candidates_size_limit,
                                                            thiele_rule_function_creator,
-                                                           voting_table_name, lifted_inference=lifted_inference)
+                                                           lifted_inference=lifted_inference)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 
@@ -193,8 +192,7 @@ def combined_constraints_experiment_district_runner(
         thiele_rule_function_creator,
         lifted_inference: bool,
         max_number_of_districts: int,
-        number_of_candidates_from_each_district: dict,
-        voting_table_name='voting'):
+        number_of_candidates_from_each_district: dict):
     experiments_results = pd.DataFrame()
 
     for current_district_number in range(1, max_number_of_districts + 1):
@@ -207,28 +205,28 @@ def combined_constraints_experiment_district_runner(
 
         # Calculate candidates and voters ranges.
         candidates_starting_point = 1
-        candidates_size_limit = 0
+        candidates_group_size = 0
         voters_starting_point = 1
-        voters_size_limit = 0
+        voters_group_size = 0
         for district_number in range(1, max_number_of_districts + 1):
             if current_district_number < district_number:
                 break
-            candidates_size_limit += config.DISTRICTS_NUMBER_OF_CANDIDATES[district_number]
-            voters_size_limit += config.DISTRICTS_NUMBER_OF_VOTERS[district_number]
+            candidates_group_size += config.DISTRICTS_NUMBER_OF_CANDIDATES[district_number]
+            voters_group_size += config.DISTRICTS_NUMBER_OF_VOTERS[district_number]
 
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
-                                        f"candidates_group_size={candidates_size_limit}\n"
+                                        f"candidates_group_size={candidates_group_size}\n"
                                         f"voters_starting_point={voters_starting_point}\n"
-                                        f"voters_group_size={voters_size_limit}\n"
+                                        f"voters_group_size={voters_group_size}\n"
                                         f"committee_size={committee_size}")
         current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
                                                            solver_time_limit, solver_name,
                                                            denial_constraints, tgd_constraints,
                                                            committee_size,
                                                            voters_starting_point, candidates_starting_point,
-                                                           voters_size_limit, candidates_size_limit,
+                                                           voters_group_size, candidates_group_size,
                                                            thiele_rule_function_creator,
-                                                           voting_table_name, lifted_inference=lifted_inference)
+                                                           lifted_inference=lifted_inference)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 
