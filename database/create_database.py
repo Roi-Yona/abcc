@@ -195,7 +195,7 @@ def create_glasgow_candidates_table(cur):
         os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-00000000_candidates.csv"))
 
     # Inserting data into the table
-    for row in candidates_data[1:]:
+    for row in candidates_data[1:209]:
         cur.execute("INSERT INTO candidates (candidate_id, district, party) values (?, ?, ?)", row[0:3])
 
 
