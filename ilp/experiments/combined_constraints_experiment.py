@@ -109,6 +109,17 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         # Update the group size after the voters cleaning.
         self._voters_group_size = self._abc_convertor.voters_group_size
 
+        # Create a string of the resulted committee.
+        committee_string = ""
+        if self._abc_convertor.solver_status == 0:
+            # If solved the problem successfully.
+            for key, value in self._abc_convertor._model_candidates_variables.items():
+                if value.solution_value() == 1:
+                    # If the candidate is chosen to the committee.
+                    committee_string += f"{key}, "
+        else:
+            committee_string = '-'
+
         # Save the results.
         new_result = {'candidates_starting_point': self._abc_convertor.candidates_starting_point,
                       'voters_starting_point': self._abc_convertor.voters_starting_point,
@@ -147,7 +158,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                        self._tgd_constraint_db_extractors]) +
 
                                                   solved_time,
-                      'solving_status': self._abc_convertor.solver_status
+                      'solving_status': self._abc_convertor.solver_status,
+                      'resulted_committee': committee_string
                       }
 
         return pd.DataFrame([new_result])
