@@ -190,7 +190,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         # Add the constraint about the voter score contribution.
         for voter_id in self._approval_profile.keys():
-            for i in range(0, self._committee_size + 1):
+            max_candidate_approval = min(self._committee_size, len(self._approval_profile[voter_id]))
+            for i in range(0, max_candidate_approval + 1):
                 # Define the abs value replacement y_plus + y_minus = abs(i-voter_approval_sum).
                 b = self._model.BoolVar('v_b_' + str(voter_id) + "_" + str(i))
                 y_plus = self._model.IntVar(0, self._committee_size + 1,
@@ -216,10 +217,41 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         :param denial_candidates_sets: A denial candidates groups.
         """
-        for candidates_set in denial_candidates_sets:
+        new_denial_candidates_sets = set()
+        candidates_bool_dict = {c: False for c in self._model_candidates_variables}
+
+        for current_candidate_index in candidates_bool_dict.keys():
+            if candidates_bool_dict[current_candidate_index]:
+                continue
+            else:
+                candidates_bool_dict[current_candidate_index] = True
+
+            # Create new denial candidate set for the current candidate.
+            new_denial_candidates_set = set()
+            new_denial_candidates_set.add(current_candidate_index)
+
+            # For all set, check if current candidate index in it.
+            for candidates_set in denial_candidates_sets:
+                if current_candidate_index in candidates_set:
+                    new_denial_candidates_set = new_denial_candidates_set.union(candidates_set)
+
+            # Sanity about the denial set.
+            if len(new_denial_candidates_set) > 1:
+                new_denial_candidates_sets.add(frozenset(new_denial_candidates_set))
+
+            # Update candidate bool array.
+            for candidate_index in new_denial_candidates_set:
+                candidates_bool_dict[candidate_index] = True
+
+        # Construct the ILP.
+        if new_denial_candidates_sets is None:
+            return
+        for candidates_set in new_denial_candidates_sets:
+            # The denial length should be according to the original denial sets.
+            denial_group_length = len(denial_candidates_sets[0])
             self._model.Add(
                 sum([self._model_candidates_variables[candidate_index] for candidate_index in candidates_set])
-                <= (len(candidates_set) - 1))
+                <= (denial_group_length - 1))
 
     def define_tgd_constraint(self, element_members_representor_sets: list):
         for element_members, tgd_representor_set in element_members_representor_sets:
