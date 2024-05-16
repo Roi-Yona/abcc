@@ -65,7 +65,10 @@ def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:
     :param solver_time_limit: The solver time limit in seconds.
     :return:
     """
-    solver = pywraplp.Solver.CreateSolver(solver_name)
+    if solver_name == "GUROBI":
+        solver = pywraplp.Solver.CreateSolver(pywraplp.Solver.GUROBI_MIXED_INTEGER_PROGRAMMING)
+    else:
+        solver = pywraplp.Solver.CreateSolver(solver_name)
     if not solver:
         print("ERROR: Creating solver failed.")
         exit(1)
