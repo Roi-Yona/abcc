@@ -66,7 +66,7 @@ def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:
     :return:
     """
     if solver_name == "GUROBI":
-        solver = pywraplp.Solver.CreateSolver(pywraplp.Solver.GUROBI_MIXED_INTEGER_PROGRAMMING)
+        solver = pywraplp.Solver.CreateSolver("GUROBI_MIXED_INTEGER_PROGRAMMING")
     else:
         solver = pywraplp.Solver.CreateSolver(solver_name)
     if not solver:
