@@ -12,7 +12,7 @@ pd.set_option('display.max_columns', None)  # None means unlimited columns
 # Experiments configuration:
 # --------------------------------------------------------------------------------
 SOLVER_TIME_LIMIT = 250
-SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK"
+SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
 THIELE_RULE = thiele_functions.create_av_thiele_dict
 THIELE_RULE_NAME = 'AV'
 LIFTED_INFERENCE = True

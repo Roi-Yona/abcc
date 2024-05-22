@@ -247,7 +247,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                     candidates_bool_dict[candidate_index] = True
         else:
             new_denial_candidates_sets = denial_candidates_sets
-        
+
         # Construct the ILP.
         for candidates_set in new_denial_candidates_sets:
             # The denial length should be according to the original denial sets.
