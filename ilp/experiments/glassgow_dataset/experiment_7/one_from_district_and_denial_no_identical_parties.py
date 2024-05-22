@@ -51,8 +51,7 @@ if __name__ == '__main__':
 
     _denial_constraints = [(denial_constraint_dict, committee_members_list, candidates_tables)]
 
-    _experiment_name = f'exp{_experiment_number}_{config.THIELE_RULE_NAME}_lifted={config.LIFTED_INFERENCE}_' \
-                       f'solver={config.SOLVER_NAME}_district_count={_max_number_of_districts}'
+    _experiment_name = config.glasgow_create_experiment_name(_experiment_number, _max_number_of_districts)
 
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(

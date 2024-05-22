@@ -48,9 +48,7 @@ if __name__ == '__main__':
         (_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
          _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]
 
-    _experiment_name = f'exp{_experiment_number}_{config.THIELE_RULE_NAME}_lifted={config.LIFTED_INFERENCE}_' \
-                       f'candidate_size={_candidates_group_size}_committee_size={_committee_size}_' \
-                       f'solver={config.SOLVER_NAME}'
+    _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)
 
     # Run the experiment.
     combined_constraints_experiment. \

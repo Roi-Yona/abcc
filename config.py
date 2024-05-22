@@ -16,6 +16,8 @@ SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK"
 THIELE_RULE = thiele_functions.create_av_thiele_dict
 THIELE_RULE_NAME = 'AV'
 LIFTED_INFERENCE = True
+MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True
+MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = True
 
 MOVIES_CANDIDATES_STARTING_POINT = 1  # 31, 64
 MOVIES_VOTERS_STARTING_POINT = 1
@@ -62,4 +64,18 @@ def debug_print(module_name, input_str):
         print("--------------------------------------")
         print(input_str)
         print("--------------------------------------\n")
+
+
+def glasgow_create_experiment_name(experiment_number: int, max_number_of_districts: int):
+    return f'{experiment_number}_{THIELE_RULE_NAME}_' \
+           f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
+           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}' \
+           f'solver={SOLVER_NAME}_district_count={max_number_of_districts}'
+
+
+def movies_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
+    return f'{experiment_number}_{THIELE_RULE_NAME}_' \
+           f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
+           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}' \
+           f'solver={SOLVER_NAME}_candidate_size={candidates_group_size}_committee_size={committee_size}'
 # --------------------------------------------------------------------------------

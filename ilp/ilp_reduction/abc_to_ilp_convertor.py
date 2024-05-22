@@ -190,7 +190,9 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         # Add the constraint about the voter score contribution.
         for voter_id in self._approval_profile.keys():
-            max_candidate_approval = min(self._committee_size, len(self._approval_profile[voter_id]))
+            max_candidate_approval = self._committee_size
+            if config.MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS:
+                max_candidate_approval = min(self._committee_size, len(self._approval_profile[voter_id]))
             for i in range(0, max_candidate_approval + 1):
                 # Define the abs value replacement y_plus + y_minus = abs(i-voter_approval_sum).
                 b = self._model.BoolVar('v_b_' + str(voter_id) + "_" + str(i))
@@ -220,32 +222,33 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         new_denial_candidates_sets = set()
         candidates_bool_dict = {c: False for c in self._model_candidates_variables}
 
-        for current_candidate_index in candidates_bool_dict.keys():
-            if candidates_bool_dict[current_candidate_index]:
-                continue
-            else:
-                candidates_bool_dict[current_candidate_index] = True
+        if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
+            for current_candidate_index in candidates_bool_dict.keys():
+                if candidates_bool_dict[current_candidate_index]:
+                    continue
+                else:
+                    candidates_bool_dict[current_candidate_index] = True
 
-            # Create new denial candidate set for the current candidate.
-            new_denial_candidates_set = set()
-            new_denial_candidates_set.add(current_candidate_index)
+                # Create new denial candidate set for the current candidate.
+                new_denial_candidates_set = set()
+                new_denial_candidates_set.add(current_candidate_index)
 
-            # For all set, check if current candidate index in it.
-            for candidates_set in denial_candidates_sets:
-                if current_candidate_index in candidates_set:
-                    new_denial_candidates_set = new_denial_candidates_set.union(candidates_set)
+                # For all set, check if current candidate index in it.
+                for candidates_set in denial_candidates_sets:
+                    if current_candidate_index in candidates_set:
+                        new_denial_candidates_set = new_denial_candidates_set.union(candidates_set)
 
-            # Sanity about the denial set.
-            if len(new_denial_candidates_set) > 1:
-                new_denial_candidates_sets.add(frozenset(new_denial_candidates_set))
+                # Sanity about the denial set.
+                if len(new_denial_candidates_set) > 1:
+                    new_denial_candidates_sets.add(frozenset(new_denial_candidates_set))
 
-            # Update candidate bool array.
-            for candidate_index in new_denial_candidates_set:
-                candidates_bool_dict[candidate_index] = True
-
+                # Update candidate bool array.
+                for candidate_index in new_denial_candidates_set:
+                    candidates_bool_dict[candidate_index] = True
+        else:
+            new_denial_candidates_sets = denial_candidates_sets
+        
         # Construct the ILP.
-        if new_denial_candidates_sets is None:
-            return
         for candidates_set in new_denial_candidates_sets:
             # The denial length should be according to the original denial sets.
             denial_group_length = len(denial_candidates_sets[0])
