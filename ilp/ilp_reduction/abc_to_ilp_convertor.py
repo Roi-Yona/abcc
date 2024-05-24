@@ -103,9 +103,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._lifted_setting = lifted_setting
 
         # Clean the voters group (only a voters with a none empty approval profile left).
-        for voter_id, profile_set in self._approval_profile.items():
-            if len(profile_set) != 0:
-                self._voters_group.add(voter_id)
+        self._voters_group = self._approval_profile.keys()
 
         debug_message = f"Voters starting id = {self.voters_starting_point}.\n" \
                         f"Candidates starting id = {self.candidates_starting_point}.\n" \

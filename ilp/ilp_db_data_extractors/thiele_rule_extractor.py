@@ -82,10 +82,9 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
 
         voter_rating_columns = self._db_engine.run_query(sql_query)
         grouped_by_voter_id_column = voter_rating_columns.groupby(by=self._voters_column_name)
-        for voter_id in range(self._voters_starting_point, self._voters_ending_point+1):
-            self._approval_profile[voter_id] = set()
-        for voter_id, candidates_ids_df in grouped_by_voter_id_column:
-            self._approval_profile[voter_id] = set(candidates_ids_df[self._candidates_column_name])
+        self._approval_profile = {voter_id: set(candidates_ids_df[self._candidates_column_name]) for
+                                  voter_id, candidates_ids_df in
+                                  grouped_by_voter_id_column}
         config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
         # ----------------------------------------------
 

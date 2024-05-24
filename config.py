@@ -76,6 +76,6 @@ def glasgow_create_experiment_name(experiment_number: int, max_number_of_distric
 def movies_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
     return f'{experiment_number}_{THIELE_RULE_NAME}_' \
            f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
-           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}' \
+           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
            f'solver={SOLVER_NAME}_candidate_size={candidates_group_size}_committee_size={committee_size}'
 # --------------------------------------------------------------------------------
