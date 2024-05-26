@@ -28,7 +28,38 @@ def create_cc_thiele_dict(length: int) -> dict:
     return cc_thiele_function
 
 
+def create_pav_thiele_dict(length: int) -> dict:
+    """Creates a dict from size of length contain the PAV thiele function.
+    :param length: The length of the returned function.
+    :return:A PAV thiele function.
+    """
+    pav_thiele_function = {}
+    if length > 0:
+        pav_thiele_function[0] = 0
+    for i in range(1, length):
+        pav_thiele_function[i] = 1/i
+    return pav_thiele_function
+
+
+def create_k_approval_thiele_dict(length: int, k: int) -> dict:
+    """Creates a dict from size of length contain the k-approval thiele function.
+    :param length: The length of the returned function.
+    :param k: The thiele approval threshold parameter.
+    :return:A k-approval thiele function.
+    """
+    k_approval_thiele_function = {}
+    if length > 0:
+        k_approval_thiele_function[0] = 0
+    for i in range(1, k):
+        k_approval_thiele_function[i] = i
+    for i in range(k, length):
+        k_approval_thiele_function[i] = k
+    return k_approval_thiele_function
+
+
 if __name__ == '__main__':
     # Sanity hand tests.
     print(create_av_thiele_dict(4))
     print(create_cc_thiele_dict(4))
+    print(create_pav_thiele_dict(4))
+    print(create_k_approval_thiele_dict(4, 2))
