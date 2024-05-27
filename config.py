@@ -70,7 +70,7 @@ def glasgow_create_experiment_name(experiment_number: int, max_number_of_distric
     return f'{experiment_number}_{THIELE_RULE_NAME}_' \
            f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
            f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}' \
-           f'solver={SOLVER_NAME}_district_count={max_number_of_districts}'
+           f'_solver={SOLVER_NAME}_district_count={max_number_of_districts}'
 
 
 def movies_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):

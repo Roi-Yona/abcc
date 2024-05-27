@@ -37,7 +37,7 @@ def create_pav_thiele_dict(length: int) -> dict:
     if length > 0:
         pav_thiele_function[0] = 0
     for i in range(1, length):
-        pav_thiele_function[i] = 1/i
+        pav_thiele_function[i] += 1/i
     return pav_thiele_function
 
 
