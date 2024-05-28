@@ -59,6 +59,10 @@ def create_k_approval_thiele_dict(length: int, k: int) -> dict:
     return k_approval_thiele_function
 
 
+def create_2_approval_thiele_dict(length: int) -> dict:
+    return create_k_approval_thiele_dict(length, 2)
+
+
 if __name__ == '__main__':
     # Sanity hand tests.
     print(create_av_thiele_dict(4))
