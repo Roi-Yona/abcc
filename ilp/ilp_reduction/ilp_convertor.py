@@ -1,4 +1,7 @@
 import ortools.linear_solver.pywraplp as pywraplp
+import time
+import config
+MODULE_NAME = "ILP Convertor"
 
 
 class ILPConvertor:
@@ -13,52 +16,64 @@ class ILPConvertor:
         # Initialize solver related variables.
         self._model = solver
         self._solved = False
-        self._solver_status = None
-
-    def define_ilp_model_variables(self) -> None:
-        # Abstract function.
-        pass
-
-    def define_ilp_model_constraints(self) -> None:
-        # Abstract function.
-        pass
-
-    def define_ilp_model_objective(self) -> None:
-        # Abstract function.
-        pass
+        self.solver_status = None
+        self.solving_time = -1
 
     def solve(self) -> None:
-        self._solver_status = self._model.Solve()
-        if self._solver_status == pywraplp.Solver.OPTIMAL:
-            self._solved = True
-
-    def show_solution(self) -> str:
-        """Creates a representation for the problem solution.
-
-           An abstract function.
-
-        :return: A string that represents the general problem solution.
+        """Solve the ILP problem, and saves the time it took,
+        the status and if it solved indicator
+        :return:
         """
+        # Solve the ILP problem.
+        start_time = time.time()
+        self.solver_status = self._model.Solve()
+        end_time = time.time()
+        if self.solver_status == pywraplp.Solver.OPTIMAL:
+            self._solved = True
+        self.solving_time = end_time - start_time
+
+    def get_model_state(self) -> str:
+        """Creates a representation for the model current state.
+
+        :return: A string that represents the general problem assignment.
+        """
+        # Abstract function
         pass
 
     def __str__(self):
+        """Creates a str depending only on the solver state function if solver,
+        otherwise the solver status"""
         solution = ""
         if self._solved:
-            solution = self.show_solution()
+            solution = self.get_model_state()
         else:
-            solution = f"The solver doesn't hane an optimal solution, the solver status is {str(self._solver_status)}."
+            solution = f"The solver doesn't have an optimal solution, the solver status is {str(self.solver_status)}."
         return solution
 
     def print_all_model_variables(self) -> None:
+        """Print all the model variables.
+        :return:
+        """
         if self._solved:
             for var in self._model.variables():
                 print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
 
-    def solved_status_getter(self) -> tuple:
-        """
-        :return: A tuple containing is_solved flag, solver status.
-        """
-        return self._solved, self._solver_status
+
+def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:
+    """Create a new pywraplp solver.
+    :param solver_name: The solver name.
+    :param solver_time_limit: The solver time limit in seconds.
+    :return:
+    """
+    if solver_name == "GUROBI":
+        solver = pywraplp.Solver.CreateSolver("GUROBI_MIXED_INTEGER_PROGRAMMING")
+    else:
+        solver = pywraplp.Solver.CreateSolver(solver_name)
+    if not solver:
+        print("ERROR: Creating solver failed.")
+        exit(1)
+    solver.set_time_limit(solver_time_limit)
+    return solver
 
 
 if __name__ == '__main__':

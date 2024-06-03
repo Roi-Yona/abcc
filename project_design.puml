@@ -1,0 +1,72 @@
+@startuml
+
+abstract class ILPConvertor {
+    +solver_status
+    +solving_time
+
+    +create_solver()
+    +solve()
+    +run_model()
+    +get_model_state()
+    +str()
+    +print_all_model_variables()
+}
+solver o-- ILPConvertor
+
+class ABCToILPConvertor{
+   +get_model_state()
+   +define_<problem/constraint>()
+}
+ILPConvertor <|-- ABCToILPConvertor
+
+abstract class DBDataExtractor{
+    +extract_data_from_db()
+    +convert_to_ilp()
+    +extract_and_convert()
+}
+ABCToILPConvertor o-- DBDataExtractor
+DBEngine o-- DBDataExtractor
+
+class ThieleRuleExtractor{
+    -voters_id_starts_from_one
+    -voting_table_name
+    -candidates_table_name
+    -candidates_column_name
+    -voters_column_name
+    -approval_column_name
+
+    +extract_data_from_db()
+    +convert_to_ilp()
+}
+DBDataExtractor <|-- ThieleRuleExtractor
+
+abstract class Experiment{
+    -experiment_name
+    -database_name
+    -solver_time_limit = int(MINUTE * 0.5)
+    -solver_name
+    -solver
+    -abc_convector
+    +results_file_path
+
+    +create_results_df()
+    +save_results()
+    +run_model()
+    +run_experiment()
+}
+Experiment --* ABCToILPConvertor
+Experiment --* DBDataExtractor
+
+class ThieleRuleExperiment{
+    -voters_group_size
+    -committee_size
+    -candidates_group_size
+    -av_db_data_extractor
+    +create_results_df()
+    +run_experiment()
+    +model_save_graph()
+    +thiele_rule_experiment_runner()
+}
+Experiment <|-- ThieleRuleExperiment
+
+@enduml
