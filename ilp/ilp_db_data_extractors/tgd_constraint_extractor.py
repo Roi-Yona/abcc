@@ -1,7 +1,5 @@
-import pandas as pd
-
 import config
-from database.database_server_interface import database_server_interface as db_interface
+from database import database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
@@ -22,8 +20,8 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
                  candidates_starting_point: int,
                  voters_size_limit: int,
                  candidates_size_limit: int,
-                 candidates_column_name='candidate_id',
-                 voters_column_name='voter_id',
+                 candidates_column_name=config.CANDIDATES_COLUMN_NAME,
+                 voters_column_name=config.VOTERS_COLUMN_NAME,
                  # Different variables indicates that these vars in the join should be different.
                  # Usually used for committee_members_list_end.
                  # For example, different committee members should represent district 1 if I demand three represents.

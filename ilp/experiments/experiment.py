@@ -3,14 +3,13 @@ import pandas as pd
 import os
 
 import config
-from database.database_server_interface import database_server_interface as db_interface
+from database import database_server_interface as db_interface
 import ilp.ilp_reduction.ilp_convertor as ilp_convertor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 
 MODULE_NAME = 'Experiment'
 MINUTE = 1000 * 60
 RESULTS_PATH = 'results'
-DATABASES_PATH = os.path.join('.')
 SERVER = 'LAPTOP-MO1JPG72'
 
 
@@ -37,7 +36,7 @@ class Experiment:
         self._database_name = database_name
         self.results_file_path = RESULTS_PATH
         # self._db_engine = db_interface.database_connect(SERVER, self._database_name)
-        db_path = os.path.join(f"{DATABASES_PATH}", f"{self._database_name}.db")
+        db_path = os.path.join(f"{config.SQLITE_DATABASE_FOLDER_PATH}", f"{self._database_name}")
         self._db_engine = db_interface.Database(db_path)
 
         self._solver = ilp_convertor.create_solver(solver_name, MINUTE * solver_time_limit)

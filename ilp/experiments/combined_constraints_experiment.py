@@ -42,11 +42,11 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  candidates_starting_point: int,
                  voters_size_limit: int, candidates_size_limit: int,
                  thiele_rule_function_creator,
-                 voting_table_name='voting',
-                 candidates_table_name='candidates',
-                 candidates_column_name='candidate_id',
-                 voters_column_name='voter_id',
-                 approval_column_name='rating',
+                 voting_table_name=config.VOTING_TABLE_NAME,
+                 candidates_table_name=config.CANDIDATES_TABLE_NAME,
+                 candidates_column_name=config.CANDIDATES_COLUMN_NAME,
+                 voters_column_name=config.VOTERS_COLUMN_NAME,
+                 approval_column_name=config.APPROVAL_COLUMN_NAME,
                  lifted_inference=False):
 
         super().__init__(experiment_name, database_name, solver_time_limit, solver_name)

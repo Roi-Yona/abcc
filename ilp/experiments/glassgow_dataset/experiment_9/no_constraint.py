@@ -15,7 +15,6 @@ if __name__ == '__main__':
     # We find a committee where there are no constraint at all.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'glasgow_city_council'
     _max_number_of_districts = 21
 
     _tgd_constraints = []
@@ -25,7 +24,7 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
-        _experiment_name, _database_name,
+        _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
         config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
         _denial_constraints, _tgd_constraints,
         config.THIELE_RULE,

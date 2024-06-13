@@ -3,9 +3,9 @@ import numpy as np
 import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ortools.linear_solver.pywraplp as pywraplp
-import database.database_server_interface.database_server_interface as db_interface
+import database.database_server_interface as db_interface
+import config
 
-import os
 import unittest
 
 
@@ -27,22 +27,19 @@ class TestDenialConstraintExtractor(unittest.TestCase):
         self.abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(self.solver)
         # ----------------------------------------------------------------
         # Create the database engine.
-        db_path = os.path.join("..", "..", "..", "database")
-        db_name = "the_movies_database_tests"
-        db_path = os.path.join(f"{db_path}", f"{db_name}.db")
-        self.db_engine = db_interface.Database(db_path)
+        self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
         # ----------------------------------------------------------------
         # Define the databases table and column names.
-        self.candidates_column_name = 'candidate_id'
-        self.voters_column_name = 'voter_id'
+        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
+        self.voters_column_name = config.VOTERS_COLUMN_NAME
 
     def test_extract_data_from_db_sanity(self):
         # Define the denial constraint.
         denial_constraint_dict = dict()
-        denial_constraint_dict[('candidates', 't1')] = \
-            [('c1', 'candidate_id'), ('x', 'genres')]
-        denial_constraint_dict[('candidates', 't2')] = \
-            [('c2', 'candidate_id'), ('x', 'genres')]
+        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+            [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
+        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+            [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
         # Define the denial constraint extractor.

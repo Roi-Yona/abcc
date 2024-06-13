@@ -14,8 +14,6 @@ if __name__ == '__main__':
     # Find a winning committee with no constraints.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'the_movies_database'
-
     _candidates_group_size = 60
     _committee_size = 10
     _tgd_constraints = []
@@ -25,7 +23,7 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment. \
-        combined_constraints_experiment_runner(_experiment_name, _database_name,
+        combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DATABASE_DB_NAME,
                                                config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
                                                _denial_constraints, _tgd_constraints,
                                                _committee_size,

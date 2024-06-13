@@ -15,21 +15,19 @@ if __name__ == '__main__':
     # and no two movies with the same spoken language.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'the_movies_database'
-
     _candidates_group_size = 30
     _committee_size = 10
     _tgd_constraints = []
 
     _denial_constraint_dict = dict()
-    _denial_constraint_dict[('candidates', 't1')] = [('c1', 'candidate_id'), ('x', 'genres')]
-    _denial_constraint_dict[('candidates', 't2')] = [('c2', 'candidate_id'), ('x', 'genres')]
+    _denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
+    _denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
     _committee_members_list = ['c1', 'c2']
     _candidates_tables = ['t1', 't2']
 
     _denial_constraint_dict2 = dict()
-    _denial_constraint_dict2[('candidates', 't1')] = [('c1', 'candidate_id'), ('x', 'spoken_languages')]
-    _denial_constraint_dict2[('candidates', 't2')] = [('c2', 'candidate_id'), ('x', 'spoken_languages')]
+    _denial_constraint_dict2[(config.CANDIDATES_TABLE_NAME, 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'spoken_languages')]
+    _denial_constraint_dict2[(config.CANDIDATES_TABLE_NAME, 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'spoken_languages')]
     _committee_members_list2 = ['c1', 'c2']
     _candidates_tables2 = ['t1', 't2']
 
@@ -40,7 +38,7 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment. \
-        combined_constraints_experiment_runner(_experiment_name, _database_name,
+        combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DATABASE_DB_NAME,
                                                config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
                                                _denial_constraints, _tgd_constraints,
                                                _committee_size,

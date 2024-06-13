@@ -1,5 +1,5 @@
 import config
-from database.database_server_interface import database_server_interface as db_interface
+from database import database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
@@ -46,8 +46,9 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         self._approval_threshold = config.APPROVAL_THRESHOLD
 
     def _extract_data_from_db(self) -> None:
+        # TODO: Change it from a range of candidates and voters to a group of candidates and voters.
         # ----------------------------------------------
-        # Extract candidates ending point.
+        # Extract candidates starting and ending point.
         sql_query = f"SELECT DISTINCT {self._candidates_column_name} FROM {self._candidates_table_name} " \
                     f"WHERE {self._candidates_column_name} " \
                     f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
@@ -61,7 +62,7 @@ class ThieleRuleExtractor(db_data_extractor.DBDataExtractor):
         config.debug_print(MODULE_NAME, f"The candidates id columns are:\n{str(candidates_id_columns.head())}\n"
                                         f"The number of candidates is {len(candidates_id_columns)}.")
         # ----------------------------------------------
-        # Extract voters ending point.
+        # Extract voters starting and ending point.
         sql_query = f"SELECT DISTINCT {self._voters_column_name} FROM {self._voting_table_name} " \
                     f"WHERE {self._voters_column_name} " \
                     f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point};"

@@ -1,12 +1,10 @@
-import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
 import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
+import config
 
-import pandas as pd
 import unittest
 
-pd.set_option('display.max_rows', None)  # None means unlimited rows
-pd.set_option('display.max_columns', None)  # None means unlimited columns
+# FIXME: Automate all tests manually committee validation tests (relevant to other tests as well).
 
 
 class TestCombinedExperiment(unittest.TestCase):
@@ -26,24 +24,24 @@ class TestCombinedExperiment(unittest.TestCase):
         self.solver_time_limit = 100
         # ----------------------------------------------------------------
         # Save experiment setting.
-        self.db_name = "the_movies_database_tests"
+        self.db_name = config.TESTS_DB_DB_PATH
         self.experiment_name = 'test_experiment'
         # ----------------------------------------------------------------
         # Define the databases table and column names.
         self.voting_table_name = 'voters'
-        self.candidates_table_name = 'candidates'
-        self.candidates_column_name = 'candidate_id'
-        self.voters_column_name = 'voter_id'
-        self.approval_column_name = 'rating'
+        self.candidates_table_name = config.CANDIDATES_TABLE_NAME
+        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
+        self.voters_column_name = config.VOTERS_COLUMN_NAME
+        self.approval_column_name = config.APPROVAL_COLUMN_NAME
         # ----------------------------------------------------------------
         # Define the tgd constraint.
         tgd_constraint_dict_start = dict()
-        tgd_constraint_dict_start['candidates', 't1'] = [('x', 'genres')]
+        tgd_constraint_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
         committee_members_list_start = []
         candidates_tables_start = ['t1']
 
         tgd_constraint_dict_end = dict()
-        tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'genres')]
+        tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list_end = ['c1']
         candidates_tables_end = ['t2']
 
@@ -55,10 +53,10 @@ class TestCombinedExperiment(unittest.TestCase):
         # ----------------------------------------------------------------
         # Define the denial constraint.
         denial_constraint_dict = dict()
-        denial_constraint_dict[('candidates', 't1')] = \
-            [('c1', 'candidate_id'), ('x', 'genres')]
-        denial_constraint_dict[('candidates', 't2')] = \
-            [('c2', 'candidate_id'), ('x', 'genres')]
+        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+            [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
+        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+            [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
         self.denial_constraints = [(denial_constraint_dict, committee_members_list, candidates_tables)]

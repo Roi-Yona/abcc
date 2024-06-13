@@ -1,7 +1,7 @@
 import time
 import config
 import pandas as pd
-import database.database_server_interface.database_server_interface as db_interface
+import database.database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 
 MODULE_NAME = "Database Extractor"

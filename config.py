@@ -1,4 +1,6 @@
 import pandas as pd
+import os
+
 from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
 
 # General:
@@ -7,6 +9,11 @@ DEBUG = True
 
 pd.set_option('display.max_rows', None)  # None means unlimited rows
 pd.set_option('display.max_columns', None)  # None means unlimited columns
+
+HOME_PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+DATABASES_FOLDER_PATH = os.path.join(HOME_PROJECT_PATH, "database", "databases")
+DATASETS_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "datasets_data")
+SQLITE_DATABASE_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "sqlite_databases")
 # --------------------------------------------------------------------------------
 
 # Experiments configuration:
@@ -18,9 +25,6 @@ THIELE_RULE_NAME = 'AV'
 LIFTED_INFERENCE = True
 MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True
 MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = True
-
-MOVIES_CANDIDATES_STARTING_POINT = 1  # 31, 64
-MOVIES_VOTERS_STARTING_POINT = 1
 # --------------------------------------------------------------------------------
 
 # DB and dataset configuration:
@@ -30,12 +34,23 @@ CANDIDATES_TABLE_NAME = 'candidates'
 VOTERS_COLUMN_NAME = 'voter_id'
 CANDIDATES_COLUMN_NAME = 'candidate_id'
 APPROVAL_COLUMN_NAME = 'rating'
-LIFTED_TABLE_NAME = 'lifted_voting'
-LIFTED_VOTERS_COLUMN_NAME = 'voter_id'
-LIFTED_VOTERS_ARRAY_LENGTH = 'lifted_voters_array_length'
 
 # Every candidate rated > approval_threshold consider as approved by the voter.
 APPROVAL_THRESHOLD = 4
+
+# The first of 'number_of_approved_candidate' in the ranked-choice ballot will consider as approved
+# candidates of the voter.
+NUMBER_OF_APPROVED_CANDIDATE = 3
+# --------------------------------------------------------------------------------
+
+# The Movies Dataset Consts:
+# --------------------------------------------------------------------------------
+MOVIES_CANDIDATES_STARTING_POINT = 1  # 31, 64
+MOVIES_VOTERS_STARTING_POINT = 1
+
+MOVIES_DATABASE_DB_NAME = "the_movies_database.db"
+MOVIES_DATABASE_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "the_movies_database")
+MOVIES_DATABASE_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, MOVIES_DATABASE_DB_NAME)
 # --------------------------------------------------------------------------------
 
 # Glasgow Dataset Consts:
@@ -52,12 +67,28 @@ NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3 = dict()
 for i in range(1, 22):
     NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT[i] = 1
     NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3[i] = 3
+
+GLASGOW_ELECTION_DB_NAME = "glasgow_city_council.db"
+GLASGOW_ELECTION_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "glasgow_city_council_elections")
+GLASGOW_ELECTION_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, GLASGOW_ELECTION_DB_NAME)
 # --------------------------------------------------------------------------------
+
+# Trip Advisor Dataset Consts:
+# --------------------------------------------------------------------------------
+TRIP_ADVISOR_DB_NAME = "the_trip_advisor_database.db"
+TRIP_ADVISOR_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "trip_advisor_database")
+TRIP_ADVISOR_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TRIP_ADVISOR_DB_NAME)
+# --------------------------------------------------------------------------------
+
+# Tests Dataset Consts:
+# --------------------------------------------------------------------------------
+TESTS_DB_NAME = 'the_movies_database_tests.db'
+TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
+# --------------------------------------------------------------------------------
+
 
 # Functions:
 # --------------------------------------------------------------------------------
-
-
 def debug_print(module_name, input_str):
     if DEBUG:
         print(f"DEBUG - {module_name}")

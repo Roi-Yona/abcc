@@ -1,9 +1,9 @@
 import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ortools.linear_solver.pywraplp as pywraplp
-import database.database_server_interface.database_server_interface as db_interface
+import database.database_server_interface as db_interface
+import config
 
-import os
 import unittest
 
 
@@ -25,24 +25,21 @@ class TestTGDConstraintExtractor(unittest.TestCase):
         self.abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(self.solver)
         # ----------------------------------------------------------------
         # Create the database engine.
-        db_path = os.path.join("..", "..", "..", "database")
-        db_name = "the_movies_database_tests"
-        db_path = os.path.join(f"{db_path}", f"{db_name}.db")
-        self.db_engine = db_interface.Database(db_path)
+        self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
         # ----------------------------------------------------------------
         # Define the databases table and column names.
-        self.candidates_column_name = 'candidate_id'
-        self.voters_column_name = 'voter_id'
+        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
+        self.voters_column_name = config.VOTERS_COLUMN_NAME
 
     def test_extract_data_from_db_sanity(self):
         # Define the tgd constraint.
         tgd_constraint_dict_start = dict()
-        tgd_constraint_dict_start['candidates', 't1'] = [('x', 'genres')]
+        tgd_constraint_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
         committee_members_list_start = []
         candidates_tables_start = ['t1']
 
         tgd_constraint_dict_end = dict()
-        tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'genres')]
+        tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list_end = ['c1']
         candidates_tables_end = ['t2']
 

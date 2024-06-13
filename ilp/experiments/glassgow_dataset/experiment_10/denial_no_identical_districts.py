@@ -17,17 +17,16 @@ if __name__ == '__main__':
     # the district. The number of different districts is 21, therefore this will be the max size of a committee.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'glasgow_city_council'
     _max_number_of_districts = 21
 
     _tgd_constraints = []
 
     # First denial constraint:
     denial_constraint_dict = dict()
-    denial_constraint_dict[('candidates', 't1')] = \
-        [('c1', 'candidate_id'), ('x', 'district')]
-    denial_constraint_dict[('candidates', 't2')] = \
-        [('c2', 'candidate_id'), ('x', 'district')]
+    denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'district')]
+    denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'district')]
     committee_members_list = ['c1', 'c2']
     candidates_tables = ['t1', 't2']
 
@@ -37,7 +36,7 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
-        _experiment_name, _database_name,
+        _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
         config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
         _denial_constraints, _tgd_constraints,
         config.THIELE_RULE,

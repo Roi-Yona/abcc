@@ -1,21 +1,36 @@
+"""This module is for creating the sqlite databases,
+and should be used after cleaning and parsing the datasets.
+"""
 import os.path
 import sqlite3
-import csv
 import os
+import pandas as pd
 
-THE_MOVIES_DATABASE_PATH = os.path.join("databases", "the_movies_database")
-GLASGOW_CITY_COUNCIL_DATABASE_PATH = os.path.join("databases", "glasgow_city_council_elections")
-THE_TRIP_ADVISOR_DATABASE_PATH = os.path.join("databases", "the_trip_advisor_database")
-
-
-def extract_list_from_csv(csv_path: str) -> list:
-    # reading data from the CSV file
-    with open(csv_path, encoding="utf8") as f:
-        reader = csv.reader(f)
-        data = list(reader)
-    return data
+import config
 
 
+# Helper Functions:
+# ---------------------------------------------------------------------------
+def remove_file(file_path: str):
+    if os.path.exists(file_path):
+        # Delete the file
+        os.remove(file_path)
+
+
+def create_voting_table(cur, con, voting_table_path: str):
+    # Create the voting table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS voting (
+    voter_id INTEGER NOT NULL,
+    candidate_id INTEGER NOT NULL,
+    rating FLOAT NOT NULL)''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(voting_table_path)
+    df.to_sql(config.VOTING_TABLE_NAME, con, if_exists='append', index=False)
+
+
+# Example DB:
+# ---------------------------------------------------------------------------
 def create_example_db(cur):
     # Create the candidates table.
     cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
@@ -84,62 +99,82 @@ def create_example_db(cur):
     cur.executemany("INSERT INTO voters VALUES (?, ?, ?)", new_data)
 
 
-def create_voting_table(cur, voting_table_csv_path: str):
-    # Creating the voting table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS voting (
-    voter_id INTEGER NOT NULL,
-    candidate_id INTEGER NOT NULL,
-    rating FLOAT NOT NULL)''')
+def example_db_create_database_main():
+    # Remove the current database if exists.
+    remove_file(config.TESTS_DB_DB_PATH)
 
-    # Extract voting data.
-    voting_data = extract_list_from_csv(voting_table_csv_path)
+    # Connect the db in the current working directory,
+    # implicitly creating one if it does not exist.
+    con = sqlite3.connect(config.TESTS_DB_DB_PATH)
+    cur = con.cursor()
 
-    # Inserting data into the table
-    for row in voting_data[1:]:
-        cur.execute("INSERT INTO voting (voter_id, candidate_id, rating) values (?, ?, ?)", row)
+    create_example_db(cur)
+
+    # Committing changes.
+    con.commit()
+    # Closing the connection.
+    con.close()
 
 
-def create_trip_advisor_candidates_table(cur):
-    # Creating the candidates table.
+# Trip Advisor DB:
+# ---------------------------------------------------------------------------
+def create_trip_advisor_candidates_table(cur, con):
+    # Create the candidates table.
     cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
     candidate_id INTEGER PRIMARY KEY,
-    price INTEGER NOT NULL, 
-    location TEXT NOT NULL)''')
+    price FLOAT NOT NULL, 
+    location TEXT NOT NULL,
+    price_range TEXT NOT NULL)''')
 
-    # Extract candidates data.
-    candidates_data = extract_list_from_csv(os.path.join(f"{THE_TRIP_ADVISOR_DATABASE_PATH}", f"candidates_table.csv"))
-
-    # Inserting data into the table
-    for row in candidates_data[1:]:
-        cur.execute("INSERT INTO candidates (candidate_id, price, location) values (?, ?, ?)", row[0:3])
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"candidates_table.csv"))
+    df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_movies_voting_table(cur):
-    # Creating the voting table.
-    cur.execute('''CREATE TABLE voting (
-       voter_id int,
-       candidate_id int,
-       rating float,
-       timestamp int
+def trip_advisor_create_database_main():
+    # Remove the current database if exists.
+    remove_file(config.TRIP_ADVISOR_DB_PATH)
+
+    # Connect the db in the current working directory,
+    # implicitly creating one if it does not exist.
+    con = sqlite3.connect(config.TRIP_ADVISOR_DB_PATH)
+    cur = con.cursor()
+
+    create_voting_table(cur, con, os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"voting_table.csv"))
+    create_trip_advisor_candidates_table(cur, con)
+
+    # Committing changes.
+    con.commit()
+    # Closing the connection.
+    con.close()
+
+
+# The Movies DB:
+# ---------------------------------------------------------------------------
+def create_movies_voting_table(cur, con):
+    # Create the voting table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS voting (
+       voter_id INTEGER NOT NULL,
+       candidate_id INTEGER NOT NULL,
+       rating FLOAT NOT NULL,
+       timestamp INTEGER NOT NULL
        )''')
 
-    # Extract voting data.
-    voting_data = extract_list_from_csv(os.path.join(f"{THE_MOVIES_DATABASE_PATH}", "ratings.csv"))
-
-    # Inserting data into the table
-    for row in voting_data[1:]:
-        cur.execute("INSERT INTO voting (voter_id, candidate_id, rating, timestamp) values (?, ?, ?, ?)", row)
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATABASE_FOLDER_PATH}", "ratings_new.csv"))
+    df.to_sql(config.VOTING_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_movies_candidates_table(cur):
-    # Creating the voting table.
-    cur.execute('''CREATE TABLE candidates (
+def create_movies_candidates_table(cur, con):
+    # FIXME: Recheck this types.
+    # Create the voting table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
        adult NVARCHAR(50),
        belongs_to_collection NVARCHAR(200),
        budget int,
        genres NVARCHAR(550),
        homepage NVARCHAR(550),
-       candidate_id int,
+       candidate_id int PRIMARY KEY,
        imdb_id NVARCHAR(50),
        original_language NVARCHAR(50),
        original_title NVARCHAR(550),
@@ -160,48 +195,40 @@ def create_movies_candidates_table(cur):
        vote_count smallint
        )''')
 
-    # Extract voting data.
-    candidates_data = extract_list_from_csv(os.path.join(f"{THE_MOVIES_DATABASE_PATH}", "movies_metadata.csv"))
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATABASE_FOLDER_PATH}", "movies_metadata_new.csv"))
 
-    # Inserting data into the table
-    for row in candidates_data[1:]:
-        cur.execute("INSERT INTO candidates "
-                    "(adult, "
-                    "belongs_to_collection, "
-                    "budget, "
-                    "genres, "
-                    "homepage, "
-                    "candidate_id, "
-                    "imdb_id, "
-                    "original_language, "
-                    "original_title, "
-                    "overview, "
-                    "popularity, "
-                    "poster_path, "
-                    "production_companies, "
-                    "production_countries, "
-                    "release_date, "
-                    "revenue, "
-                    "runtime, "
-                    "spoken_languages, "
-                    "status, "
-                    "tagline, "
-                    "title, "
-                    "video, "
-                    "vote_average, "
-                    "vote_count) "
-                    "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", row)
-
-    cur.execute("DELETE FROM candidates where rowid IN (Select rowid from candidates limit 1);")
+    df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_glasgow_voting_table(cur, district_index: int):
+def the_movies_database_create_database_main():
+    # Remove the current database if exists.
+    remove_file(config.MOVIES_DATABASE_DB_PATH)
+
+    # Connect the db in the current working directory,
+    # implicitly creating one if it does not exist.
+    con = sqlite3.connect(config.MOVIES_DATABASE_DB_PATH)
+    cur = con.cursor()
+
+    create_movies_voting_table(cur, con)
+    create_movies_candidates_table(cur, con)
+
+    # Committing changes.
+    con.commit()
+    # Closing the connection.
+    con.close()
+
+
+# Glasgow DB:
+# ---------------------------------------------------------------------------
+def create_glasgow_voting_table(cur, con, district_index: int):
     if district_index < 10:
         district_index = '0' + str(district_index)
-    create_voting_table(cur, os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-000000{district_index}.csv"))
+    create_voting_table(cur, con,
+                        os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-000000{district_index}.csv"))
 
 
-def create_glasgow_candidates_table(cur):
+def create_glasgow_candidates_table(cur, con):
     # FIXME: In order to enable different number of candidates per district, I should add a table per district.
     # Creating the candidates table.
     cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
@@ -209,17 +236,16 @@ def create_glasgow_candidates_table(cur):
     district INTEGER NOT NULL, 
     party TEXT NOT NULL)''')
 
-    # Extract candidates data.
-    candidates_data = extract_list_from_csv(
-        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-00000000_candidates.csv"))
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-00000000_candidates.csv"))
 
-    # Inserting data into the table
-    # The limit of the 209 exists due to irrelevant data at the end of the candidate table in my local csv.
-    for row in candidates_data[1:209]:
-        cur.execute("INSERT INTO candidates (candidate_id, district, party) values (?, ?, ?)", row[0:3])
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'district', 'party']]
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_glasgow_important_parties_db(cur):
+def create_glasgow_important_parties_db(cur, con):
     # Create the important parties table.
     cur.execute('''CREATE TABLE IF NOT EXISTS important_parties (
                         party TEXT PRIMARY KEY)''')
@@ -236,65 +262,56 @@ def create_glasgow_important_parties_db(cur):
     cur.executemany("INSERT INTO important_parties (party) values (?)", new_data)
 
 
-def create_glasgow_context_degree_db(cur):
-    # Create the important parties table.
+def create_glasgow_context_degree_db(cur, con):
+    # Create the candidates degrees table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_degree (
                         candidate_id INTEGER NOT NULL,
                         degree_status TEXT NOT NULL)''')
 
-    # Extract voting data.
-    candidates_data = extract_list_from_csv(
-        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-00000000_candidates.csv"))
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-00000000_candidates.csv"))
 
-    # Inserting data into the table
-    for row in candidates_data[1:]:
-        cur.execute("INSERT INTO context_degree (candidate_id, degree_status) values (?, ?)", [row[0], row[5]])
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'degree_status']]
+
+    # Filter out rows where column values is '', empty strings (''), or NaN.
+    df = df[df['degree_status'].notna() & (df['degree_status'] != 'NULL') & (df['degree_status'] != '')]
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql('context_degree', con, if_exists='append', index=False)
 
 
-def create_glasgow_context_domain_db(cur):
-    # Create the important parties table.
+def create_glasgow_context_domain_db(cur, con):
+    # Create the candidates domain table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_domain (
                         candidate_id INTEGER NOT NULL,
                         domain TEXT NOT NULL)''')
 
-    # Extract voting data.
-    candidates_data = extract_list_from_csv(
-        os.path.join(f"{GLASGOW_CITY_COUNCIL_DATABASE_PATH}", f"00008-00000000_candidates.csv"))
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-00000000_candidates.csv"))
 
-    # Inserting data into the table
-    for row in candidates_data[1:]:
-        if row[6] != 'NULL' and row[6] is not None and row[6] != '':
-            l = row[6].strip().split(',')
-            for x in l:
-                cur.execute("INSERT INTO context_domain (candidate_id, domain) values (?, ?)", [row[0], x])
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'domain']]
+
+    # Filter out rows where column values is '', empty strings (''), or NaN.
+    df = df[df['domain'].notna() & (df['domain'] != 'NULL') & (df['domain'] != '')]
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql('context_domain', con, if_exists='append', index=False)
 
 
 def glasgow_create_database_main():
+    # Remove the current database if exists.
+    remove_file(config.GLASGOW_ELECTION_DB_PATH)
+
     # Connect the db in the current working directory,
     # implicitly creating one if it does not exist.
-    con = sqlite3.connect('glasgow_city_council.db')
+    con = sqlite3.connect(config.GLASGOW_ELECTION_DB_PATH)
     cur = con.cursor()
 
     for i in range(1, 22):
-        create_glasgow_voting_table(cur, i)
-    create_glasgow_candidates_table(cur)
-    create_glasgow_important_parties_db(cur)
-    create_glasgow_context_domain_db(cur)
-
-    # Committing changes.
-    con.commit()
-    # Closing the connection.
-    con.close()
-
-
-def trip_advisor_create_database_main():
-    # Connect the db in the current working directory,
-    # implicitly creating one if it does not exist.
-    con = sqlite3.connect('the_trip_advisor_database.db')
-    cur = con.cursor()
-
-    create_voting_table(cur, os.path.join(f"{THE_TRIP_ADVISOR_DATABASE_PATH}", f"voting_table.csv"))
-    create_trip_advisor_candidates_table(cur)
+        create_glasgow_voting_table(cur, con, i)
+    create_glasgow_candidates_table(cur, con)
+    create_glasgow_important_parties_db(cur, con)
+    create_glasgow_context_domain_db(cur, con)
 
     # Committing changes.
     con.commit()
@@ -303,5 +320,9 @@ def trip_advisor_create_database_main():
 
 
 if __name__ == '__main__':
+    # TODO: Update All DB's in all experiments (linux) with the updated versions.
+    # example_db_create_database_main()
+    # the_movies_database_create_database_main()
+    # glasgow_create_database_main()
     trip_advisor_create_database_main()
 

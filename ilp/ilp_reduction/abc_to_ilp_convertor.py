@@ -184,7 +184,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         for voter_id in self._approval_profile.keys():
             self._model.Add(self._model_voters_approval_candidates_sum_variables[voter_id] ==
                             sum([self._model_candidates_variables[candidate_id] for candidate_id in
-                                 self._approval_profile[voter_id]]))
+                                 self._approval_profile[voter_id] if candidate_id in self._model_candidates_variables]))
 
         # Add the constraint about the voter score contribution.
         for voter_id in self._approval_profile.keys():
@@ -251,7 +251,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             # The denial length should be according to the original denial sets.
             denial_group_length = len(denial_candidates_sets[0])
             self._model.Add(
-                sum([self._model_candidates_variables[candidate_index] for candidate_index in candidates_set])
+                sum([self._model_candidates_variables[candidate_index] for candidate_index in candidates_set
+                     if candidate_index in self._model_candidates_variables])
                 <= (denial_group_length - 1))
 
     def define_tgd_constraint(self, element_members_representor_sets: list):
@@ -260,7 +261,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             b = self._model.BoolVar('tgd_b_' + str(self._global_counter))
             self._global_counter += 1
             self._model.Add(
-                sum([self._model_candidates_variables[x] for x in element_members])
+                sum([self._model_candidates_variables[x] for x in element_members
+                     if x in self._model_candidates_variables])
                 <= (b - 1 + len(element_members)))
 
             # List of possible representor.
@@ -270,7 +272,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                 self._global_counter += 1
                 b_representor_list.append(current_b)
                 self._model.Add(
-                    sum([self._model_candidates_variables[x] for x in representor])
+                    sum([self._model_candidates_variables[x] for x in representor
+                         if x in self._model_candidates_variables])
                     >= (current_b * len(representor)))
 
             # If b chosen, chose at least one representor.

@@ -17,8 +17,6 @@ if __name__ == '__main__':
     # We find a committee where there is 1 representor from 1 district.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'glasgow_city_council'
-
     _number_of_districts = 1
     _candidates_starting_point = 1
     _candidates_group_size = 0
@@ -42,7 +40,7 @@ if __name__ == '__main__':
     # Run the experiment.
     experiments_results = pd.DataFrame()
     av_experiment = combined_constraints_experiment. \
-        CombinedConstraintsExperiment(_experiment_name, _database_name,
+        CombinedConstraintsExperiment(_experiment_name, config.GLASGOW_ELECTION_DB_NAME,
                                       config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
                                       _denial_constrains, _tgd_constraints,
                                       _committee_size,

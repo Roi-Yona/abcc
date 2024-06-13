@@ -1,10 +1,9 @@
-import os
-
 import ilp.ilp_db_data_extractors.thiele_rule_extractor as thiele_rule_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
 import ortools.linear_solver.pywraplp as pywraplp
-import database.database_server_interface.database_server_interface as db_interface
+import database.database_server_interface as db_interface
+import config
 
 import unittest
 
@@ -30,17 +29,14 @@ class TestThieleRuleExtractor(unittest.TestCase):
         self.abc_convertor = abc_to_ilp_convertor.ABCToILPConvertor(self.solver)
         # ----------------------------------------------------------------
         # Create the database engine.
-        db_path = os.path.join("..", "..", "..", "database")
-        db_name = "the_movies_database_tests"
-        db_path = os.path.join(f"{db_path}", f"{db_name}.db")
-        self.db_engine = db_interface.Database(db_path)
+        self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
         # ----------------------------------------------------------------
         # Define the databases table and column names.
         self.voting_table_name = 'voters'
-        self.candidates_table_name = 'candidates'
-        self.candidates_column_name = 'candidate_id'
-        self.voters_column_name = 'voter_id'
-        self.approval_column_name = 'rating'
+        self.candidates_table_name = config.CANDIDATES_TABLE_NAME
+        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
+        self.voters_column_name = config.VOTERS_COLUMN_NAME
+        self.approval_column_name = config.APPROVAL_COLUMN_NAME
 
     def test_extract_data_from_db_sanity(self):
         # Define the thiele rule extractor.

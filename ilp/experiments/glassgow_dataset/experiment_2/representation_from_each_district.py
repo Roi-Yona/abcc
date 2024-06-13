@@ -15,17 +15,16 @@ if __name__ == '__main__':
     # We find a committee where there is 1 representor from each district (enforce as a TGD).
     # ---------------------------------------------------------------------------
 
-    _database_name = 'glasgow_city_council'
     _max_number_of_districts = 21
 
     _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['candidates', 't1'] = [('x', 'district')]
+    _tgd_constraint_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'district')]
     _committee_members_list_start = []
     # This indicates that the id limitation applies here as well.
     _candidates_tables_start = ['t1']
 
     _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end['candidates', 't2'] = [('c1', 'candidate_id'), ('x', 'district')]
+    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'district')]
     _committee_members_list_end = ['c1']
     _candidates_tables_end = ['t2']
 
@@ -40,7 +39,7 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
-        _experiment_name, _database_name,
+        _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
         config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
         _denial_constraints, _tgd_constraints,
         config.THIELE_RULE,

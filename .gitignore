@@ -29,6 +29,7 @@
 database/databases/*
 tests/ddnnf/CNF_results/*
 **/results/
+db_sql_query.py
 
 # OS generated files #
 ######################

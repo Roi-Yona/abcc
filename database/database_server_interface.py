@@ -61,7 +61,7 @@ if __name__ == '__main__':
     #
     # df = database_run_query(db_engine, 'SELECT * FROM basketball_metadata')
     # print(df)
-    db = Database("..\\the_movies_database.db")
+    db = Database("databases/sqlite_databases/the_movies_database.db")
     print(db.run_query("SELECT * FROM candidates WHERE candidate_id=3"))
     db.close()
 
