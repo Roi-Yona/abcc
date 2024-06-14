@@ -21,8 +21,8 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
         # Initializing ABC setting variables.
         self._voters_starting_point = voters_starting_point
         self._voters_size_limit = voters_size_limit
-        self._candidates_ending_point = self._candidates_starting_point + self._candidates_size_limit - 1
-        self._voters_ending_point = self._voters_starting_point + self._voters_size_limit - 1
+        self._candidates_starting_point = candidates_starting_point
+        self._candidates_size_limit = candidates_size_limit
         self._voters_ids_set = set()
         self._candidates_ids_set = set()
         self._approval_profile = dict()
@@ -35,14 +35,16 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
 
     def _extract_data_from_db(self) -> None:
         # ----------------------------------------------
-        # Extract candidates starting and ending point.
+        # Extract the candidates group ids.
         sql_query = f"SELECT DISTINCT {config.CANDIDATES_COLUMN_NAME} FROM {config.CANDIDATES_TABLE_NAME} " \
-                    f"WHERE {config.CANDIDATES_COLUMN_NAME} " \
-                    f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
+                    f"WHERE {config.CANDIDATES_COLUMN_NAME} >= {self._candidates_starting_point} " \
+                    f"ORDER BY {config.CANDIDATES_COLUMN_NAME}" \
+                    f"LIMIT {self._candidates_size_limit};"
         candidates_id_columns = self._db_engine.run_query(sql_query)
         self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
         self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
         self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
+        self._candidates_size_limit = len(self._candidates_ids_set)
 
         if self._committee_size > len(candidates_id_columns):
             config.debug_print(MODULE_NAME, "Note: Candidates group size is lower then committee size, \n"
@@ -50,14 +52,17 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
         config.debug_print(MODULE_NAME, f"The candidates id columns are:\n{str(candidates_id_columns.head())}\n"
                                         f"The number of candidates is {len(candidates_id_columns)}.")
         # ----------------------------------------------
-        # Extract voters starting and ending point.
+        # Extract voters ids group.
         sql_query = f"SELECT DISTINCT {config.VOTERS_COLUMN_NAME} FROM {config.VOTING_TABLE_NAME} " \
-                    f"WHERE {config.VOTERS_COLUMN_NAME} " \
-                    f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point};"
+                    f"WHERE {config.VOTERS_COLUMN_NAME} >= {self._voters_starting_point} " \
+                    f"ORDER BY {config.VOTERS_COLUMN_NAME}" \
+                    f"LIMIT {self._voters_size_limit};"
         voters_id_columns = self._db_engine.run_query(sql_query)
         self._voters_ids_set = set(voters_id_columns[config.VOTERS_COLUMN_NAME])
-        self._voters_ending_point = int(voters_id_columns.max().iloc[0])
         self._voters_starting_point = int(voters_id_columns.min().iloc[0])
+        self._voters_ending_point = int(voters_id_columns.max().iloc[0])
+        self._voters_size_limit = len(self._voters_ids_set)
+
         config.debug_print(MODULE_NAME, f"The voters id columns are:\n{str(voters_id_columns.head())}\n"
                                         f"The number of voters is {len(voters_id_columns)}.")
         # ----------------------------------------------
