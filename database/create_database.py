@@ -31,7 +31,7 @@ def create_voting_table(cur, con, voting_table_path: str):
 
 # Example DB:
 # ---------------------------------------------------------------------------
-def create_example_db(cur):
+def create_tests_db(cur):
     # Create the candidates table.
     cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
                         candidate_id INTEGER PRIMARY KEY,
@@ -62,7 +62,7 @@ def create_example_db(cur):
     cur.executemany("INSERT INTO popular VALUES (?, ?)", new_data)
 
     # Create the voters table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS voters (
+    cur.execute('''CREATE TABLE IF NOT EXISTS voting (
                         voter_id INTEGER NOT NULL,
                         candidate_id INTEGER NOT NULL,
                         rating FLOAT NOT NULL)''')
@@ -96,10 +96,10 @@ def create_example_db(cur):
     7         : 1                        : 2
 
     """
-    cur.executemany("INSERT INTO voters VALUES (?, ?, ?)", new_data)
+    cur.executemany("INSERT INTO voting VALUES (?, ?, ?)", new_data)
 
 
-def example_db_create_database_main():
+def db_tests_create_database_main():
     # Remove the current database if exists.
     remove_file(config.TESTS_DB_DB_PATH)
 
@@ -108,7 +108,7 @@ def example_db_create_database_main():
     con = sqlite3.connect(config.TESTS_DB_DB_PATH)
     cur = con.cursor()
 
-    create_example_db(cur)
+    create_tests_db(cur)
 
     # Committing changes.
     con.commit()
@@ -321,8 +321,8 @@ def glasgow_create_database_main():
 
 if __name__ == '__main__':
     # TODO: Update All DB's in all experiments (linux) with the updated versions.
-    # example_db_create_database_main()
+    db_tests_create_database_main()
     # the_movies_database_create_database_main()
     # glasgow_create_database_main()
-    trip_advisor_create_database_main()
+    # trip_advisor_create_database_main()
 

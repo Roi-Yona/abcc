@@ -28,18 +28,12 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         super().__init__(solver)
 
         # ABC data.
-        self.candidates_starting_point = 0
-        self.voters_starting_point = 0
         self.candidates_group_size = 0
         self.voters_group_size = 0
+        self._candidates_ids_set = set()
         self._approval_profile = {}
         self._committee_size = 0
-
-        # The group of the voters id's.
-        self._voters_group = set()
-
         self.lifted_voters_group_size = 0
-        self._lifted_setting = False
         self._lifted_voters_weights = None
 
         # The voting rule.
@@ -77,59 +71,43 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         return solution
 
     def define_abc_setting(self,
-                           candidates_group_starting_point: int,
-                           voters_group_starting_point: int,
-                           candidates_group_size: int, voters_group_size: int, approval_profile: dict,
-                           committee_size: int, thiele_score_function: dict, lifted_setting) -> None:
+                           candidates_ids_set: set,
+                           approval_profile: dict,
+                           committee_size: int, thiele_score_function: dict) -> None:
         """Set and convert to ILP the ABC problem setting, including the thiele score function.
-        :param candidates_group_starting_point: The starting id for the candidates group.
-        :param voters_group_starting_point: The starting id for the voters group.
-        :param candidates_group_size:    The input candidates group size.
-        :param voters_group_size:        The input voters group size.
+        :param candidates_ids_set:       A set of candidates id's.
         :param approval_profile:         A dict the is key is the voter id,
                                          is value is a group of candidates id's this voter approves.
         :param committee_size:           The committee size.
         :param thiele_score_function:    A dict with the number of approved candidates as key,
                                          the thiele score as value ({1,..,k}->N).
-        :param lifted_setting:           Indicate whether to use lifted inference optimization setting or not.
         """
         # Set the ABC data.
-        self.candidates_starting_point = candidates_group_starting_point
-        self.voters_starting_point = voters_group_starting_point
-        self.candidates_group_size = candidates_group_size
-        self.voters_group_size = voters_group_size
+        self._candidates_ids_set = candidates_ids_set
         self._approval_profile = approval_profile
         self._committee_size = committee_size
-        self._lifted_setting = lifted_setting
 
-        # Clean the voters group (only a voters with a none empty approval profile left).
-        self._voters_group = self._approval_profile.keys()
+        self.candidates_group_size = len(self._candidates_ids_set)
 
-        debug_message = f"Voters starting id = {self.voters_starting_point}.\n" \
-                        f"Candidates starting id = {self.candidates_starting_point}.\n" \
-                        f"Candidates group size = {self.candidates_group_size}.\n" \
-                        f"Voters Group size (original) = {self.voters_group_size}.\n" \
-                        f"Real voters group size (after cleaning) = {len(self._voters_group)}.\n" \
+        # Those are only voters with a none-empty approval profile.
+        self.voters_group_size = len(set(self._approval_profile.keys()))
+        self.lifted_voters_group_size = self.voters_group_size
+
+        debug_message = f"Candidates group size = {self.candidates_group_size}.\n" \
+                        f"Real voters group size (after cleaning) = {self.voters_group_size}.\n" \
                         f"Committee size = {self._committee_size}.\n" \
-            # f"Approval profile = {self._approval_profile}."
+                        # f"Approval profile = {self._approval_profile}."
         config.debug_print(MODULE_NAME, debug_message)
-
-        # Updating for the voter group size after 'cleaning'.
-        self.voters_group_size = len(self._voters_group)
-        self.lifted_voters_group_size = voters_group_size
 
         # Set the voting rule.
         self._thiele_score_function = thiele_score_function
 
         # Find the max value of the thiele score function.
-        self._max_thiele_function_value = 0
-        for score in self._thiele_score_function.values():
-            if self._max_thiele_function_value < score:
-                self._max_thiele_function_value = score
+        self._max_thiele_function_value = max(self._thiele_score_function.values())
 
         # Union all voters with the same approval profile in order to 'lifted inference' those voters
         # and represent them as one weighted voter.
-        if self._lifted_setting:
+        if config.LIFTED_INFERENCE:
             # Make the approval profiles hash-ables.
             for i, j in self._approval_profile.items():
                 self._approval_profile[i] = frozenset(j)
@@ -151,9 +129,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                                            for voter_id in self._approval_profile}
         else:
             # Define defaults weights.
-            self._lifted_voters_weights = {voter_id: 1 for voter_id in
-                                           range(self.voters_starting_point,
-                                                 self.voters_starting_point + self.voters_group_size)}
+            self._lifted_voters_weights = {voter_id: 1 for voter_id in self._approval_profile.keys()}
 
         self._define_abc_setting_variables()
         self._define_abc_setting_constraints()
@@ -161,8 +137,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
     def _define_abc_setting_variables(self) -> None:
         # Create the committee ILP variables.
-        for candidate_id in range(self.candidates_starting_point,
-                       self.candidates_starting_point + self.candidates_group_size):
+        for candidate_id in self._candidates_ids_set:
             self._model_candidates_variables[candidate_id] = self._model.BoolVar("c_" + str(candidate_id))
 
         # Create the voters approval candidates sum variables.

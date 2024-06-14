@@ -15,7 +15,6 @@ class TestDenialConstraintExtractor(unittest.TestCase):
         # Define ABC setting.
         self.candidates_starting_point = 0
         self.candidates_group_size = 10
-        self.voters_group_size = 8
         self.committee_size = 3
         # ----------------------------------------------------------------
         # Define the ILP solver.
@@ -28,10 +27,6 @@ class TestDenialConstraintExtractor(unittest.TestCase):
         # ----------------------------------------------------------------
         # Create the database engine.
         self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
-        # ----------------------------------------------------------------
-        # Define the databases table and column names.
-        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
-        self.voters_column_name = config.VOTERS_COLUMN_NAME
 
     def test_extract_data_from_db_sanity(self):
         # Define the denial constraint.
@@ -50,10 +45,7 @@ class TestDenialConstraintExtractor(unittest.TestCase):
             candidates_tables,
             self.committee_size,
             self.candidates_starting_point,
-            self.voters_group_size,
-            self.candidates_group_size,
-            self.candidates_column_name,
-            self.voters_column_name)
+            self.candidates_group_size)
 
         extractor._extract_data_from_db()
 

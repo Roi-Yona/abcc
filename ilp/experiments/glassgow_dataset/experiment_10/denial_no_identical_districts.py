@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.append(os.path.join('..', '..', '..', '..'))
 
-from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
@@ -37,9 +36,6 @@ if __name__ == '__main__':
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
         _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
-        config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
         _denial_constraints, _tgd_constraints,
-        config.THIELE_RULE,
-        config.LIFTED_INFERENCE,
         _max_number_of_districts,
         config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)

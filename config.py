@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from ilp.ilp_reduction.thiele_rule_to_ilp import thiele_functions
+from ilp.ilp_reduction import thiele_functions
 
 # General:
 # --------------------------------------------------------------------------------
@@ -18,10 +18,12 @@ SQLITE_DATABASE_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "sqlite_databa
 
 # Experiments configuration:
 # --------------------------------------------------------------------------------
-SOLVER_TIME_LIMIT = 250
+MINUTE = 1000 * 60
+SOLVER_TIME_LIMIT = 250 * MINUTE
 SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
 THIELE_RULE = thiele_functions.create_av_thiele_dict
 THIELE_RULE_NAME = 'AV'
+
 LIFTED_INFERENCE = True
 MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True
 MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = True
@@ -78,6 +80,9 @@ GLASGOW_ELECTION_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, GLASGOW_ELE
 TRIP_ADVISOR_DB_NAME = "the_trip_advisor_database.db"
 TRIP_ADVISOR_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "trip_advisor_database")
 TRIP_ADVISOR_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TRIP_ADVISOR_DB_NAME)
+
+TRIP_ADVISOR_CANDIDATES_STARTING_POINT = 1
+TRIP_ADVISOR_VOTERS_STARTING_POINT = 1
 # --------------------------------------------------------------------------------
 
 # Tests Dataset Consts:
@@ -97,6 +102,13 @@ def debug_print(module_name, input_str):
         print("--------------------------------------\n")
 
 
+def default_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
+    return f'{experiment_number}_{THIELE_RULE_NAME}_' \
+           f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
+           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
+           f'solver={SOLVER_NAME}_candidate_size={candidates_group_size}_committee_size={committee_size}'
+
+
 def glasgow_create_experiment_name(experiment_number: int, max_number_of_districts: int):
     return f'{experiment_number}_{THIELE_RULE_NAME}_' \
            f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
@@ -105,8 +117,9 @@ def glasgow_create_experiment_name(experiment_number: int, max_number_of_distric
 
 
 def movies_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
-    return f'{experiment_number}_{THIELE_RULE_NAME}_' \
-           f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
-           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
-           f'solver={SOLVER_NAME}_candidate_size={candidates_group_size}_committee_size={committee_size}'
+    return default_experiment_name(experiment_number, candidates_group_size, committee_size)
+
+
+def trip_advisor_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
+    return default_experiment_name(experiment_number, candidates_group_size, committee_size)
 # --------------------------------------------------------------------------------

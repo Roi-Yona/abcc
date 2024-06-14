@@ -18,22 +18,16 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
                  candidates_tables_end: list,
                  committee_size: int,
                  candidates_starting_point: int,
-                 voters_size_limit: int,
                  candidates_size_limit: int,
-                 candidates_column_name=config.CANDIDATES_COLUMN_NAME,
-                 voters_column_name=config.VOTERS_COLUMN_NAME,
                  # Different variables indicates that these vars in the join should be different.
                  # Usually used for committee_members_list_end.
                  # For example, different committee members should represent district 1 if I demand three represents.
                  different_variables=None
                  ):
 
-        super().__init__(abc_convertor, database_engine,
-                         candidates_column_name, candidates_starting_point, candidates_size_limit)
+        super().__init__(abc_convertor, database_engine, candidates_starting_point, candidates_size_limit)
 
         self._committee_size = committee_size
-        self._voters_size_limit = voters_size_limit
-        self._voters_column_name = voters_column_name
 
         self._tgd_constraint_dict_start = tgd_constraint_dict_start
         self._committee_members_list_start = committee_members_list_start

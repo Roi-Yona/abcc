@@ -41,12 +41,10 @@ if __name__ == '__main__':
     experiments_results = pd.DataFrame()
     av_experiment = combined_constraints_experiment. \
         CombinedConstraintsExperiment(_experiment_name, config.GLASGOW_ELECTION_DB_NAME,
-                                      config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
                                       _denial_constrains, _tgd_constraints,
                                       _committee_size,
                                       _voters_starting_point, _candidates_starting_point,
-                                      _voters_group_size, _candidates_group_size,
-                                      config.THIELE_RULE, lifted_inference=config.LIFTED_INFERENCE)
+                                      _voters_group_size, _candidates_group_size)
     experiments_results = experiment.save_result(experiments_results, av_experiment.run_experiment())
     experiment.experiment_save_excel(experiments_results, _experiment_name, av_experiment.results_file_path)
     # In case of one approval from each voter - Sanity result: Candidate 7.

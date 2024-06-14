@@ -31,10 +31,7 @@ if __name__ == '__main__':
     # Run the experiment.
     combined_constraints_experiment. \
         combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DATABASE_DB_NAME,
-                                               config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
                                                _denial_constraints, _tgd_constraints,
                                                _committee_size,
                                                config.MOVIES_VOTERS_STARTING_POINT,
-                                               config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size,
-                                               config.THIELE_RULE,
-                                               config.LIFTED_INFERENCE)
+                                               config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)

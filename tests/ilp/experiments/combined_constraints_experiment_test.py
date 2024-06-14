@@ -1,4 +1,4 @@
-import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
+import ilp.ilp_reduction.thiele_functions as thiele_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
@@ -15,24 +15,17 @@ class TestCombinedExperiment(unittest.TestCase):
         self.voters_starting_point = 0
         self.candidates_group_size = 10
         self.voters_group_size = 8
-        self.lifted_inference_setting = False
+        config.LIFTED_INFERENCE = False
         self.committee_size = 4
-        self.thiele_function_score_creator = thiele_functions.create_av_thiele_dict
+        config.THIELE_RULE = thiele_functions.create_av_thiele_dict
+        config.THIELE_RULE_NAME = "AV"
         # ----------------------------------------------------------------
         # Define the ILP solver.
-        self.solver_name = "CP_SAT"
-        self.solver_time_limit = 100
+        config.SOLVER_NAME = "CP_SAT"
         # ----------------------------------------------------------------
         # Save experiment setting.
         self.db_name = config.TESTS_DB_DB_PATH
         self.experiment_name = 'test_experiment'
-        # ----------------------------------------------------------------
-        # Define the databases table and column names.
-        self.voting_table_name = 'voters'
-        self.candidates_table_name = config.CANDIDATES_TABLE_NAME
-        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
-        self.voters_column_name = config.VOTERS_COLUMN_NAME
-        self.approval_column_name = config.APPROVAL_COLUMN_NAME
         # ----------------------------------------------------------------
         # Define the tgd constraint.
         tgd_constraint_dict_start = dict()
@@ -77,14 +70,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             [], self.tgd_constraints,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 
@@ -97,14 +85,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             [], self.tgd_constraints,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 
@@ -117,14 +100,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             self.denial_constraints, [],
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 
@@ -136,14 +114,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             self.denial_constraints, [],
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 
@@ -156,14 +129,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             self.denial_constraints, [],
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 
@@ -175,14 +143,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             self.denial_constraints, self.tgd_constraints,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 
@@ -195,14 +158,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             self.denial_constraints, self.tgd_constraints,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 
@@ -215,14 +173,9 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.solver_time_limit, self.solver_name,
             self.denial_constraints, self.tgd_constraints,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
-            self.voters_group_size, self.candidates_group_size,
-            self.thiele_function_score_creator,
-            self.voting_table_name, self.candidates_table_name,
-            self.candidates_column_name, self.voters_column_name, self.approval_column_name,
-            self.lifted_inference_setting)
+            self.voters_group_size, self.candidates_group_size)
 
         resulted_df = experiment.run_experiment()
 

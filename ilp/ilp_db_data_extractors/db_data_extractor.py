@@ -14,14 +14,12 @@ class DBDataExtractor:
     def __init__(self,
                  abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
-                 candidates_column_name: str,
                  candidates_starting_point: int,
                  candidates_size_limit: int):
         self._abc_convertor = abc_convertor
         self._db_engine = database_engine
         self.convert_to_ilp_timer = -1
         self.extract_data_timer = -1
-        self._candidates_column_name = candidates_column_name
         self._candidates_size_limit = candidates_size_limit
         self._candidates_starting_point = candidates_starting_point
 
@@ -32,14 +30,13 @@ class DBDataExtractor:
         tables_dict[('candidates', 't1')] = [('x', 'user_id'), ... ]
         When there are shared columns join natural inner join, otherwise, cross join.
 
-        :param candidate_tables: All the tables containing self._candidates_column_name.
+        :param candidate_tables: All the tables containing config.CANDIDATES_COLUMN_NAME.
         :param constants: A constants variables, dict with the new variable name and his const value.
         :param tables_dict: A dict as described in the brief.
         :param different_variables: A list of variables (with the new naming) that should differ from one another.
         :return: The resulted df of the join operation,
         with names given to the tables_dict.
         """
-
         if constants is None:
             constants = dict()
 
@@ -81,7 +78,7 @@ class DBDataExtractor:
         for table_name in candidate_tables:
             if where_phrase != "WHERE ":
                 where_phrase += " AND "
-            where_phrase += f"{table_name}.{self._candidates_column_name} " \
+            where_phrase += f"{table_name}.{config.CANDIDATES_COLUMN_NAME} " \
                             f"BETWEEN {self._candidates_starting_point} AND " \
                             f"{self._candidates_starting_point + self._candidates_size_limit - 1}"
 

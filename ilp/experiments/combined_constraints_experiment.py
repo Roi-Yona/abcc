@@ -5,7 +5,7 @@ sys.path.append(os.path.join('..', '..'))
 import pandas as pd
 
 import config
-import ilp.ilp_db_data_extractors.thiele_rule_extractor as thiele_rule_db_data_extractor
+import ilp.ilp_db_data_extractors.abc_setting_extractor as abc_setting_extractor
 import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
 import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
 import ilp.experiments.experiment as experiment
@@ -24,7 +24,6 @@ class CombinedConstraintsExperiment(experiment.Experiment):
     def __init__(self,
                  experiment_name: str,
                  database_name: str,
-                 solver_time_limit: int, solver_name: str,
 
                  # Denial constraints parameters are:
                  # (denial_constraint_dict: dict, committee_members_list: list, candidates_tables: list)
@@ -38,18 +37,10 @@ class CombinedConstraintsExperiment(experiment.Experiment):
 
                  # ABC settings:
                  committee_size: int,
-                 voters_starting_point: int,
-                 candidates_starting_point: int,
-                 voters_size_limit: int, candidates_size_limit: int,
-                 thiele_rule_function_creator,
-                 voting_table_name=config.VOTING_TABLE_NAME,
-                 candidates_table_name=config.CANDIDATES_TABLE_NAME,
-                 candidates_column_name=config.CANDIDATES_COLUMN_NAME,
-                 voters_column_name=config.VOTERS_COLUMN_NAME,
-                 approval_column_name=config.APPROVAL_COLUMN_NAME,
-                 lifted_inference=False):
+                 voters_starting_point: int, candidates_starting_point: int,
+                 voters_size_limit: int, candidates_size_limit: int):
 
-        super().__init__(experiment_name, database_name, solver_time_limit, solver_name)
+        super().__init__(experiment_name, database_name)
         self._candidates_starting_point = candidates_starting_point
         self._voters_starting_point = voters_starting_point
         self._voters_group_size = voters_size_limit
@@ -66,8 +57,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             self._denial_constraint_db_extractors.append(denial_constraint_extractor.DenialConstraintExtractor(
                 self._abc_convertor, self._db_engine,
                 local_denial_constraint_dict, local_committee_members_list, local_candidates_tables,
-                committee_size, candidates_starting_point, voters_size_limit, candidates_size_limit,
-                candidates_column_name, voters_column_name))
+                committee_size, candidates_starting_point, candidates_size_limit))
 
         self._tgd_constraint_db_extractors = []
         for param_tuples in tgd_constraints:
@@ -84,20 +74,17 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                 local_tgd_constraint_dict_start, local_committee_members_list_start,
                 local_tgd_constraint_dict_end, local_committee_members_list_end,
                 local_candidates_tables_start, local_candidates_tables_end,
-                committee_size, candidates_starting_point, voters_size_limit, candidates_size_limit,
-                candidates_column_name, voters_column_name, local_different_variables))
+                committee_size, candidates_starting_point, candidates_size_limit, local_different_variables))
 
-        self._av_db_data_extractor = thiele_rule_db_data_extractor.ThieleRuleExtractor(
+        self._abc_setting_extractor = abc_setting_extractor.ABCSettingExtractor(
             self._abc_convertor, self._db_engine,
             committee_size, voters_starting_point, candidates_starting_point, voters_size_limit, candidates_size_limit,
-            thiele_rule_function_creator(committee_size + 1),
-            voting_table_name, candidates_table_name, candidates_column_name, voters_column_name, approval_column_name,
-            lifted_inference)
+            config.THIELE_RULE(committee_size + 1))
 
     def run_experiment(self):
         # Extract problem data from the database and convert to ILP.
         # NOTE_1: Can alternative convert to ilp directly using the _abc_convertor using a data that already extracted.
-        self._av_db_data_extractor.extract_and_convert()
+        self._abc_setting_extractor.extract_and_convert()
         for denial_extractor in self._denial_constraint_db_extractors:
             denial_extractor.extract_and_convert()
         for tgd_extractor in self._tgd_constraint_db_extractors:
@@ -121,42 +108,41 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             committee_string = '-'
 
         # Save the results.
-        new_result = {'candidates_starting_point': self._abc_convertor.candidates_starting_point,
-                      'voters_starting_point': self._abc_convertor.voters_starting_point,
-                      'voters_group_size': self._abc_convertor.voters_group_size,
+        new_result = {'candidates_starting_point': self._candidates_starting_point,
+                      'voters_starting_point': self._voters_starting_point,
+                      'voters_group_size': self._voters_group_size,
                       'lifted_voters_group_size': self._abc_convertor.lifted_voters_group_size,
                       'candidates_group_size': self._abc_convertor.candidates_group_size,
                       'committee_size': self._committee_size,
                       'ilp_solving_time(sec)': solved_time,
                       'number_of_solver_variables': self._solver.NumVariables(),
                       'number_of_solver_constraints': self._solver.NumConstraints(),
-                      'ilp_construction_time_abc(sec)': self._av_db_data_extractor.convert_to_ilp_timer,
+                      'ilp_construction_time_abc(sec)': self._abc_setting_extractor.convert_to_ilp_timer,
                       'ilp_construction_time_denial_constraint(sec)': sum([x.convert_to_ilp_timer for x in
                                                                            self._denial_constraint_db_extractors]),
                       'ilp_construction_time_tgd(sec)': sum([x.convert_to_ilp_timer for x in
                                                              self._tgd_constraint_db_extractors]),
-                      'ilp_construction_time_total(sec)': self._av_db_data_extractor.convert_to_ilp_timer +
+                      'ilp_construction_time_total(sec)': self._abc_setting_extractor.convert_to_ilp_timer +
                                                           sum([x.convert_to_ilp_timer for x in
                                                                self._denial_constraint_db_extractors]) +
                                                           sum([x.convert_to_ilp_timer for x in
                                                                self._tgd_constraint_db_extractors]),
-                      'extract_data_time(sec)': self._av_db_data_extractor.extract_data_timer +
+                      'extract_data_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                 sum([x.extract_data_timer for x in
                                                      self._denial_constraint_db_extractors]) +
                                                 sum([x.extract_data_timer for x in
                                                      self._tgd_constraint_db_extractors]),
-                      'total_solution_time(sec)': self._av_db_data_extractor.extract_data_timer +
+                      'total_solution_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                   sum([x.extract_data_timer for x in
                                                        self._denial_constraint_db_extractors]) +
                                                   sum([x.extract_data_timer for x in
                                                        self._tgd_constraint_db_extractors]) +
 
-                                                  self._av_db_data_extractor.convert_to_ilp_timer +
+                                                  self._abc_setting_extractor.convert_to_ilp_timer +
                                                   sum([x.convert_to_ilp_timer for x in
                                                        self._denial_constraint_db_extractors]) +
                                                   sum([x.convert_to_ilp_timer for x in
                                                        self._tgd_constraint_db_extractors]) +
-
                                                   solved_time,
                       'solving_status': self._abc_convertor.solver_status,
                       'resulted_committee': committee_string
@@ -167,42 +153,32 @@ class CombinedConstraintsExperiment(experiment.Experiment):
 
 # Functions------------------------------------------------------------------
 def combined_constraints_experiment_runner(experiment_name: str, database_name: str,
-                                           solver_time_limit: int,
-                                           solver_name: str,
                                            denial_constraints: list,
                                            tgd_constraints: list,
                                            committee_size: int,
                                            voters_starting_point: int,
                                            candidates_starting_point: int,
-                                           candidates_size_limit: int,
-                                           thiele_rule_function_creator,
-                                           lifted_inference=False):
+                                           candidates_size_limit: int):
     experiments_results = pd.DataFrame()
 
     for voters_size_limit in range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE):
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
-                                        f"candidates_group_size={candidates_size_limit}\n"
+                                        f"candidates_group_size_limit={candidates_size_limit}\n"
                                         f"voters_starting_point={voters_starting_point}\n"
-                                        f"voters_group_size={voters_size_limit}\n"
+                                        f"voters_group_size_limit={voters_size_limit}\n"
                                         f"committee_size={committee_size}")
         current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
-                                                           solver_time_limit, solver_name,
                                                            denial_constraints, tgd_constraints,
                                                            committee_size,
                                                            voters_starting_point, candidates_starting_point,
-                                                           voters_size_limit, candidates_size_limit,
-                                                           thiele_rule_function_creator,
-                                                           lifted_inference=lifted_inference)
+                                                           voters_size_limit, candidates_size_limit)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 
 
 def combined_constraints_experiment_district_runner(
         experiment_name: str, database_name: str,
-        solver_time_limit: int, solver_name: str,
         denial_constraints: list, tgd_constraints: list,
-        thiele_rule_function_creator,
-        lifted_inference: bool,
         max_number_of_districts: int,
         number_of_candidates_from_each_district: dict):
     experiments_results = pd.DataFrame()
@@ -227,18 +203,15 @@ def combined_constraints_experiment_district_runner(
             voters_group_size += config.DISTRICTS_NUMBER_OF_VOTERS[district_number]
 
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
-                                        f"candidates_group_size={candidates_group_size}\n"
+                                        f"candidates_group_size_limit={candidates_group_size}\n"
                                         f"voters_starting_point={voters_starting_point}\n"
-                                        f"voters_group_size={voters_group_size}\n"
+                                        f"voters_group_size_limit={voters_group_size}\n"
                                         f"committee_size={committee_size}")
         current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
-                                                           solver_time_limit, solver_name,
                                                            denial_constraints, tgd_constraints,
                                                            committee_size,
                                                            voters_starting_point, candidates_starting_point,
-                                                           voters_group_size, candidates_group_size,
-                                                           thiele_rule_function_creator,
-                                                           lifted_inference=lifted_inference)
+                                                           voters_group_size, candidates_group_size)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 

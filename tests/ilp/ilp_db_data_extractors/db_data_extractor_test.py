@@ -25,9 +25,6 @@ class TestDBDataExtractor(unittest.TestCase):
         # ----------------------------------------------------------------
         # Create the database engine.
         self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
-        # ----------------------------------------------------------------
-        # Define the databases table and column names.
-        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
 
     def test_extract_data_from_db_sanity(self):
         # Define the join tables input.
@@ -41,7 +38,6 @@ class TestDBDataExtractor(unittest.TestCase):
         # Define the data constraint extractor.
         extractor = db_data_extractor.DBDataExtractor(
             self.abc_convertor, self.db_engine,
-            self.candidates_column_name,
             self.candidates_starting_point,
             self.candidates_group_size)
 
@@ -69,7 +65,6 @@ class TestDBDataExtractor(unittest.TestCase):
         # Define the data constraint extractor.
         extractor = db_data_extractor.DBDataExtractor(
             self.abc_convertor, self.db_engine,
-            self.candidates_column_name,
             self.candidates_starting_point,
             self.candidates_group_size)
 

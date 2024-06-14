@@ -8,6 +8,8 @@ import config
 import numpy as np
 import pandas as pd
 
+MODULE_NAME = "Parse Dataset"
+
 
 def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path: str):
     # Load the CSV file into a DataFrame
@@ -178,8 +180,8 @@ def trip_advisor_dat_to_csv_candidates(dat_file_path: str, new_csv_file_path: st
     one_third_value = df['price'].quantile(0.333)
     two_third_value = df['price'].quantile(0.667)
 
-    print("Trip Advisor dataset - one-third price value:", one_third_value)
-    print("Trip Advisor dataset - two-third price value:", two_third_value)
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - one-third price value: {one_third_value}")
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - two-third price value: {two_third_value}")
 
     # Create a function to categorize values based on quantiles.
     def categorize_value(value, one_third, two_third):

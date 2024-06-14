@@ -1,6 +1,6 @@
-import ilp.ilp_db_data_extractors.thiele_rule_extractor as thiele_rule_extractor
+import ilp.ilp_db_data_extractors.abc_setting_extractor as abc_setting_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
-import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
+import ilp.ilp_reduction.thiele_functions as thiele_functions
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface as db_interface
 import config
@@ -16,9 +16,9 @@ class TestThieleRuleExtractor(unittest.TestCase):
         self.voters_starting_point = 0
         self.candidates_group_size = 5
         self.voters_group_size = 8
-        self.lifted_inference_setting = False
+        config.LIFTED_INFERENCE = False
         self.committee_size = 3
-        self.thiele_function_score = thiele_functions.create_av_thiele_dict(self.committee_size + 1)
+        self._thiele_rule_dict = thiele_functions.create_av_thiele_dict(self.committee_size + 1)
         # ----------------------------------------------------------------
         # Define the ILP solver.
         solver_name = "CP_SAT"
@@ -30,26 +30,15 @@ class TestThieleRuleExtractor(unittest.TestCase):
         # ----------------------------------------------------------------
         # Create the database engine.
         self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
-        # ----------------------------------------------------------------
-        # Define the databases table and column names.
-        self.voting_table_name = 'voters'
-        self.candidates_table_name = config.CANDIDATES_TABLE_NAME
-        self.candidates_column_name = config.CANDIDATES_COLUMN_NAME
-        self.voters_column_name = config.VOTERS_COLUMN_NAME
-        self.approval_column_name = config.APPROVAL_COLUMN_NAME
 
     def test_extract_data_from_db_sanity(self):
-        # Define the thiele rule extractor.
-        extractor = thiele_rule_extractor.ThieleRuleExtractor(self.abc_convertor, self.db_engine,
+        # Define the abc setting extractor.
+        extractor = abc_setting_extractor.ABCSettingExtractor(self.abc_convertor, self.db_engine,
                                                               self.committee_size,
                                                               self.voters_starting_point,
                                                               self.candidates_starting_point,
                                                               self.voters_group_size, self.candidates_group_size,
-                                                              self.thiele_function_score,
-                                                              self.voting_table_name, self.candidates_table_name,
-                                                              self.candidates_column_name, self.voters_column_name,
-                                                              self.approval_column_name,
-                                                              self.lifted_inference_setting)
+                                                              self._thiele_rule_dict)
 
         extractor._extract_data_from_db()
 

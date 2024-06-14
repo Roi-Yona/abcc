@@ -40,10 +40,7 @@ if __name__ == '__main__':
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
         _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
-        config.SOLVER_TIME_LIMIT, config.SOLVER_NAME,
         _denial_constraints, _tgd_constraints,
-        config.THIELE_RULE,
-        config.LIFTED_INFERENCE,
         _max_number_of_districts,
         config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)
     # In case of one approval from each voter - Sanity result for 4 districts: Candidate 7, 16, 28, 38.

@@ -1,19 +1,17 @@
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
-import ilp.ilp_reduction.thiele_rule_to_ilp.thiele_functions as thiele_functions
+import ilp.ilp_reduction.thiele_functions as thiele_functions
 import ortools.linear_solver.pywraplp as pywraplp
 
 import pandas as pd
 import unittest
+import config
 
 
 class TestABCToILPConvertor(unittest.TestCase):
     def setUp(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
-        self.candidates_starting_point = 0
-        self.voters_starting_point = 0
-        self.candidates_group_size = 5
-        self.voters_group_size = 8
+        self.candidates_ids_set = {0, 1, 2, 3, 4}
         self.approval_profile_dict = {0: {1, 2}, 1: {2, 4}, 2: {3, 1}, 3: {4}, 4: {1, 2}, 5: {1}, 6: {1, 2},
                                       7: {1}}
         """
@@ -25,7 +23,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         4         : 2                        : 3
         
         """
-        self.lifted_inference_setting = False
+        config.LIFTED_INFERENCE = False
         self.committee_size = 3
         self.thiele_function_score = thiele_functions.create_av_thiele_dict(self.committee_size + 1)
         # ----------------------------------------------------------------
@@ -40,12 +38,10 @@ class TestABCToILPConvertor(unittest.TestCase):
     def test_convertor_sanity(self):
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
-                                              self.candidates_group_size, self.voters_group_size,
+        self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score,
-                                              self.lifted_inference_setting)
+                                              self.thiele_function_score)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -86,18 +82,15 @@ class TestABCToILPConvertor(unittest.TestCase):
     def test_convertor_lifted_inference_on(self):
         self.approval_profile_dict[8] = {3}
         self.approval_profile_dict[9] = {3}
-        self.voters_group_size = 10
         # ----------------------------------------------------------------
         # Define ABC setting.
-        self.lifted_inference_setting = True
+        config.LIFTED_INFERENCE = True
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
-                                              self.candidates_group_size, self.voters_group_size,
+        self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score,
-                                              self.lifted_inference_setting)
+                                              self.thiele_function_score)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -137,12 +130,10 @@ class TestABCToILPConvertor(unittest.TestCase):
         denial_df = pd.DataFrame(data)
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
-                                              self.candidates_group_size, self.voters_group_size,
+        self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score,
-                                              self.lifted_inference_setting)
+                                              self.thiele_function_score)
         self.abc_convertor.define_denial_constraint(denial_df.values)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
@@ -198,12 +189,10 @@ class TestABCToILPConvertor(unittest.TestCase):
 
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
-                                              self.candidates_group_size, self.voters_group_size,
+        self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score,
-                                              self.lifted_inference_setting)
+                                              self.thiele_function_score)
         self.abc_convertor.define_tgd_constraint(represent_sets)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
@@ -248,16 +237,13 @@ class TestABCToILPConvertor(unittest.TestCase):
         # Define ABC setting.
         self.approval_profile_dict = {3: {5, 7, 4}, 4: {7}, 5: {7},
                                       6: {7}, 7: {7}}
-        self.candidates_starting_point = 3
-        self.voters_starting_point = 3
+        self.candidates_ids_set = {3, 4, 5, 6, 7}
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
-                                              self.candidates_group_size, self.voters_group_size,
+        self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score,
-                                              self.lifted_inference_setting)
+                                              self.thiele_function_score)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -307,12 +293,10 @@ class TestABCToILPConvertor(unittest.TestCase):
         represent_sets = [(candidates_set_start, candidates_set_end), (candidates_set_start_2, candidates_set_end_2)]
         # ----------------------------------------------------------------
         # Convert to ILP domain.
-        self.abc_convertor.define_abc_setting(self.candidates_starting_point, self.voters_starting_point,
-                                              self.candidates_group_size, self.voters_group_size,
+        self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score,
-                                              self.lifted_inference_setting)
+                                              self.thiele_function_score)
         self.abc_convertor.define_tgd_constraint(represent_sets)
         self.abc_convertor.define_denial_constraint(denial_df.values)
         # ----------------------------------------------------------------

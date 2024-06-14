@@ -28,18 +28,12 @@ class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
                  candidates_tables: list,
                  committee_size: int,
                  candidates_starting_point: int,
-                 voters_size_limit: int,
                  candidates_size_limit: int,
-                 candidates_column_name=config.CANDIDATES_COLUMN_NAME,
-                 voters_column_name=config.VOTERS_COLUMN_NAME,
                  ):
 
-        super().__init__(abc_convertor, database_engine,
-                         candidates_column_name, candidates_starting_point, candidates_size_limit)
+        super().__init__(abc_convertor, database_engine, candidates_starting_point, candidates_size_limit)
 
         self._committee_size = committee_size
-        self._voters_size_limit = voters_size_limit
-        self._voters_column_name = voters_column_name
 
         self._denial_constraint_dict = denial_constraint_dict
         self._committee_members_list = committee_members_list
