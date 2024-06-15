@@ -94,7 +94,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self.lifted_voters_group_size = self.voters_group_size
 
         debug_message = f"Candidates group size = {self.candidates_group_size}.\n" \
-                        f"Real voters group size (after cleaning) = {self.voters_group_size}.\n" \
+                        f"Voters group size (non empty approval profile) = {self.voters_group_size}.\n" \
                         f"Committee size = {self._committee_size}.\n" \
                         # f"Approval profile = {self._approval_profile}."
         config.debug_print(MODULE_NAME, debug_message)

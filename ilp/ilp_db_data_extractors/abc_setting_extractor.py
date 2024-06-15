@@ -30,15 +30,12 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
         self._thiele_function = thiele_rule_function
         self._lifted_voters = dict()
 
-        # In this database each user rates the movie 1-5, we define approval as a rating higher or equal to 4.
-        self._approval_threshold = config.APPROVAL_THRESHOLD
-
     def _extract_data_from_db(self) -> None:
         # ----------------------------------------------
         # Extract the candidates group ids.
         sql_query = f"SELECT DISTINCT {config.CANDIDATES_COLUMN_NAME} FROM {config.CANDIDATES_TABLE_NAME} " \
                     f"WHERE {config.CANDIDATES_COLUMN_NAME} >= {self._candidates_starting_point} " \
-                    f"ORDER BY {config.CANDIDATES_COLUMN_NAME}" \
+                    f"ORDER BY {config.CANDIDATES_COLUMN_NAME} " \
                     f"LIMIT {self._candidates_size_limit};"
         candidates_id_columns = self._db_engine.run_query(sql_query)
         self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
@@ -53,9 +50,13 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
                                         f"The number of candidates is {len(candidates_id_columns)}.")
         # ----------------------------------------------
         # Extract voters ids group.
+        # Extract only voters ids with a non-empty approval profile in regard to the candidates group.
         sql_query = f"SELECT DISTINCT {config.VOTERS_COLUMN_NAME} FROM {config.VOTING_TABLE_NAME} " \
-                    f"WHERE {config.VOTERS_COLUMN_NAME} >= {self._voters_starting_point} " \
-                    f"ORDER BY {config.VOTERS_COLUMN_NAME}" \
+                    f"WHERE {config.VOTERS_COLUMN_NAME} >= {self._voters_starting_point} AND " \
+                    f"{config.APPROVAL_COLUMN_NAME} > {config.APPROVAL_THRESHOLD} " \
+                    f"AND {config.CANDIDATES_COLUMN_NAME} " \
+                    f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point} " \
+                    f"ORDER BY {config.VOTERS_COLUMN_NAME} " \
                     f"LIMIT {self._voters_size_limit};"
         voters_id_columns = self._db_engine.run_query(sql_query)
         self._voters_ids_set = set(voters_id_columns[config.VOTERS_COLUMN_NAME])
@@ -68,12 +69,12 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
         # ----------------------------------------------
         # Extract approval profile.
         sql_query = f"SELECT DISTINCT {config.VOTERS_COLUMN_NAME}, {config.CANDIDATES_COLUMN_NAME} " \
-            f"FROM {config.VOTING_TABLE_NAME} " \
-            f"WHERE {config.APPROVAL_COLUMN_NAME} > {str(self._approval_threshold)} " \
-            f"AND {config.VOTERS_COLUMN_NAME} " \
-            f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point} " \
-            f"AND {config.CANDIDATES_COLUMN_NAME} " \
-            f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
+                    f"FROM {config.VOTING_TABLE_NAME} " \
+                    f"WHERE {config.APPROVAL_COLUMN_NAME} > {str(config.APPROVAL_THRESHOLD)} " \
+                    f"AND {config.VOTERS_COLUMN_NAME} " \
+                    f"BETWEEN {self._voters_starting_point} AND {self._voters_ending_point} " \
+                    f"AND {config.CANDIDATES_COLUMN_NAME} " \
+                    f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point};"
 
         voter_rating_columns = self._db_engine.run_query(sql_query)
         grouped_by_voter_id_column = voter_rating_columns.groupby(by=config.VOTERS_COLUMN_NAME)
@@ -82,6 +83,10 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
                                   grouped_by_voter_id_column}
         config.debug_print(MODULE_NAME, f"The length of the approval profile is: {str(len(self._approval_profile))}.")
         # ----------------------------------------------
+        # The number of approval profile and the number of voters should always be equal, because we extract voters
+        # with a non-empty approval profile.
+        if len(self._approval_profile.keys()) != len(self._voters_ids_set):
+            raise Exception
 
     def _convert_to_ilp(self) -> None:
         self._abc_convertor.define_abc_setting(

@@ -11,10 +11,6 @@ import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_ext
 import ilp.experiments.experiment as experiment
 
 MODULE_NAME = "Combined Constraint Experiment"
-START_EXPERIMENT_RANGE = 5000
-END_EXPERIMENT_RANGE = 280000
-TICK_EXPERIMENT_RANGE = 20000
-
 
 # FIXME: Consider a class representing denial constraint.
 # FIXME: Consider creating a class representing TGD constraint.
@@ -157,11 +153,15 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                            tgd_constraints: list,
                                            committee_size: int,
                                            voters_starting_point: int,
+                                           voters_starting_ticking_size_limit: int,
+                                           voters_ticking_size_limit: int,
+                                           voters_final_ticking_size_limit: int,
                                            candidates_starting_point: int,
                                            candidates_size_limit: int):
     experiments_results = pd.DataFrame()
 
-    for voters_size_limit in range(START_EXPERIMENT_RANGE, END_EXPERIMENT_RANGE, TICK_EXPERIMENT_RANGE):
+    for voters_size_limit in range(voters_starting_ticking_size_limit, voters_final_ticking_size_limit,
+                                   voters_ticking_size_limit):
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
                                         f"candidates_group_size_limit={candidates_size_limit}\n"
                                         f"voters_starting_point={voters_starting_point}\n"

@@ -25,7 +25,9 @@ if __name__ == '__main__':
     # Run the experiment.
     combined_constraints_experiment. \
         combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DATABASE_DB_NAME,
-                                               _denial_constraints, _tgd_constraints,
-                                               _committee_size,
-                                               _voters_starting_point,
+                                               _denial_constraints, _tgd_constraints, _committee_size,
+                                               config.MOVIES_VOTERS_STARTING_POINT,
+                                               config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT,
+                                               config.MOVIES_VOTERS_TICKING_SIZE_LIMIT,
+                                               config.MOVIES_VOTERS_FINAL_TICKING_SIZE_LIMIT,
                                                config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)
