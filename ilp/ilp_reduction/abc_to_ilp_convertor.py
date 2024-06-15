@@ -54,19 +54,29 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         :return: A string that represents the ABC problem assignment.
         """
         solution = f""
+        count = 0
         for key, value in self._model_candidates_variables.items():
             solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
+            count += 1
+            if count > 50:
+                break
+        count = 0
         for key, value in self._lifted_voters_weights.items():
             solution += f"Voter id: {key}, Voter weight: {value}.\n"
-            if key > 50:
+            count += 1
+            if count > 50:
                 break
+        count = 0
         for key, value in self._model_voters_approval_candidates_sum_variables.items():
             solution += f"Voter id: {key}, Voter approval sum: {value.solution_value()}.\n"
-            if key > 50:
+            count += 1
+            if count > 50:
                 break
+        count = 0
         for key, value in self._model_voters_score_contribution_variables.items():
             solution += f"Voter id: {key}, Voter contribution: {value.solution_value()}.\n"
-            if key > 50:
+            count += 1
+            if count > 50:
                 break
         return solution
 

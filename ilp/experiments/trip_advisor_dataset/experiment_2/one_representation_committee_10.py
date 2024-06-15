@@ -6,7 +6,7 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 1
+_experiment_number = 2
 MODULE_NAME = f'Trip Advisor Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = 6
+    _committee_size = 10
     _denial_constraints = []
 
     _tgd_constraint_dict_start = dict()
@@ -26,7 +26,8 @@ if __name__ == '__main__':
     _candidates_tables_start = []
 
     _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location')]
+    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
+                                                                    ('x', 'location')]
     _committee_members_list_end = ['c1']
     _candidates_tables_end = ['t2']
 

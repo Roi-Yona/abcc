@@ -142,7 +142,7 @@ def trip_advisor_create_locations_table(cur, con):
 
 
 def trip_advisor_create_important_locations_table(cur, con):
-    # Create the important parties table.
+    # Create the important locations table.
     cur.execute('''CREATE TABLE IF NOT EXISTS important_locations (
                         location TEXT NOT NULL PRIMARY KEY)''')
 
@@ -159,6 +159,21 @@ def trip_advisor_create_important_locations_table(cur, con):
     cur.executemany("INSERT INTO important_locations (location) values (?)", new_data)
 
 
+def trip_advisor_create_price_ranges_table(cur, con):
+    # Create the important price ranges table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS price_ranges (
+                        price_range TEXT NOT NULL PRIMARY KEY)''')
+
+    # Insert multiple rows into the table
+    new_data = [
+        ('high',),
+        ('medium',),
+        ('low',),
+    ]
+
+    cur.executemany("INSERT INTO price_ranges (price_range) values (?)", new_data)
+
+
 def trip_advisor_create_database_main():
     # Remove the current database if exists.
     remove_file(config.TRIP_ADVISOR_DB_PATH)
@@ -172,6 +187,7 @@ def trip_advisor_create_database_main():
     create_trip_advisor_candidates_table(cur, con)
     trip_advisor_create_locations_table(cur, con)
     trip_advisor_create_important_locations_table(cur, con)
+    trip_advisor_create_price_ranges_table(cur, con)
 
     # Committing changes.
     con.commit()
