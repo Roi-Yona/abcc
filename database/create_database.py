@@ -19,10 +19,10 @@ def remove_file(file_path: str):
 
 def create_voting_table(cur, con, voting_table_path: str):
     # Create the voting table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS voting (
-    voter_id INTEGER NOT NULL,
-    candidate_id INTEGER NOT NULL,
-    rating FLOAT NOT NULL)''')
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.VOTING_TABLE_NAME} (
+    {config.VOTERS_COLUMN_NAME} INTEGER NOT NULL,
+    {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
+    {config.APPROVAL_COLUMN_NAME} FLOAT NOT NULL)''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(voting_table_path)
@@ -33,8 +33,8 @@ def create_voting_table(cur, con, voting_table_path: str):
 # ---------------------------------------------------------------------------
 def create_tests_db(cur):
     # Create the candidates table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
-                        candidate_id INTEGER PRIMARY KEY,
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
+                        {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
                         genres TEXT NOT NULL,
                         adult TEXT NOT NULL)''')
     new_data = [
@@ -47,7 +47,7 @@ def create_tests_db(cur):
         (7, 'comedy', "false"),
         (8, 'new_category', "false"),
     ]
-    cur.executemany("INSERT INTO candidates VALUES (?, ?, ?)", new_data)
+    cur.executemany(f"INSERT INTO {config.CANDIDATES_TABLE_NAME} VALUES (?, ?, ?)", new_data)
 
     # Join test table.
     cur.execute('''CREATE TABLE IF NOT EXISTS popular (
@@ -62,10 +62,10 @@ def create_tests_db(cur):
     cur.executemany("INSERT INTO popular VALUES (?, ?)", new_data)
 
     # Create the voters table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS voting (
-                        voter_id INTEGER NOT NULL,
-                        candidate_id INTEGER NOT NULL,
-                        rating FLOAT NOT NULL)''')
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.VOTING_TABLE_NAME} (
+                        {config.VOTERS_COLUMN_NAME} INTEGER NOT NULL,
+                        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
+                        {config.APPROVAL_COLUMN_NAME} FLOAT NOT NULL)''')
 
     # Insert multiple rows into the table
     new_data = [
@@ -96,7 +96,7 @@ def create_tests_db(cur):
     7         : 1                        : 2
 
     """
-    cur.executemany("INSERT INTO voting VALUES (?, ?, ?)", new_data)
+    cur.executemany(f"INSERT INTO {config.VOTING_TABLE_NAME} VALUES (?, ?, ?)", new_data)
 
 
 def db_tests_create_database_main():
@@ -120,8 +120,8 @@ def db_tests_create_database_main():
 # ---------------------------------------------------------------------------
 def create_trip_advisor_candidates_table(cur, con):
     # Create the candidates table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
-    candidate_id INTEGER PRIMARY KEY,
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
     price FLOAT NOT NULL, 
     location TEXT NOT NULL,
     price_range TEXT NOT NULL)''')
@@ -129,6 +129,34 @@ def create_trip_advisor_candidates_table(cur, con):
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"candidates_table.csv"))
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
+
+
+def trip_advisor_create_locations_table(cur, con):
+    # Create the voting table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS locations (
+    location TEXT NOT NULL PRIMARY KEY)''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"locations_table.csv"))
+    df.to_sql('locations', con, if_exists='append', index=False)
+
+
+def trip_advisor_create_important_locations_table(cur, con):
+    # Create the important parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS important_locations (
+                        location TEXT NOT NULL PRIMARY KEY)''')
+
+    # Insert multiple rows into the table
+    new_data = [
+        ('Barcelona Catalonia',),
+        ('Madrid',),
+        ('Seminyak Bali',),
+        ('Toronto Ontario',),
+        ('Shibuya Tokyo Tokyo Prefecture Kanto',),
+        ('Singapore', )
+    ]
+
+    cur.executemany("INSERT INTO important_locations (location) values (?)", new_data)
 
 
 def trip_advisor_create_database_main():
@@ -142,6 +170,8 @@ def trip_advisor_create_database_main():
 
     create_voting_table(cur, con, os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"voting_table.csv"))
     create_trip_advisor_candidates_table(cur, con)
+    trip_advisor_create_locations_table(cur, con)
+    trip_advisor_create_important_locations_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -153,10 +183,10 @@ def trip_advisor_create_database_main():
 # ---------------------------------------------------------------------------
 def create_movies_voting_table(cur, con):
     # Create the voting table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS voting (
-       voter_id INTEGER NOT NULL,
-       candidate_id INTEGER NOT NULL,
-       rating FLOAT NOT NULL,
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.VOTING_TABLE_NAME} (
+       {config.VOTERS_COLUMN_NAME} INTEGER NOT NULL,
+       {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
+       {config.APPROVAL_COLUMN_NAME} FLOAT NOT NULL,
        timestamp INTEGER NOT NULL
        )''')
 
@@ -166,15 +196,15 @@ def create_movies_voting_table(cur, con):
 
 
 def create_movies_candidates_table(cur, con):
-    # FIXME: Recheck this types.
+    # FIXME: Recheck those types.
     # Create the voting table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
        adult NVARCHAR(50),
        belongs_to_collection NVARCHAR(200),
        budget int,
        genres NVARCHAR(550),
        homepage NVARCHAR(550),
-       candidate_id int PRIMARY KEY,
+       {config.CANDIDATES_COLUMN_NAME} int PRIMARY KEY,
        imdb_id NVARCHAR(50),
        original_language NVARCHAR(50),
        original_title NVARCHAR(550),
@@ -231,8 +261,8 @@ def create_glasgow_voting_table(cur, con, district_index: int):
 def create_glasgow_candidates_table(cur, con):
     # FIXME: In order to enable different number of candidates per district, I should add a table per district.
     # Creating the candidates table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS candidates (
-    candidate_id INTEGER PRIMARY KEY,
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
     district INTEGER NOT NULL, 
     party TEXT NOT NULL)''')
 
@@ -321,8 +351,8 @@ def glasgow_create_database_main():
 
 if __name__ == '__main__':
     # TODO: Update All DB's in all experiments (linux) with the updated versions.
-    db_tests_create_database_main()
+    # db_tests_create_database_main()
     # the_movies_database_create_database_main()
     # glasgow_create_database_main()
-    # trip_advisor_create_database_main()
+    trip_advisor_create_database_main()
 

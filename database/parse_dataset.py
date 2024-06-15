@@ -199,6 +199,19 @@ def trip_advisor_dat_to_csv_candidates(dat_file_path: str, new_csv_file_path: st
     df.to_csv(new_csv_file_path, index=False)
 
 
+def trip_advisor_locations_csv(candidates_table_path: str, new_locations_table_path: str):
+    candidates_df = pd.read_csv(candidates_table_path)
+    # Filter to only the location column.
+    locations_df = candidates_df[['location']]
+    # Remove the value 'Unknown'.
+    locations_df = locations_df[locations_df['location'] != 'Unknown']
+    # Drop duplicates, sort the column, and reset indices.
+    locations_df = locations_df.drop_duplicates().sort_values(by='location').reset_index(drop=True)
+
+    # Save the clean table of locations into a csv.
+    locations_df.to_csv(new_locations_table_path, index=False)
+
+
 def print_trip_advisor_dataset_frequency_of_voters(dataset_path: str):
     # Read the CSV file and extract the column.
     original_df = pd.read_csv(dataset_path)
@@ -343,6 +356,8 @@ def trip_advisor_dataset_main():
     trip_advisor_dat_to_csv_candidates(
         os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'00040-00000001_new.dat'),
         os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'candidates_table.csv'))
+    trip_advisor_locations_csv(os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'candidates_table.csv'),
+                               os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'locations_table.csv'))
 
 
 def trip_advisor_dataset_analyze():
@@ -354,6 +369,6 @@ def trip_advisor_dataset_analyze():
 if __name__ == '__main__':
     # the_movies_dataset_main()
     # glasgow_dataset_main()
-    glasgow_dataset_analyze()
-    # trip_advisor_dataset_main()
+    # glasgow_dataset_analyze()
+    trip_advisor_dataset_main()
     # trip_advisor_dataset_analyze()

@@ -20,8 +20,20 @@ class DBDataExtractor:
         self._db_engine = database_engine
         self.convert_to_ilp_timer = -1
         self.extract_data_timer = -1
-        self._candidates_size_limit = candidates_size_limit
         self._candidates_starting_point = candidates_starting_point
+
+        # ----------------------------------------------
+        # Extract the candidates group ids.
+        sql_query = f"SELECT DISTINCT {config.CANDIDATES_COLUMN_NAME} FROM {config.CANDIDATES_TABLE_NAME} " \
+                    f"WHERE {config.CANDIDATES_COLUMN_NAME} >= {self._candidates_starting_point} " \
+                    f"ORDER BY {config.CANDIDATES_COLUMN_NAME} " \
+                    f"LIMIT {candidates_size_limit};"
+        candidates_id_columns = self._db_engine.run_query(sql_query)
+        self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
+        self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
+        self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
+        self._candidates_size_limit = len(self._candidates_ids_set)
+        # ----------------------------------------------
 
     def join_tables(self, candidate_tables: list, tables_dict: dict, constants=None,
                     different_variables=None) -> pd.DataFrame:
@@ -79,8 +91,7 @@ class DBDataExtractor:
             if where_phrase != "WHERE ":
                 where_phrase += " AND "
             where_phrase += f"{table_name}.{config.CANDIDATES_COLUMN_NAME} " \
-                            f"BETWEEN {self._candidates_starting_point} AND " \
-                            f"{self._candidates_starting_point + self._candidates_size_limit - 1}"
+                            f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point}"
 
         # Add constants values constraint.
         for constant_name, constant_value in constants.items():
