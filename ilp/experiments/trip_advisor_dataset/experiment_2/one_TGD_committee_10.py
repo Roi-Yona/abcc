@@ -12,13 +12,29 @@ MODULE_NAME = f'Trip Advisor Experiment {_experiment_number}:'
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # We find a winning committee with no constraints.
+    # We find a winning committee with one TGD constraint (representation constraint).
+    # The constraint is representation for every location from important locations table in the committee.
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = 10
-    _tgd_constraints = []
+    _committee_size = 6
     _denial_constraints = []
+
+    _tgd_constraint_dict_start = dict()
+    _tgd_constraint_dict_start['important_locations', 't1'] = [('x', 'location')]
+    _committee_members_list_start = []
+    _candidates_tables_start = []
+
+    _tgd_constraint_dict_end = dict()
+    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location')]
+    _committee_members_list_end = ['c1']
+    _candidates_tables_end = ['t2']
+
+    _different_variables = _committee_members_list_end
+
+    _tgd_constraints = [
+        (_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
+         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]
 
     _experiment_name = config.trip_advisor_create_experiment_name(
         _experiment_number, _candidates_group_size, _committee_size)
