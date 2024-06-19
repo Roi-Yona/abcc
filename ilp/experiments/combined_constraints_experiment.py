@@ -184,10 +184,10 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                                            voters_starting_point, candidates_starting_point,
                                                            voters_size_limit, candidates_size_limit)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
-        if previous_number_of_voters == experiments_results['voters_group_size']:
+        if previous_number_of_voters == experiments_results['voters_group_size'].iloc[-1]:
             # We reached the total number of relevant voters to this candidates group.
             break
-        previous_number_of_voters = experiments_results['voters_group_size']
+        previous_number_of_voters = experiments_results['voters_group_size'].iloc[-1]
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 
 
