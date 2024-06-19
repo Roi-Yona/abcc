@@ -12,6 +12,7 @@ import ilp.experiments.experiment as experiment
 
 MODULE_NAME = "Combined Constraint Experiment"
 
+
 # FIXME: Consider a class representing denial constraint.
 # FIXME: Consider creating a class representing TGD constraint.
 
@@ -128,6 +129,16 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                      self._denial_constraint_db_extractors]) +
                                                 sum([x.extract_data_timer for x in
                                                      self._tgd_constraint_db_extractors]),
+                      'total_construction_and_extraction_time(sec)': self._abc_setting_extractor.extract_data_timer +
+                                                                     sum([x.extract_data_timer for x in
+                                                                          self._denial_constraint_db_extractors]) +
+                                                                     sum([x.extract_data_timer for x in
+                                                                          self._tgd_constraint_db_extractors]) +
+                                                                     self._abc_setting_extractor.convert_to_ilp_timer +
+                                                                     sum([x.convert_to_ilp_timer for x in
+                                                                          self._denial_constraint_db_extractors]) +
+                                                                     sum([x.convert_to_ilp_timer for x in
+                                                                          self._tgd_constraint_db_extractors]),
                       'total_solution_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                   sum([x.extract_data_timer for x in
                                                        self._denial_constraint_db_extractors]) +
@@ -159,7 +170,7 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                            candidates_starting_point: int,
                                            candidates_size_limit: int):
     experiments_results = pd.DataFrame()
-
+    previous_number_of_voters = -1
     for voters_size_limit in range(voters_starting_ticking_size_limit, voters_final_ticking_size_limit,
                                    voters_ticking_size_limit):
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
@@ -173,6 +184,10 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                                            voters_starting_point, candidates_starting_point,
                                                            voters_size_limit, candidates_size_limit)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
+        if previous_number_of_voters == experiments_results['voters_group_size']:
+            # We reached the total number of relevant voters to this candidates group.
+            break
+        previous_number_of_voters = experiments_results['voters_group_size']
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 
 
