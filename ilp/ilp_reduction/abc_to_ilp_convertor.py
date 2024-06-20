@@ -202,18 +202,20 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         :param denial_candidates_sets: A denial candidates groups.
         """
-        new_denial_candidates_sets = set()
+        new_denial_candidates_sets = []
+        denial_candidates_sets = [set(i) for i in denial_candidates_sets]
+
         if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
             for current_set in denial_candidates_sets:
                 merged = False
                 for disjoint_set in new_denial_candidates_sets:
                     if current_set & disjoint_set:  # Check if there's any intersection.
-                        new_denial_candidates_sets.add(disjoint_set | current_set)  # Merge the sets.
+                        new_denial_candidates_sets.append(disjoint_set | current_set)  # Merge the sets.
                         merged = True
                         break
 
                 if not merged:
-                    new_denial_candidates_sets.add(current_set)
+                    new_denial_candidates_sets.append(current_set)
         else:
             new_denial_candidates_sets = denial_candidates_sets
 
