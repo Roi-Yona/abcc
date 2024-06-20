@@ -203,31 +203,17 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         :param denial_candidates_sets: A denial candidates groups.
         """
         new_denial_candidates_sets = set()
-        candidates_bool_dict = {c: False for c in self._model_candidates_variables}
-
         if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
-            for current_candidate_index in candidates_bool_dict.keys():
-                if candidates_bool_dict[current_candidate_index]:
-                    continue
-                else:
-                    candidates_bool_dict[current_candidate_index] = True
+            for current_set in denial_candidates_sets:
+                merged = False
+                for disjoint_set in new_denial_candidates_sets:
+                    if current_set & disjoint_set:  # Check if there's any intersection.
+                        new_denial_candidates_sets.add(disjoint_set | current_set)  # Merge the sets.
+                        merged = True
+                        break
 
-                # Create new denial candidate set for the current candidate.
-                new_denial_candidates_set = set()
-                new_denial_candidates_set.add(current_candidate_index)
-
-                # For all set, check if current candidate index in it.
-                for candidates_set in denial_candidates_sets:
-                    if current_candidate_index in candidates_set:
-                        new_denial_candidates_set = new_denial_candidates_set.union(candidates_set)
-
-                # Sanity about the denial set.
-                if len(new_denial_candidates_set) > 1:
-                    new_denial_candidates_sets.add(frozenset(new_denial_candidates_set))
-
-                # Update candidate bool array.
-                for candidate_index in new_denial_candidates_set:
-                    candidates_bool_dict[candidate_index] = True
+                if not merged:
+                    new_denial_candidates_sets.add(current_set)
         else:
             new_denial_candidates_sets = denial_candidates_sets
 
