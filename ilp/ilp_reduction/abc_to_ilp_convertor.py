@@ -208,12 +208,11 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
             for current_set in denial_candidates_sets:
                 merged = False
-                for disjoint_set in new_denial_candidates_sets:
+                for i, disjoint_set in enumerate(new_denial_candidates_sets):
                     if current_set & disjoint_set:  # Check if there's any intersection.
-                        new_denial_candidates_sets.append(disjoint_set | current_set)  # Merge the sets.
+                        new_denial_candidates_sets[i] = (disjoint_set | current_set)  # Merge the sets.
                         merged = True
                         break
-
                 if not merged:
                     new_denial_candidates_sets.append(current_set)
         else:
