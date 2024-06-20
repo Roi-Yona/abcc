@@ -219,9 +219,11 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             new_denial_candidates_sets = denial_candidates_sets
 
         # Construct the ILP.
-        for candidates_set in new_denial_candidates_sets:
-            # The denial length should be according to the original denial sets.
+        # The denial length should be according to the original denial sets.
+        denial_group_length = 0
+        if len(denial_candidates_sets) > 0:
             denial_group_length = len(denial_candidates_sets[0])
+        for candidates_set in new_denial_candidates_sets:
             self._model.Add(
                 sum([self._model_candidates_variables[candidate_index] for candidate_index in candidates_set
                      if candidate_index in self._model_candidates_variables])
