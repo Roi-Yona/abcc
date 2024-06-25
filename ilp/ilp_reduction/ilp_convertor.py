@@ -55,9 +55,10 @@ class ILPConvertor:
         """Print all the model variables.
         :return:
         """
-        if self._solved:
-            for var in self._model.variables():
-                print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
+        if config.DEBUG:
+            if self._solved:
+                for var in self._model.variables():
+                    print(f"Var name is {str(var)}, and var value is {str(var.solution_value())}")
 
 
 def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:

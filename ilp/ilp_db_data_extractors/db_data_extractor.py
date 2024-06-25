@@ -80,16 +80,16 @@ class DBDataExtractor:
         # Create WHERE phrase.
         where_phrase = 'WHERE '
         for new_variable_name, new_table_names in variables_dict.items():
+            where_phrase = self.sql_concat_and(where_phrase)
             for i in range(0, len(new_table_names) - 1, 1):
                 where_phrase += f"{new_table_names[i][0]}.{new_table_names[i][1]} = " \
                                 f"{new_table_names[i + 1][0]}.{new_table_names[i + 1][1]}"
-                if i != len(new_table_names) - 2:
-                    where_phrase += f" AND "
+                if i != (len(new_table_names) - 2):
+                    where_phrase = self.sql_concat_and(where_phrase)
 
         # Add group range constraint.
         for table_name in candidate_tables:
-            if where_phrase != "WHERE ":
-                where_phrase += " AND "
+            where_phrase = self.sql_concat_and(where_phrase)
             where_phrase += f"{table_name}.{config.CANDIDATES_COLUMN_NAME} " \
                             f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point}"
 
@@ -100,8 +100,7 @@ class DBDataExtractor:
                     str_value = str(constant_value)
                     if not str_value.isdigit():
                         str_value = f"\"{str_value}\""
-                    if where_phrase != "WHERE ":
-                        where_phrase += " AND "
+                    where_phrase = self.sql_concat_and(where_phrase)
                     where_phrase += f"{new_table_name}.{original_variable_name}={str_value}"
 
         # Add the different variable constraint.
@@ -109,8 +108,7 @@ class DBDataExtractor:
             # Make sure they differ.
             # Make sure they don't repeat in different order.
             for i in range(len(different_variables)-1):
-                if where_phrase != "WHERE ":
-                    where_phrase += " AND "
+                where_phrase = self.sql_concat_and(where_phrase)
                 where_phrase += f"{different_variables[i]}<{different_variables[i+1]}"
 
         where_phrase += '\n'
@@ -140,6 +138,11 @@ class DBDataExtractor:
     def _convert_to_ilp(self) -> None:
         # Abstract function.
         pass
+
+    def sql_concat_and(self, input_str) -> str:
+        if input_str != "WHERE " and input_str[-4:] != 'AND ':
+            input_str += " AND "
+        return input_str
 
     def convert_to_ilp(self) -> None:
         start = time.time()

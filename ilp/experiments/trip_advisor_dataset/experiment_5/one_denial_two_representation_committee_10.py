@@ -14,23 +14,24 @@ if __name__ == '__main__':
     # Experiment summary:
     # We find a winning committee with one Denial constraint and two Representation constraint.
     # The constraint are -
-    # Denial: There are no two committee members with the same location in the committee.
-    # Representation 1: For every location in important locations, there is a committee member representing it.
-    # Representation 2: For every price range there is a committee member representing it.
+    # Denial: There are no two committee members with the same location and the same price.
+    # Representation: For every location in important locations, there is a low price
+    # committee member representing it.
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
     _committee_size = 10
 
-    # Representation constraint 1.
+    # Representation constraint.
     _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['important_locations', 't1'] = [('x', 'location')]
+    _tgd_constraint_dict_start['important_locations', 't1'] = [('x', 'location'), ('y', 'price_range')]
     _committee_members_list_start = []
     _candidates_tables_start = []
 
     _tgd_constraint_dict_end = dict()
     _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                                    ('x', 'location')]
+                                                                    ('x', 'location'),
+                                                                    ('y', 'price_range')]
     _committee_members_list_end = ['c1']
     _candidates_tables_end = ['t2']
 
@@ -40,30 +41,12 @@ if __name__ == '__main__':
         (_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
          _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]
 
-    # Representation constraint 2.
-    _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['price_ranges', 't1'] = [('x', 'price_range')]
-    _committee_members_list_start = []
-    _candidates_tables_start = []
-
-    _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                                    ('x', 'price_range')]
-    _committee_members_list_end = ['c1']
-    _candidates_tables_end = ['t2']
-
-    _different_variables = _committee_members_list_end
-
-    _tgd_constraints.append(
-        (_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
-         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables))
-
     # Denial constraint.
     denial_constraint_dict = dict()
     denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
-        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location')]
+        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
     denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
-        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location')]
+        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
     committee_members_list = ['c1', 'c2']
     candidates_tables = ['t1', 't2']
 

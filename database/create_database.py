@@ -144,19 +144,20 @@ def trip_advisor_create_locations_table(cur, con):
 def trip_advisor_create_important_locations_table(cur, con):
     # Create the important locations table.
     cur.execute('''CREATE TABLE IF NOT EXISTS important_locations (
-                        location TEXT NOT NULL PRIMARY KEY)''')
+                        location TEXT NOT NULL,
+                        price_range TEXT NOT NULL)''')
 
     # Insert multiple rows into the table
     new_data = [
-        ('Barcelona Catalonia',),
-        ('Madrid',),
-        ('Seminyak Bali',),
-        ('Toronto Ontario',),
-        ('Shibuya Tokyo Tokyo Prefecture Kanto',),
-        ('Singapore', )
+        ('Barcelona Catalonia', 'low'),
+        ('Madrid', 'low'),
+        ('Seminyak Bali', 'low'),
+        ('Toronto Ontario', 'low'),
+        ('Shibuya Tokyo Tokyo Prefecture Kanto', 'low'),
+        ('Singapore', 'low')
     ]
 
-    cur.executemany("INSERT INTO important_locations (location) values (?)", new_data)
+    cur.executemany("INSERT INTO important_locations (location, price_range) values (?, ?)", new_data)
 
 
 def trip_advisor_create_price_ranges_table(cur, con):
