@@ -149,12 +149,13 @@ def trip_advisor_create_important_locations_table(cur, con):
 
     # Insert multiple rows into the table
     new_data = [
-        ('Barcelona Catalonia', 'low'),
+        ('Dallas Texas', 'low'),
         ('Madrid', 'low'),
         ('Seminyak Bali', 'low'),
         ('Toronto Ontario', 'low'),
-        ('Shibuya Tokyo Tokyo Prefecture Kanto', 'low'),
-        ('Singapore', 'low')
+        ('Singapore', 'low'),
+        ('Seattle Washington', 'low'),
+
     ]
 
     cur.executemany("INSERT INTO important_locations (location, price_range) values (?, ?)", new_data)
