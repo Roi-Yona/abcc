@@ -191,6 +191,33 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
 
 
+def combined_constraints_experiment_runner_ticking_committee_size(
+        experiment_name: str, database_name: str,
+        denial_constraints: list, tgd_constraints: list,
+        voters_starting_point: int,
+        voters_size_limit: int,
+        candidates_starting_point: int,
+        candidates_size_limit: int,
+        committee_size_ticking_start_point: int,
+        committee_size_ticking_step: int,
+        committee_size_ticking_end_point: int):
+    experiments_results = pd.DataFrame()
+    for committee_size in range(committee_size_ticking_start_point, committee_size_ticking_end_point,
+                                committee_size_ticking_step):
+        config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
+                                        f"candidates_group_size_limit={candidates_size_limit}\n"
+                                        f"voters_starting_point={voters_starting_point}\n"
+                                        f"voters_group_size_limit={voters_size_limit}\n"
+                                        f"committee_size={committee_size}")
+        current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
+                                                           denial_constraints, tgd_constraints,
+                                                           committee_size,
+                                                           voters_starting_point, candidates_starting_point,
+                                                           voters_size_limit, candidates_size_limit)
+        experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
+        experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
+
+
 def combined_constraints_experiment_district_runner(
         experiment_name: str, database_name: str,
         denial_constraints: list, tgd_constraints: list,
