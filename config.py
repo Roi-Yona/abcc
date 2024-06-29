@@ -21,8 +21,8 @@ SQLITE_DATABASE_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "sqlite_databa
 MINUTE = 1000 * 60
 SOLVER_TIME_LIMIT = 250 * MINUTE
 SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
-THIELE_RULE = thiele_functions.create_av_thiele_dict
-THIELE_RULE_NAME = 'AV'
+THIELE_RULE = thiele_functions.create_pav_thiele_dict
+THIELE_RULE_NAME = 'PAV'
 
 LIFTED_INFERENCE = True
 MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True

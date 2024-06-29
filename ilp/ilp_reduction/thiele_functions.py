@@ -43,11 +43,11 @@ def create_pav_thiele_dict(length: int) -> dict:
     return pav_thiele_function
 
 
-def create_k_approval_thiele_dict(length: int, k: int) -> dict:
-    """Creates a dict from size of length contain the k-approval thiele function.
+def create_k_truncated_av_thiele_dict(length: int, k: int) -> dict:
+    """Creates a dict from size of length contain the k-truncated AV thiele function.
     :param length: The length of the returned function.
-    :param k: The thiele approval threshold parameter.
-    :return:A k-approval thiele function.
+    :param k: The point where the function becomes const.
+    :return:k-truncated AV thiele function.
     """
     k_approval_thiele_function = {}
     if length > 0:
@@ -59,8 +59,8 @@ def create_k_approval_thiele_dict(length: int, k: int) -> dict:
     return k_approval_thiele_function
 
 
-def create_2_approval_thiele_dict(length: int) -> dict:
-    return create_k_approval_thiele_dict(length, 2)
+def create_2_truncated_av_thiele_dict(length: int) -> dict:
+    return create_k_truncated_av_thiele_dict(length, 2)
 
 
 if __name__ == '__main__':
@@ -68,4 +68,4 @@ if __name__ == '__main__':
     print(create_av_thiele_dict(4))
     print(create_cc_thiele_dict(4))
     print(create_pav_thiele_dict(4))
-    print(create_k_approval_thiele_dict(4, 2))
+    print(create_k_truncated_av_thiele_dict(4, 2))
