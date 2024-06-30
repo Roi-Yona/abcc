@@ -8,7 +8,7 @@ import ilp.ilp_reduction.ilp_convertor as ilp_convertor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 
 MODULE_NAME = 'Experiment'
-RESULTS_PATH = 'results'
+RESULTS_PATH = os.path.join('..', 'results')
 SERVER = 'LAPTOP-MO1JPG72'
 
 
