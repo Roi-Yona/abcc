@@ -25,7 +25,7 @@ def experiment_save_excel(df: pd.DataFrame, experiment_name: str, results_file_p
                                f'{config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS}'
                                f'{experiment_name}_{str(datetime.now().date())}.xlsx')
     if not os.path.exists(results_file_path):
-        os.mkdir(results_file_path)
+        os.makedirs(results_file_path, exist_ok=True)
     # Save the DataFrame to Excel
     df.to_excel(result_path, index=False)
 
