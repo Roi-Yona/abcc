@@ -29,7 +29,7 @@
 database/databases/*
 tests/ddnnf/CNF_results/*
 **/results/
-*/old_results/
+**/old_results/
 db_sql_query.py
 
 # OS generated files #
