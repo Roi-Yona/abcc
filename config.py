@@ -117,16 +117,16 @@ def debug_print(module_name, input_str):
 
 def default_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
     return f'{experiment_number}_{THIELE_RULE_NAME}_' \
-           f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
-           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
-           f'solver={SOLVER_NAME}_candidate_size={candidates_group_size}_committee_size={committee_size}'
+           f'lifted={LIFTED_INFERENCE}_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
+           f'_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
+           f'{SOLVER_NAME}_cand_size={candidates_group_size}_com_size={committee_size}'
 
 
 def glasgow_create_experiment_name(experiment_number: int, max_number_of_districts: int):
     return f'{experiment_number}_{THIELE_RULE_NAME}_' \
-           f'lifted={LIFTED_INFERENCE}_min_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
-           f'_min_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}' \
-           f'_solver={SOLVER_NAME}_district_count={max_number_of_districts}'
+           f'lifted={LIFTED_INFERENCE}_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
+           f'_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}' \
+           f'_{SOLVER_NAME}_district_count={max_number_of_districts}'
 
 
 def movies_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):

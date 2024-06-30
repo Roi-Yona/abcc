@@ -20,12 +20,11 @@ def experiment_save_excel(df: pd.DataFrame, experiment_name: str, results_file_p
     config.debug_print(MODULE_NAME, f"Experiment results\n{str(df)}")
     result_path = os.path.join(f'{results_file_path}',
                                f'{str(datetime.now().date())}',
-                               f'lifted_voters_{config.LIFTED_INFERENCE}_min_contribution_equations_'
-                               f'{config.MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_min_dc_'
-                               f'{config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS}'
-                               f'{experiment_name}_{str(datetime.now().date())}.xlsx')
-    if not os.path.exists(results_file_path):
-        os.makedirs(results_file_path, exist_ok=True)
+                               f'lifted_{config.LIFTED_INFERENCE}_score_'
+                               f'{config.MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_dc_'
+                               f'{config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS}',
+                               f'{experiment_name}.xlsx')
+    os.makedirs(os.path.dirname(result_path), exist_ok=True)
     # Save the DataFrame to Excel
     df.to_excel(result_path, index=False)
 
