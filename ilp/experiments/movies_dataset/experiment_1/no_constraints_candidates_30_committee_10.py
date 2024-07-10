@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # Experiment summary:
     # We find a winning committee with no constraints.
     # ---------------------------------------------------------------------------
-
+    # TODO: Try max candidate size as well.
     _candidates_group_size = 30
     _committee_size = 10
     _tgd_constraints = []

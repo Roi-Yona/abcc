@@ -7,12 +7,13 @@ import config
 
 import numpy as np
 import pandas as pd
+import ast
 
 MODULE_NAME = "Parse Dataset"
 
 
 def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path: str):
-    # Load the CSV file into a DataFrame
+    # Load the CSV file into a DataFrame.
     # Note: This line should generate a DtypeWarning because it is before cleaning, hence there are invalid lines.
     df = pd.read_csv(original_csv_file_path)
 
@@ -32,8 +33,50 @@ def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path:
     valid_rows.to_csv(new_csv_file_path, index=False)
 
 
+def unpack_list_with_dictionary_column(original_csv_file_path: str, new_csv_file_path: str,
+                                       column_name: str, new_column_name: str):
+    # An example for the genres column value:
+    # [{'id': 16, 'name': 'Animation'}, {'id': 35, 'name': 'Comedy'}, {'id': 10751, 'name': 'Family'}]
+    # An example for the spoken languages column value:
+    # [{'iso_639_1': 'en', 'name': 'English'}, {'iso_639_1': 'fr', 'name': 'FranÃ§ais'}]
+
+    # Load the CSV file into a DataFrame.
+    df = pd.read_csv(original_csv_file_path)
+
+    # Drop rows where the requested column is empty.
+    df = df.dropna(subset=[column_name])
+
+    # Parse the required column as a dict (parsed as a string by default).
+    df[column_name] = df[column_name].apply(ast.literal_eval)
+
+    # Create a new column with the names list as a value.
+    df[new_column_name] = df[column_name].apply(
+        lambda current_row_dict_list: [current_dict['name'] for current_dict in current_row_dict_list])
+
+    # Keep only the relevant columns.
+    df = df[['candidate_id', new_column_name]]
+
+    # Explode the new_column column to create a separate row for each genre.
+    df_exploded = df.explode(new_column_name)
+
+    # Drop rows where the new column is empty.
+    df_exploded = df_exploded.dropna(subset=[new_column_name])
+    df_exploded = df_exploded[df_exploded[new_column_name] != '']
+
+    # Save the cleaned DataFrame to the new CSV file.
+    df_exploded.to_csv(new_csv_file_path, index=False)
+
+
+def create_movie_genre_metadata(original_csv_file_path: str, new_csv_file_path: str):
+    unpack_list_with_dictionary_column(original_csv_file_path, new_csv_file_path, 'genres', 'genre')
+
+
+def create_movie_spoken_languages_metadata(original_csv_file_path: str, new_csv_file_path: str):
+    unpack_list_with_dictionary_column(original_csv_file_path, new_csv_file_path, 'spoken_languages', 'spoken_language')
+
+
 def clean_movie_dataset_rating(original_csv_file_path: str, new_csv_file_path: str):
-    # Load the CSV file into a DataFrame
+    # Load the CSV file into a DataFrame.
     # Note: This line should generate a DtypeWarning because it is before cleaning, hence there are invalid lines.
     df = pd.read_csv(original_csv_file_path)
 
@@ -278,10 +321,15 @@ def print_best_hotels_by_av(dataset_path: str):
 
 
 def the_movies_dataset_main():
-    clean_movie_dataset_metadata(os.path.join(config.MOVIES_DATABASE_FOLDER_PATH, f'movies_metadata.csv'),
-                                 os.path.join(config.MOVIES_DATABASE_FOLDER_PATH, f'movies_metadata_new.csv'))
-    clean_movie_dataset_rating(os.path.join(config.MOVIES_DATABASE_FOLDER_PATH, f'ratings.csv'),
-                               os.path.join(config.MOVIES_DATABASE_FOLDER_PATH, f'ratings_new.csv'))
+    clean_movie_dataset_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata.csv'),
+                                 os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'))
+    clean_movie_dataset_rating(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'ratings.csv'),
+                               os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'ratings_new.csv'))
+    create_movie_genre_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
+                                os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_genres.csv'))
+    create_movie_spoken_languages_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
+                                           os.path.join(config.MOVIES_DATASET_FOLDER_PATH,
+                                                        f'movies_spoken_languages.csv'))
 
 
 def glasgow_dataset_main():
@@ -336,7 +384,8 @@ def glasgow_dataset_analyze_district(district_number: int):
                 histogram[int(candidate_id)] += number_of_voters
             total_count_of_voters += number_of_voters
 
-    print(f"Histogram of district {district_number} (when taking in account approval threshold to be first choice - 1).")
+    print(
+        f"Histogram of district {district_number} (when taking in account approval threshold to be first choice - 1).")
     print("The keys are candidates, and values are the number of votes the candidate got.")
     print(histogram)
     print(f"The total number of voters is: {total_count_of_voters}.")
@@ -367,8 +416,8 @@ def trip_advisor_dataset_analyze():
 
 
 if __name__ == '__main__':
-    # the_movies_dataset_main()
+    the_movies_dataset_main()
     # glasgow_dataset_main()
     # glasgow_dataset_analyze()
-    trip_advisor_dataset_main()
+    # trip_advisor_dataset_main()
     # trip_advisor_dataset_analyze()

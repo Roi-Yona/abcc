@@ -49,7 +49,7 @@ NUMBER_OF_APPROVED_CANDIDATE = 3
 # The Movies Dataset Consts:
 # --------------------------------------------------------------------------------
 MOVIES_DATABASE_DB_NAME = "the_movies_database.db"
-MOVIES_DATABASE_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "the_movies_database")
+MOVIES_DATASET_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "the_movies_database")
 MOVIES_DATABASE_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, MOVIES_DATABASE_DB_NAME)
 
 MOVIES_CANDIDATES_STARTING_POINT = 2  # 31, 64

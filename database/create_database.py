@@ -209,7 +209,7 @@ def create_movies_voting_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATABASE_FOLDER_PATH}", "ratings_new.csv"))
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "ratings_new.csv"))
     df.to_sql(config.VOTING_TABLE_NAME, con, if_exists='append', index=False)
 
 
@@ -244,9 +244,33 @@ def create_movies_candidates_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATABASE_FOLDER_PATH}", "movies_metadata_new.csv"))
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_metadata_new.csv"))
 
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
+
+
+def create_movies_genres_table(cur, con):
+    # Create the genres table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS genres (
+       {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
+       genre TEXT NOT NULL
+       )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_genres.csv"))
+    df.to_sql("genres", con, if_exists='append', index=False)
+
+
+def create_movies_spoken_languages_table(cur, con):
+    # Create the voting table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS spoken_languages (
+       {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
+       spoken_language TEXT NOT NULL
+       )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_spoken_languages.csv"))
+    df.to_sql("spoken_languages", con, if_exists='append', index=False)
 
 
 def the_movies_database_create_database_main():
@@ -260,6 +284,8 @@ def the_movies_database_create_database_main():
 
     create_movies_voting_table(cur, con)
     create_movies_candidates_table(cur, con)
+    create_movies_genres_table(cur, con)
+    create_movies_spoken_languages_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -368,9 +394,9 @@ def glasgow_create_database_main():
 
 
 if __name__ == '__main__':
-    # TODO: Update All DB's in all experiments (linux) with the updated versions.
+    # TODO: Update All DB's in all experiments (linux) with the updated versions of the movies db.
     # db_tests_create_database_main()
-    # the_movies_database_create_database_main()
+    the_movies_database_create_database_main()
     # glasgow_create_database_main()
-    trip_advisor_create_database_main()
+    # trip_advisor_create_database_main()
 
