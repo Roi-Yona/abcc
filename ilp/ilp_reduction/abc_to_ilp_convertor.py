@@ -1,5 +1,6 @@
 import time
 from collections import Counter
+import networkx as nx
 import config
 import ortools.linear_solver.pywraplp as pywraplp
 import ilp.ilp_reduction.ilp_convertor as ilp_convertor
@@ -202,19 +203,19 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         :param denial_candidates_sets: A denial candidates groups.
         """
-        new_denial_candidates_sets = []
-        denial_candidates_sets = [set(i) for i in denial_candidates_sets]
-
         if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
-            for current_set in denial_candidates_sets:
-                merged = False
-                for i, disjoint_set in enumerate(new_denial_candidates_sets):
-                    if current_set & disjoint_set:  # Check if there's any intersection.
-                        new_denial_candidates_sets[i] = (disjoint_set | current_set)  # Merge the sets.
-                        merged = True
-                        break
-                if not merged:
-                    new_denial_candidates_sets.append(current_set)
+            # Create an empty graph.
+            denial_pairs_graph = nx.Graph()
+
+            # Add edges to the graph.
+            # TODO: Consider how hyper-graph should created, should it actually be with regular graph as I defined?
+            for denial_candidates_set in denial_candidates_sets:
+                denial_pairs_graph.add_edges_from(
+                    [(c1, c2) for c1 in denial_candidates_set for c2 in denial_candidates_set if c1 != c2])
+
+            # Find all cliques.
+            # Each clique is a list of all denial candidates in the clique.
+            new_denial_candidates_sets = list(nx.find_cliques(denial_pairs_graph))
         else:
             new_denial_candidates_sets = denial_candidates_sets
 
