@@ -25,8 +25,8 @@ THIELE_RULE = thiele_functions.create_pav_thiele_dict
 THIELE_RULE_NAME = 'PAV'
 
 LIFTED_INFERENCE = True
-MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True
 MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = True
+MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True
 # --------------------------------------------------------------------------------
 
 # DB and dataset configuration:
@@ -117,16 +117,18 @@ def debug_print(module_name, input_str):
 
 def default_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
     return f'{experiment_number}_{THIELE_RULE_NAME}_' \
-           f'lifted={LIFTED_INFERENCE}_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
-           f'_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
+           f'lifted={LIFTED_INFERENCE}_' \
+           f'score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
+           f'DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}_' \
            f'{SOLVER_NAME}_cand_size={candidates_group_size}_com_size={committee_size}'
 
 
 def glasgow_create_experiment_name(experiment_number: int, max_number_of_districts: int):
     return f'{experiment_number}_{THIELE_RULE_NAME}_' \
-           f'lifted={LIFTED_INFERENCE}_DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}' \
-           f'_score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}' \
-           f'_{SOLVER_NAME}_district_count={max_number_of_districts}'
+           f'lifted={LIFTED_INFERENCE}_' \
+           f'score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
+           f'DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}_' \
+           f'{SOLVER_NAME}_district_count={max_number_of_districts}'
 
 
 def movies_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
