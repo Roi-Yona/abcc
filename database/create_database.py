@@ -273,6 +273,18 @@ def create_movies_spoken_languages_table(cur, con):
     df.to_sql("spoken_languages", con, if_exists='append', index=False)
 
 
+def create_movies_runtime_table(cur, con):
+    # Create the voting table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS runtime (
+       {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
+       runtime TEXT NOT NULL
+       )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_runtime.csv"))
+    df.to_sql("runtime", con, if_exists='append', index=False)
+
+
 def the_movies_database_create_database_main():
     # Remove the current database if exists.
     remove_file(config.MOVIES_DATABASE_DB_PATH)
@@ -286,6 +298,7 @@ def the_movies_database_create_database_main():
     create_movies_candidates_table(cur, con)
     create_movies_genres_table(cur, con)
     create_movies_spoken_languages_table(cur, con)
+    create_movies_runtime_table(cur, con)
 
     # Committing changes.
     con.commit()

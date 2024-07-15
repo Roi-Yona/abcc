@@ -75,6 +75,35 @@ def create_movie_spoken_languages_metadata(original_csv_file_path: str, new_csv_
     unpack_list_with_dictionary_column(original_csv_file_path, new_csv_file_path, 'spoken_languages', 'spoken_language')
 
 
+def create_movie_runtime_metadata(original_csv_file_path: str, new_csv_file_path: str):
+    # Reading the dat file in csv format.
+    df = pd.read_csv(original_csv_file_path)
+
+    # Removing irrelevant columns.
+    columns_to_keep = ['candidate_id', 'runtime']
+    df = df[columns_to_keep]
+
+    # Drop duplicate rows
+    df = df.drop_duplicates()
+
+    # Find the one-third and two-third values
+    median_value = df['runtime'].quantile(0.5)
+    config.debug_print(MODULE_NAME, f"The Movies dataset - median: {median_value}")
+
+    # Create a function to categorize values based on quantiles.
+    def categorize_value(value, median):
+        if value <= median:
+            return 'short'
+        else:
+            return 'long'
+
+    # Add 'price_range' column based on quantiles.
+    df['runtime'] = df['runtime'].apply(lambda x: categorize_value(x, median_value))
+
+    # Write data to the CSV file
+    df.to_csv(new_csv_file_path, index=False)
+
+
 def clean_movie_dataset_rating(original_csv_file_path: str, new_csv_file_path: str):
     # Load the CSV file into a DataFrame.
     # Note: This line should generate a DtypeWarning because it is before cleaning, hence there are invalid lines.
@@ -330,6 +359,8 @@ def the_movies_dataset_main():
     create_movie_spoken_languages_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
                                            os.path.join(config.MOVIES_DATASET_FOLDER_PATH,
                                                         f'movies_spoken_languages.csv'))
+    create_movie_runtime_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
+                                  os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_runtime.csv'))
 
 
 def glasgow_dataset_main():
