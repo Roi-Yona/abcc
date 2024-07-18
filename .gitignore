@@ -31,6 +31,7 @@ tests/ddnnf/CNF_results/*
 **/results/
 **/old_results/
 db_sql_query.py
+graphs_generator/*
 
 # OS generated files #
 ######################

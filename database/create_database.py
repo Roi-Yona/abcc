@@ -317,6 +317,7 @@ def the_movies_database_create_database_main():
     create_movies_genres_table(cur, con)
     create_movies_spoken_languages_table(cur, con)
     create_movies_runtime_table(cur, con)
+    movies_create_important_languages_table(cur, con)
 
     # Committing changes.
     con.commit()
