@@ -5,19 +5,27 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 4
+_experiment_number = 6
 MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # Find a winning committee with no constraints.
+    # We find a winning committee with one Denial constraint.
+    # Denial: There are no two committee members (i.e. movies) with the same genre.
     # ---------------------------------------------------------------------------
 
-    _candidates_group_size = 30
-    _committee_size = 5
+    _candidates_group_size = 100
+    _committee_size = 10
     _tgd_constraints = []
-    _denial_constraints = []
+
+    _denial_constraint_dict = dict()
+    _denial_constraint_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _denial_constraint_dict[('movies_genres', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _committee_members_list = ['c1', 'c2']
+    _candidates_tables = ['t1', 't2']
+
+    _denial_constraints = [(_denial_constraint_dict, _committee_members_list, _candidates_tables)]
 
     _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)
 

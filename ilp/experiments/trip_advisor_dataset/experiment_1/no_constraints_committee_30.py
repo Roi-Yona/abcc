@@ -16,7 +16,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = 10
+    _committee_size = 30
     _tgd_constraints = []
     _denial_constraints = []
 

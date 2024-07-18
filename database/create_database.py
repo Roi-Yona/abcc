@@ -163,7 +163,7 @@ def trip_advisor_create_important_locations_table(cur, con):
 
 def trip_advisor_create_price_ranges_table(cur, con):
     # Create the important price ranges table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS price_ranges (
+    cur.execute('''CREATE TABLE IF NOT EXISTS hotels_price_ranges (
                         price_range TEXT NOT NULL PRIMARY KEY)''')
 
     # Insert multiple rows into the table
@@ -173,7 +173,7 @@ def trip_advisor_create_price_ranges_table(cur, con):
         ('low',),
     ]
 
-    cur.executemany("INSERT INTO price_ranges (price_range) values (?)", new_data)
+    cur.executemany("INSERT INTO hotels_price_ranges (price_range) values (?)", new_data)
 
 
 def trip_advisor_create_database_main():
@@ -251,38 +251,56 @@ def create_movies_candidates_table(cur, con):
 
 def create_movies_genres_table(cur, con):
     # Create the genres table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS genres (
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_genres (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        genre TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_genres.csv"))
-    df.to_sql("genres", con, if_exists='append', index=False)
+    df.to_sql("movies_genres", con, if_exists='append', index=False)
 
 
 def create_movies_spoken_languages_table(cur, con):
     # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS spoken_languages (
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_spoken_languages (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        spoken_language TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_spoken_languages.csv"))
-    df.to_sql("spoken_languages", con, if_exists='append', index=False)
+    df.to_sql("movies_spoken_languages", con, if_exists='append', index=False)
 
 
 def create_movies_runtime_table(cur, con):
     # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS runtime (
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_runtime (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        runtime TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_runtime.csv"))
-    df.to_sql("runtime", con, if_exists='append', index=False)
+    df.to_sql("movies_runtime", con, if_exists='append', index=False)
+
+
+def movies_create_important_languages_table(cur, con):
+    # Create the important locations table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS important_languages (
+                        spoken_language TEXT NOT NULL,
+                        duration TEXT NOT NULL)''')
+
+    # Insert multiple rows into the table
+    new_data = [
+        ('English', 'long'),
+        ('Deutsch', 'long'),
+        ('Italiano', 'long'),
+        ('EspaÃ±ol', 'long'),
+        ('FranÃ§ais', 'long'),
+    ]
+
+    cur.executemany("INSERT INTO important_languages (spoken_language, duration) values (?, ?)", new_data)
 
 
 def the_movies_database_create_database_main():
@@ -407,9 +425,8 @@ def glasgow_create_database_main():
 
 
 if __name__ == '__main__':
-    # TODO: Update All DB's in all experiments (linux) with the updated versions of the movies db.
     # db_tests_create_database_main()
     the_movies_database_create_database_main()
     # glasgow_create_database_main()
-    # trip_advisor_create_database_main()
+    trip_advisor_create_database_main()
 

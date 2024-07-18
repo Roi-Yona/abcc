@@ -5,29 +5,37 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 8
+_experiment_number = 9
 MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # Find a winning committee with one TGD, for every original language there is a movie in the committee.
+    # We find a winning committee with one Denial constraint and one Representation constraint.
+    # Denial: There are no two committee members (i.e. movies) with the same genre.
+    # Representation: There is a committee member for every spoken language from the important languages table with a
+    # long duration.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'the_movies_database'
-
-    _candidates_group_size = 30
+    _candidates_group_size = 100
     _committee_size = 10
-    _denial_constraints = []
+
+    _denial_constraint_dict = dict()
+    _denial_constraint_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _denial_constraint_dict[('movies_genres', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _committee_members_list = ['c1', 'c2']
+    _candidates_tables = ['t1', 't2']
+
+    _denial_constraints = [(_denial_constraint_dict, _committee_members_list, _candidates_tables)]
 
     _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'original_language')]
+    _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'spoken_language'), ('y', 'duration')]
     _committee_members_list_start = []
-    # This indicates that the id limitation applies here as well.
-    _candidates_tables_start = ['t1']
+    _candidates_tables_start = []
 
     _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'original_language')]
+    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
+                                                                    ('x', 'spoken_language'), ('y', 'duration')]
     _committee_members_list_end = ['c1']
     _candidates_tables_end = ['t2']
 
@@ -48,4 +56,3 @@ if __name__ == '__main__':
                                                config.MOVIES_VOTERS_TICKING_SIZE_LIMIT,
                                                config.MOVIES_VOTERS_FINAL_TICKING_SIZE_LIMIT,
                                                config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)
-
