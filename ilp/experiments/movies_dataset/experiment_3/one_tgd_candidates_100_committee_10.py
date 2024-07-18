@@ -28,10 +28,12 @@ if __name__ == '__main__':
     _candidates_tables_start = []
 
     _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                                    ('x', 'spoken_language'), ('y', 'duration')]
+    _tgd_constraint_dict_end['movies_spoken_languages', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
+                                                                 ('x', 'spoken_language')]
+    _tgd_constraint_dict_end['movies_runtime', 't3'] = [('c1', config.CANDIDATES_COLUMN_NAME),
+                                                        ('y', 'runtime')]
     _committee_members_list_end = ['c1']
-    _candidates_tables_end = ['t2']
+    _candidates_tables_end = ['t2', 't3']
 
     _different_variables = _committee_members_list_end
 
