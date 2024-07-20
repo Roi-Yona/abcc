@@ -73,6 +73,16 @@ def create_movie_genre_metadata(original_csv_file_path: str, new_csv_file_path: 
 
 def create_movie_spoken_languages_metadata(original_csv_file_path: str, new_csv_file_path: str):
     unpack_list_with_dictionary_column(original_csv_file_path, new_csv_file_path, 'spoken_languages', 'spoken_language')
+    # Load the CSV file into a DataFrame.
+    df = pd.read_csv(new_csv_file_path)
+
+    df['spoken_language'] = df['spoken_language'].replace('Français', 'French')
+    df['spoken_language'] = df['spoken_language'].replace('Español', 'Spanish')
+    df['spoken_language'] = df['spoken_language'].replace('Italiano', 'Italian')
+    df['spoken_language'] = df['spoken_language'].replace('Deutsch', 'German')
+
+    # Save the updated DataFrame to the CSV file.
+    df.to_csv(new_csv_file_path, index=False)
 
 
 def create_movie_runtime_metadata(original_csv_file_path: str, new_csv_file_path: str):
@@ -450,5 +460,5 @@ if __name__ == '__main__':
     the_movies_dataset_main()
     # glasgow_dataset_main()
     # glasgow_dataset_analyze()
-    trip_advisor_dataset_main()
+    # trip_advisor_dataset_main()
     # trip_advisor_dataset_analyze()

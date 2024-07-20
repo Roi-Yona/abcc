@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # Experiment summary:
     # We find a winning committee with one Representation constraint.
     # Representation: There is a committee member for every spoken language from the important languages table with a
-    # long duration.
+    # long runtime.
     # ---------------------------------------------------------------------------
 
     _database_name = 'the_movies_database'
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     _denial_constraints = []
 
     _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'spoken_language'), ('y', 'duration')]
+    _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'spoken_language'), ('y', 'runtime')]
     _committee_members_list_start = []
     _candidates_tables_start = []
 
