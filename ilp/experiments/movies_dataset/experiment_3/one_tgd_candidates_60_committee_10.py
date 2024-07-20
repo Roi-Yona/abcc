@@ -5,7 +5,7 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 6
+_experiment_number = 3
 MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -18,8 +18,8 @@ if __name__ == '__main__':
 
     _database_name = 'the_movies_database'
 
-    _candidates_group_size = 100
-    _committee_size = 30
+    _candidates_group_size = 60
+    _committee_size = 10
     _denial_constraints = []
 
     _tgd_constraint_dict_start = dict()

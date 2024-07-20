@@ -5,22 +5,29 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 5
+_experiment_number = 4
 MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # We find a winning committee with one Representation constraint.
+    # We find a winning committee with one Denial constraint and one Representation constraint.
+    # Denial: There are no two committee members (i.e. movies) with the same genre.
     # Representation: There is a committee member for every spoken language from the important languages table with a
     # long runtime.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'the_movies_database'
+    _candidates_group_size = 60
+    _committee_size = 10
 
-    _candidates_group_size = 100
-    _committee_size = 20
-    _denial_constraints = []
+    _denial_constraint_dict = dict()
+    _denial_constraint_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _denial_constraint_dict[('movies_runtime', 't2')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
+    _denial_constraint_dict[('movies_genres', 't3')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _denial_constraint_dict[('movies_runtime', 't4')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
+    _committee_members_list = ['c1', 'c2']
+    _candidates_tables = ['t1', 't2', 't3', 't4']
+    _denial_constraints = [(_denial_constraint_dict, _committee_members_list, _candidates_tables)]
 
     _tgd_constraint_dict_start = dict()
     _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'spoken_language'), ('y', 'runtime')]
@@ -52,4 +59,3 @@ if __name__ == '__main__':
                                                config.MOVIES_VOTERS_TICKING_SIZE_LIMIT,
                                                config.MOVIES_VOTERS_FINAL_TICKING_SIZE_LIMIT,
                                                config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)
-
