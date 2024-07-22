@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
     # We find a winning committee with one Denial constraint.
-    # Denial: There are no two committee members (i.e. movies) with the same genre.
+    # Denial: There are no two committee members (i.e. movies) with both the same genre and the same runtime.
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = 60

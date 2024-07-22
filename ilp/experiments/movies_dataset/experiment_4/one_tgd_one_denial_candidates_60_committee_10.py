@@ -12,8 +12,8 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
     # We find a winning committee with one Denial constraint and one Representation constraint.
-    # Denial: There are no two committee members (i.e. movies) with the same genre.
-    # Representation: There is a committee member for every spoken language from the important languages table with a
+    # Denial: There are no two committee members (i.e. movies) with both the same genre and the same runtime.
+    # Representation: There is a committee member for every original language from the important languages table with a
     # long runtime.
     # ---------------------------------------------------------------------------
 
@@ -30,13 +30,13 @@ if __name__ == '__main__':
     _denial_constraints = [(_denial_constraint_dict, _committee_members_list, _candidates_tables)]
 
     _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'spoken_language'), ('y', 'runtime')]
+    _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'original_language'), ('y', 'runtime')]
     _committee_members_list_start = []
     _candidates_tables_start = []
 
     _tgd_constraint_dict_end = dict()
-    _tgd_constraint_dict_end['movies_spoken_languages', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                                 ('x', 'spoken_language')]
+    _tgd_constraint_dict_end['movies_original_language', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
+                                                                  ('x', 'original_language')]
     _tgd_constraint_dict_end['movies_runtime', 't3'] = [('c1', config.CANDIDATES_COLUMN_NAME),
                                                         ('y', 'runtime')]
     _committee_members_list_end = ['c1']

@@ -85,6 +85,27 @@ def create_movie_spoken_languages_metadata(original_csv_file_path: str, new_csv_
     df.to_csv(new_csv_file_path, index=False)
 
 
+def create_movie_original_language_metadata(original_csv_file_path: str, new_csv_file_path: str):
+    # Load the CSV file into a DataFrame.
+    df = pd.read_csv(original_csv_file_path)
+
+    # Save the updated DataFrame to the CSV file.
+    df.to_csv(new_csv_file_path, index=False)
+
+    # Load the CSV file into a DataFrame.
+    df = pd.read_csv(original_csv_file_path)
+
+    # Drop rows where the requested column is empty.
+    df = df.dropna(subset=['original_language'])
+    df = df[df['original_language'] != '']
+
+    # Keep only the relevant columns.
+    df = df[['candidate_id', 'original_language']]
+
+    # Save the cleaned DataFrame to the new CSV file.
+    df.to_csv(new_csv_file_path, index=False)
+
+
 def create_movie_runtime_metadata(original_csv_file_path: str, new_csv_file_path: str):
     # Reading the dat file in csv format.
     df = pd.read_csv(original_csv_file_path)
@@ -371,6 +392,9 @@ def the_movies_dataset_main():
                                                         f'movies_spoken_languages.csv'))
     create_movie_runtime_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
                                   os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_runtime.csv'))
+    create_movie_original_language_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
+                                            os.path.join(config.MOVIES_DATASET_FOLDER_PATH,
+                                                         f'movies_original_language.csv'))
 
 
 def glasgow_dataset_main():
@@ -458,7 +482,7 @@ def trip_advisor_dataset_analyze():
 
 if __name__ == '__main__':
     the_movies_dataset_main()
-    # glasgow_dataset_main()
-    # glasgow_dataset_analyze()
     # trip_advisor_dataset_main()
     # trip_advisor_dataset_analyze()
+    # glasgow_dataset_main()
+    # glasgow_dataset_analyze()

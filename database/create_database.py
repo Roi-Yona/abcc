@@ -273,6 +273,18 @@ def create_movies_spoken_languages_table(cur, con):
     df.to_sql("movies_spoken_languages", con, if_exists='append', index=False)
 
 
+def create_movies_original_language_table(cur, con):
+    # Create the voting table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_original_language (
+       {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
+       original_language TEXT NOT NULL
+       )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_original_language.csv"))
+    df.to_sql("movies_original_language", con, if_exists='append', index=False)
+
+
 def create_movies_runtime_table(cur, con):
     # Create the voting table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_runtime (
@@ -288,19 +300,19 @@ def create_movies_runtime_table(cur, con):
 def movies_create_important_languages_table(cur, con):
     # Create the important locations table.
     cur.execute('''CREATE TABLE IF NOT EXISTS important_languages (
-                        spoken_language TEXT NOT NULL,
+                        original_language TEXT NOT NULL,
                         runtime TEXT NOT NULL)''')
 
     # Insert multiple rows into the table
     new_data = [
-        ('English', 'long'),
-        ('German', 'long'),
-        ('Italian', 'long'),
-        ('Spanish', 'long'),
-        ('French', 'long'),
+        ('en', 'long'),
+        ('nl', 'long'),
+        ('it', 'long'),
+        ('es', 'long'),
+        ('fr', 'long'),
     ]
 
-    cur.executemany("INSERT INTO important_languages (spoken_language, runtime) values (?, ?)", new_data)
+    cur.executemany("INSERT INTO important_languages (original_language, runtime) values (?, ?)", new_data)
 
 
 def the_movies_database_create_database_main():
@@ -318,6 +330,7 @@ def the_movies_database_create_database_main():
     create_movies_spoken_languages_table(cur, con)
     create_movies_runtime_table(cur, con)
     movies_create_important_languages_table(cur, con)
+    create_movies_original_language_table(cur, con)
 
     # Committing changes.
     con.commit()
