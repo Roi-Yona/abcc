@@ -23,18 +23,15 @@ if __name__ == '__main__':
     _denial_constraints = []
 
     _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'original_language'), ('y', 'runtime')]
+    _tgd_constraint_dict_start['important_languages', 't1'] = [('x', 'original_language')]
     _committee_members_list_start = []
     _candidates_tables_start = []
 
     _tgd_constraint_dict_end = dict()
     _tgd_constraint_dict_end['movies_original_language', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                                 ('x', 'original_language')]
-    _tgd_constraint_dict_end['movies_runtime', 't3'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                        ('y', 'runtime')]
+                                                                  ('x', 'original_language')]
     _committee_members_list_end = ['c1']
-    _candidates_tables_end = ['t2', 't3']
-
+    _candidates_tables_end = ['t2']
     _different_variables = _committee_members_list_end
 
     _tgd_constraints = [
