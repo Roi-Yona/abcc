@@ -300,19 +300,16 @@ def create_movies_runtime_table(cur, con):
 def movies_create_important_languages_table(cur, con):
     # Create the important locations table.
     cur.execute('''CREATE TABLE IF NOT EXISTS important_languages (
-                        original_language TEXT NOT NULL,
-                        runtime TEXT NOT NULL)''')
+                        original_language TEXT NOT NULL)''')
 
     # Insert multiple rows into the table
     new_data = [
-        ('en', 'long'),
-        ('nl', 'long'),
-        ('it', 'long'),
-        ('es', 'long'),
-        ('fr', 'long'),
+        ('en',),
+        ('fr',),
+        ('es',),
     ]
 
-    cur.executemany("INSERT INTO important_languages (original_language, runtime) values (?, ?)", new_data)
+    cur.executemany("INSERT INTO important_languages (original_language) values (?)", new_data)
 
 
 def the_movies_database_create_database_main():
@@ -441,5 +438,5 @@ def glasgow_create_database_main():
 if __name__ == '__main__':
     # db_tests_create_database_main()
     the_movies_database_create_database_main()
-    # glasgow_create_database_main()
     # trip_advisor_create_database_main()
+    # glasgow_create_database_main()

@@ -482,7 +482,7 @@ def trip_advisor_dataset_analyze():
 
 if __name__ == '__main__':
     the_movies_dataset_main()
-    # trip_advisor_dataset_main()
+    trip_advisor_dataset_main()
     # trip_advisor_dataset_analyze()
     # glasgow_dataset_main()
     # glasgow_dataset_analyze()
