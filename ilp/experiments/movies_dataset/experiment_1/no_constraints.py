@@ -13,8 +13,8 @@ if __name__ == '__main__':
     # Experiment summary:
     # We find a winning committee with no constraints.
     # ---------------------------------------------------------------------------
-    _candidates_group_size = 60
-    _committee_size = 10
+    _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
+    _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
     _tgd_constraints = []
     _denial_constraints = []
 

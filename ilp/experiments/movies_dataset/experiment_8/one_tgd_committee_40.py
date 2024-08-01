@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     _database_name = 'the_movies_database'
 
-    _candidates_group_size = 60
+    _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = 40
     _denial_constraints = []
 
