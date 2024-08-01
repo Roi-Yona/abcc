@@ -101,6 +101,8 @@ TRIP_ADVISOR_VOTERS_TICKING_SIZE_LIMIT = 2000
 TRIP_ADVISOR_VOTERS_FINAL_TICKING_SIZE_LIMIT = TRIP_ADVISOR_TOTAL_NUMBER_OF_VOTERS + \
                                                TRIP_ADVISOR_VOTERS_TICKING_SIZE_LIMIT
 TRIP_ADVISOR_NUMBER_OF_DIFFERENT_LOCATIONS = 66
+
+TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE = 30
 # --------------------------------------------------------------------------------
 
 # Tests Dataset Consts:
