@@ -17,7 +17,7 @@ class TestCombinedExperiment(unittest.TestCase):
         self.voters_group_size = 8
         config.LIFTED_INFERENCE = False
         self.committee_size = 4
-        config.THIELE_RULE = thiele_functions.create_av_thiele_dict
+        config.SCORE_FUNCTION = thiele_functions.av_thiele_function
         config.THIELE_RULE_NAME = "AV"
         # ----------------------------------------------------------------
         # Define the ILP solver.

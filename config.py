@@ -23,7 +23,7 @@ HOUR = MINUTE * 60
 
 SOLVER_TIME_LIMIT = HOUR * 2
 SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
-THIELE_RULE = thiele_functions.create_pav_thiele_dict
+SCORE_FUNCTION = thiele_functions.pav_thiele_function
 THIELE_RULE_NAME = 'PAV'
 
 LIFTED_INFERENCE = True

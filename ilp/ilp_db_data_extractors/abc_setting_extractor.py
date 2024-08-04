@@ -15,7 +15,7 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
                  candidates_starting_point: int,
                  voters_size_limit: int,
                  candidates_size_limit: int,
-                 thiele_rule_function: dict):
+                 score_function):
         super().__init__(abc_convertor, database_engine, candidates_starting_point, candidates_size_limit)
 
         # Initializing ABC setting variables.
@@ -27,7 +27,7 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
         self._candidates_ids_set = set()
         self._approval_profile = dict()
         self._committee_size = committee_size
-        self._thiele_function = thiele_rule_function
+        self._score_function = score_function
         self._lifted_voters = dict()
 
     def _extract_data_from_db(self) -> None:
@@ -93,7 +93,7 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
             self._candidates_ids_set,
             self._approval_profile,
             self._committee_size,
-            self._thiele_function)
+            self._score_function)
 
 
 if __name__ == '__main__':

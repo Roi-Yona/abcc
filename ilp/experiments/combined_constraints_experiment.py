@@ -76,7 +76,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         self._abc_setting_extractor = abc_setting_extractor.ABCSettingExtractor(
             self._abc_convertor, self._db_engine,
             committee_size, voters_starting_point, candidates_starting_point, voters_size_limit, candidates_size_limit,
-            config.THIELE_RULE(committee_size + 1))
+            config.SCORE_FUNCTION)
 
     def run_experiment(self):
         # Extract problem data from the database and convert to ILP.

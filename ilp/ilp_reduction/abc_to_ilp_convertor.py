@@ -10,7 +10,7 @@ MODULE_NAME = "ABC to ILP Convertor"
 
 class ABCToILPConvertor(ilp_convertor.ILPConvertor):
     """A class for converting ABC problem of finding
-       a winning committee given a thiele voting rule
+       a winning committee given a voting rule score function
        and contextual constraints to an ILP problem.
 
            The problem original input is:
@@ -18,7 +18,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
            V - Group of voters.
            A(V) - Approval profile.
            k - The committee size.
-           r - The thiele rule.
+           r - The voting rule score function.
            Gamma - Set of contextual constraints.
     """
 
@@ -38,8 +38,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         self._lifted_voters_weights = None
 
         # The voting rule.
-        self._thiele_score_function = {}
-        self._max_thiele_function_value = 0
+        self._voting_rule_score_function = None
+        self._max_score_function_value = 0
 
         # The model variables.
         self._model_candidates_variables = dict()
@@ -84,14 +84,13 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
     def define_abc_setting(self,
                            candidates_ids_set: set,
                            approval_profile: dict,
-                           committee_size: int, thiele_score_function: dict) -> None:
-        """Set and convert to ILP the ABC problem setting, including the thiele score function.
+                           committee_size: int, score_function) -> None:
+        """Set and convert to ILP the ABC problem setting, including the voting rule score function.
         :param candidates_ids_set:       A set of candidates id's.
         :param approval_profile:         A dict the is key is the voter id,
                                          is value is a group of candidates id's this voter approves.
         :param committee_size:           The committee size.
-        :param thiele_score_function:    A dict with the number of approved candidates as key,
-                                         the thiele score as value ({1,..,k}->N).
+        :param score_function:    An ABC score function.
         """
         # Set the ABC data.
         self._candidates_ids_set = candidates_ids_set
@@ -111,10 +110,11 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         config.debug_print(MODULE_NAME, debug_message)
 
         # Set the voting rule.
-        self._thiele_score_function = thiele_score_function
+        self._voting_rule_score_function = score_function
 
-        # Find the max value of the thiele score function.
-        self._max_thiele_function_value = max(self._thiele_score_function.values())
+        # Find the max value of the score function.
+        # Assuming (reasonably) that a smaller approval profile, means larger score given the max approval.
+        self._max_score_function_value = self._voting_rule_score_function(self._committee_size, 1)
 
         # Union all voters with the same approval profile in order to 'lifted inference' those voters
         # and represent them as one weighted voter.
@@ -159,7 +159,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         # Create the voters score contribution ILP variables.
         for voter_id in self._approval_profile.keys():
             self._model_voters_score_contribution_variables[voter_id] = \
-                self._model.NumVar(0, self._max_thiele_function_value, "v_" + str(voter_id) + "_score")
+                self._model.NumVar(0, self._max_score_function_value, "v_" + str(voter_id) + "_score")
 
     def _define_abc_setting_constraints(self) -> None:
         # Add the constraint about the number of candidates in the committee.
@@ -188,10 +188,11 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                 self._model.Add(y_plus <= (b * (self._committee_size + 1)))
                 self._model.Add((y_plus - y_minus) ==
                                 (i - self._model_voters_approval_candidates_sum_variables[voter_id]))
-                # Add the constraint voter_contribution <= abs(i-voter_approval_sum)*(Max_Thiele+1) + thiele(i).
+                # Add the constraint
+                # voter_contribution <= abs(i-voter_approval_sum)*(max_score_function_value+1) + score_function(i).
                 self._model.Add(self._model_voters_score_contribution_variables[voter_id] <=
-                                ((y_plus + y_minus) * (self._max_thiele_function_value + 1) +
-                                 self._thiele_score_function[i]))
+                                ((y_plus + y_minus) * (self._max_score_function_value + 1) +
+                                 self._voting_rule_score_function(i, len(self._approval_profile[voter_id]))))
 
     def _define_abc_setting_objective(self) -> None:
         self._model.Maximize(sum([score * (self._lifted_voters_weights[voter_id])
