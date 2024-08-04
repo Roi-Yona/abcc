@@ -6,29 +6,31 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 2
+_experiment_number = 5
 MODULE_NAME = f'Trip Advisor Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # We find a winning committee with one Representation constraint (TGD).
-    # Representation: For every location from important locations table there is representation in the committee.
+    # We find a winning committee with one Denial constraint and two TGD constraint.
+    # The constraint are -
+    # Denial: There are no two committee members with the same location and the same price.
+    # TGD: For every location in important locations, there is a low price committee member representing it.
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = config.TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE
-    _denial_constraints = []
+    _committee_size = 10
 
-    # Representation constraint.
+    # TGD constraint.
     _tgd_constraint_dict_start = dict()
-    _tgd_constraint_dict_start['important_locations', 't1'] = [('x', 'location')]
+    _tgd_constraint_dict_start['important_locations', 't1'] = [('x', 'location'), ('y', 'price_range')]
     _committee_members_list_start = []
     _candidates_tables_start = []
 
     _tgd_constraint_dict_end = dict()
     _tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                                    ('x', 'location')]
+                                                                    ('x', 'location'),
+                                                                    ('y', 'price_range')]
     _committee_members_list_end = ['c1']
     _candidates_tables_end = ['t2']
 
@@ -37,6 +39,17 @@ if __name__ == '__main__':
     _tgd_constraints = [
         (_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
          _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]
+
+    # Denial constraint.
+    denial_constraint_dict = dict()
+    denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
+    denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
+    committee_members_list = ['c1', 'c2']
+    candidates_tables = ['t1', 't2']
+
+    _denial_constraints = [(denial_constraint_dict, committee_members_list, candidates_tables)]
 
     # Define the experiment name.
     _experiment_name = config.trip_advisor_create_experiment_name(

@@ -5,22 +5,20 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
-_experiment_number = 10
+_experiment_number = 2
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # The voting rule is approval voting.
-    # We find committee where using a denial constraint we enforce there are no two candidates in the committee from
-    # the district. The number of different districts is 21, therefore this will be the max size of a committee.
+    # We find a winning committee with one denial constraint.
+    # Denial: There are no two committee members from the same district.
+    # Note that in this case, the max number of districts is the max committee size.
     # ---------------------------------------------------------------------------
-
-    _max_number_of_districts = 21
+    _max_number_of_districts = config.GLASGOW_TOTAL_NUMBER_OF_DISTRICTS
 
     _tgd_constraints = []
 
-    # First denial constraint:
     denial_constraint_dict = dict()
     denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
         [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'district')]
@@ -38,4 +36,4 @@ if __name__ == '__main__':
         _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
         _denial_constraints, _tgd_constraints,
         _max_number_of_districts,
-        config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)
+        config.GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)

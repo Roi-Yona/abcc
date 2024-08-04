@@ -11,8 +11,8 @@ MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # We find a winning committee with one Representation constraint.
-    # Representation: There is a committee member for every original language from the important languages table with a
+    # We find a winning committee with one TGD constraint.
+    # TGD: There is a committee member for every original language from the important languages table with a
     # long runtime.
     # ---------------------------------------------------------------------------
 

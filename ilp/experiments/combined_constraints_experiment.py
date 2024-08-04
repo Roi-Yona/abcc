@@ -241,8 +241,8 @@ def combined_constraints_experiment_district_runner(
         for district_number in range(1, max_number_of_districts + 1):
             if current_district_number < district_number:
                 break
-            candidates_group_size += config.DISTRICTS_NUMBER_OF_CANDIDATES[district_number]
-            voters_group_size += config.DISTRICTS_NUMBER_OF_VOTERS[district_number]
+            candidates_group_size += config.GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES[district_number]
+            voters_group_size += config.GLASGOW_DISTRICTS_NUMBER_OF_VOTERS[district_number]
 
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
                                         f"candidates_group_size_limit={candidates_group_size}\n"

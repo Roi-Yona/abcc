@@ -5,17 +5,16 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
-_experiment_number = 9
+_experiment_number = 1
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # The voting rule is approval voting.
-    # We find a committee where there are no constraint at all.
+    # We find a committee where there are no constraints at all.
+    # The committee size is as the number of districts.
     # ---------------------------------------------------------------------------
-
-    _max_number_of_districts = 21
+    _max_number_of_districts = config.GLASGOW_TOTAL_NUMBER_OF_DISTRICTS
 
     _tgd_constraints = []
     _denial_constraints = []
@@ -27,4 +26,4 @@ if __name__ == '__main__':
         _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
         _denial_constraints, _tgd_constraints,
         _max_number_of_districts,
-        config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)
+        config.GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)

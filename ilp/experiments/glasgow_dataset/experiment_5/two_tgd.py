@@ -5,22 +5,18 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
-_experiment_number = 8
+_experiment_number = 5
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # The voting rule is approval voting.
-    # We find a committee where there is 1 representor from each district (enforce as a TGD).
-    # We find committee where there is representation for all the parties.
-    # The valid committee should be from size 14 up, because there are 14 parties.
-
-    # Because district 7 is the only one with CPA party and also the only one with Scottish Christian from district 7 up
-    # we cannot achieve such a committee.
+    # We find a winning committee with two TGD constraints.
+    # First TGD: There is one committee member for each district.
+    # Second TGD: There is representation for all parties in the important parties table.
+    # Note that any valid committee should be at least from size 4 up, because there are 4 important parties.
     # ---------------------------------------------------------------------------
-
-    _max_number_of_districts = 21
+    _max_number_of_districts = config.GLASGOW_TOTAL_NUMBER_OF_DISTRICTS
 
     # First TGD:
     _tgd_constraint_dict_start = dict()
@@ -38,10 +34,9 @@ if __name__ == '__main__':
 
     # Second TGD:
     _tgd_constraint_dict_start2 = dict()
-    _tgd_constraint_dict_start2[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'party')]
+    _tgd_constraint_dict_start2['important_parties', 't1'] = [('x', 'party')]
     _committee_members_list_start2 = []
-    # This indicates that the id limitation applies here as well.
-    _candidates_tables_start2 = ['t1']
+    _candidates_tables_start2 = []
 
     _tgd_constraint_dict_end2 = dict()
     _tgd_constraint_dict_end2[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'party')]
@@ -51,7 +46,7 @@ if __name__ == '__main__':
     _different_variables2 = _committee_members_list_end2
 
     _tgd_constraints = [(_tgd_constraint_dict_start, _committee_members_list_start, _tgd_constraint_dict_end,
-                         _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,
+                        _committee_members_list_end, _candidates_tables_start, _candidates_tables_end,
                          _different_variables),
                         (_tgd_constraint_dict_start2, _committee_members_list_start2, _tgd_constraint_dict_end2,
                          _committee_members_list_end2, _candidates_tables_start2, _candidates_tables_end2,
@@ -66,4 +61,4 @@ if __name__ == '__main__':
         _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
         _denial_constraints, _tgd_constraints,
         _max_number_of_districts,
-        config.NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)
+        config.GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)

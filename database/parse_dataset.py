@@ -420,8 +420,8 @@ def glasgow_dataset_main():
         _new_csv_file_path_c = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, f'00008-000000{t}_candidates.csv')
         soi_to_csv_voting(_soi_file_path, _new_csv_file_path, candidates_starting_point, voters_starting_point)
         soi_to_csv_candidates(_soi_file_path, _new_csv_file_path_c, candidates_starting_point)
-        voters_starting_point += config.DISTRICTS_NUMBER_OF_VOTERS[i]
-        candidates_starting_point += config.DISTRICTS_NUMBER_OF_CANDIDATES[i]
+        voters_starting_point += config.GLASGOW_DISTRICTS_NUMBER_OF_VOTERS[i]
+        candidates_starting_point += config.GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES[i]
 
 
 def glasgow_dataset_analyze_district(district_number: int):
@@ -481,8 +481,8 @@ def trip_advisor_dataset_analyze():
 
 
 if __name__ == '__main__':
-    the_movies_dataset_main()
-    trip_advisor_dataset_main()
+    # the_movies_dataset_main()
+    # trip_advisor_dataset_main()
     # trip_advisor_dataset_analyze()
-    # glasgow_dataset_main()
-    # glasgow_dataset_analyze()
+    glasgow_dataset_main()
+    glasgow_dataset_analyze()

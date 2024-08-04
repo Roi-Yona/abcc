@@ -6,23 +6,22 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 9
+_experiment_number = 6
 MODULE_NAME = f'Trip Advisor Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # We find a winning committee with one Denial constraint and two Representation constraint.
+    # We find a winning committee with one Denial constraint and two TGD constraint.
     # The constraint are -
     # Denial: There are no two committee members with the same location and the same price.
-    # Representation: For every location in important locations, there is a low price
-    # committee member representing it.
+    # TGD: For every location in important locations, there is a low price committee member representing it.
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = 50
+    _committee_size = 20
 
-    # Representation constraint.
+    # TGD constraint.
     _tgd_constraint_dict_start = dict()
     _tgd_constraint_dict_start['important_locations', 't1'] = [('x', 'location'), ('y', 'price_range')]
     _committee_members_list_start = []

@@ -11,9 +11,9 @@ MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # We find a winning committee with one Denial constraint and one Representation constraint.
+    # We find a winning committee with one Denial constraint and one TGD constraint.
     # Denial: There are no two committee members (i.e. movies) with both the same genre and the same runtime.
-    # Representation: There is a committee member for every original language from the important languages table..
+    # TGD: There is a committee member for every original language from the important languages table.
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE

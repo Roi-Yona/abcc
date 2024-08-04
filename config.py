@@ -19,7 +19,9 @@ SQLITE_DATABASE_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "sqlite_databa
 # Experiments configuration:
 # --------------------------------------------------------------------------------
 MINUTE = 1000 * 60
-SOLVER_TIME_LIMIT = 250 * MINUTE
+HOUR = MINUTE * 60
+
+SOLVER_TIME_LIMIT = HOUR * 2
 SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
 THIELE_RULE = thiele_functions.create_pav_thiele_dict
 THIELE_RULE_NAME = 'PAV'
@@ -57,7 +59,7 @@ MOVIES_VOTERS_STARTING_POINT = 1
 MOVIES_TOTAL_NUMBER_OF_CANDIDATES = 45404
 MOVIES_TOTAL_NUMBER_OF_VOTERS = 270896
 MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT = 5000
-MOVIES_VOTERS_TICKING_SIZE_LIMIT = 20000
+MOVIES_VOTERS_TICKING_SIZE_LIMIT = 5000
 MOVIES_VOTERS_FINAL_TICKING_SIZE_LIMIT = MOVIES_TOTAL_NUMBER_OF_VOTERS + MOVIES_VOTERS_TICKING_SIZE_LIMIT
 MOVIES_NUMBER_OF_DIFFERENT_GENRES = 20
 
@@ -67,22 +69,26 @@ MOVIES_DEFAULT_CANDIDATE_SIZE = 100
 
 # Glasgow Dataset Consts:
 # --------------------------------------------------------------------------------
-DISTRICTS_NUMBER_OF_CANDIDATES = {1: 9, 2: 11, 3: 10, 4: 11, 5: 10, 6: 10, 7: 13, 8: 10, 9: 11, 10: 9, 11: 10, 12: 8,
-                                  13: 11, 14: 8, 15: 9, 16: 10, 17: 9, 18: 9, 19: 11, 20: 9, 21: 10}
-DISTRICTS_NUMBER_OF_VOTERS = {1: 6900, 2: 10376, 3: 5199, 4: 8624, 5: 11052, 6: 8680, 7: 9078, 8: 70160, 9: 9650,
-                              10: 8682, 11: 8984, 12: 9334, 13: 9567, 14: 9901, 15: 8654, 16: 8363, 17: 12744, 18: 9567,
-                              19: 8803, 20: 8783, 21: 5410}
+GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES = {1: 9, 2: 11, 3: 10, 4: 11, 5: 10, 6: 10, 7: 13, 8: 10, 9: 11, 10: 9, 11: 10, 12: 8,
+                                          13: 11, 14: 8, 15: 9, 16: 10, 17: 9, 18: 9, 19: 11, 20: 9, 21: 10}
+GLASGOW_DISTRICTS_NUMBER_OF_VOTERS = {1: 6900, 2: 10376, 3: 5199, 4: 8624, 5: 11052, 6: 8680, 7: 9078, 8: 70160, 9: 9650,
+                                      10: 8682, 11: 8984, 12: 9334, 13: 9567, 14: 9901, 15: 8654, 16: 8363, 17: 12744, 18: 9567,
+                                      19: 8803, 20: 8783, 21: 5410}
 
-NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT = dict()
-NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3 = dict()
+GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT = dict()
+GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3 = dict()
 
-for i in range(1, 22):
-    NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT[i] = 1
-    NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3[i] = 3
+GLASGOW_TOTAL_NUMBER_OF_DISTRICTS = 21
+
+for i in range(1, GLASGOW_TOTAL_NUMBER_OF_DISTRICTS + 1):
+    GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT[i] = 1
+    GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3[i] = 3
 
 GLASGOW_ELECTION_DB_NAME = "glasgow_city_council.db"
 GLASGOW_ELECTION_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "glasgow_city_council_elections")
 GLASGOW_ELECTION_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, GLASGOW_ELECTION_DB_NAME)
+
+
 # --------------------------------------------------------------------------------
 
 # Trip Advisor Dataset Consts:
@@ -144,4 +150,10 @@ def movies_create_experiment_name(experiment_number: int, candidates_group_size:
 
 def trip_advisor_create_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
     return default_experiment_name(experiment_number, candidates_group_size, committee_size)
+
+
+def get_total_construction_and_solving_time(df: pd.DataFrame) -> tuple:
+    total_construction_time = df['total_construction_and_extraction_time(sec)']
+    total_solving_time = df['total_solution_time(sec)']
+    return total_construction_time, total_solving_time
 # --------------------------------------------------------------------------------
