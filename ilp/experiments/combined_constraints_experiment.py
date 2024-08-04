@@ -6,14 +6,14 @@ import pandas as pd
 
 import config
 import ilp.ilp_db_data_extractors.abc_setting_extractor as abc_setting_extractor
-import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
+import ilp.ilp_db_data_extractors.dc_extractor as dc_extractor
 import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
 import ilp.experiments.experiment as experiment
 
 MODULE_NAME = "Combined Constraint Experiment"
 
 
-# FIXME: Consider a class representing denial constraint.
+# FIXME: Consider a class representing dc.
 # FIXME: Consider creating a class representing TGD constraint.
 
 
@@ -23,7 +23,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  database_name: str,
 
                  # Denial constraints parameters are:
-                 # (denial_constraint_dict: dict, committee_members_list: list, candidates_tables: list)
+                 # (dc_dict: dict, committee_members_list: list, candidates_tables: list)
                  denial_constraints: list,
 
                  # TGD constraints parameters are:
@@ -45,15 +45,15 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         self._committee_size = committee_size
 
         # Create the data extractors.
-        # NOTE_1: Can alternative define here a denial constraint data after extracting directly using SQL query.
-        self._denial_constraint_db_extractors = []
+        # NOTE_1: Can alternative define here a dc data after extracting directly using SQL query.
+        self._dc_db_extractors = []
         for param_tuples in denial_constraints:
-            local_denial_constraint_dict = param_tuples[0]
+            local_dc_dict = param_tuples[0]
             local_committee_members_list = param_tuples[1]
             local_candidates_tables = param_tuples[2]
-            self._denial_constraint_db_extractors.append(denial_constraint_extractor.DenialConstraintExtractor(
+            self._dc_db_extractors.append(dc_extractor.DenialConstraintExtractor(
                 self._abc_convertor, self._db_engine,
-                local_denial_constraint_dict, local_committee_members_list, local_candidates_tables,
+                local_dc_dict, local_committee_members_list, local_candidates_tables,
                 committee_size, candidates_starting_point, candidates_size_limit))
 
         self._tgd_constraint_db_extractors = []
@@ -82,8 +82,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         # Extract problem data from the database and convert to ILP.
         # NOTE_1: Can alternative convert to ilp directly using the _abc_convertor using a data that already extracted.
         self._abc_setting_extractor.extract_and_convert()
-        for denial_extractor in self._denial_constraint_db_extractors:
-            denial_extractor.extract_and_convert()
+        for dc_extractor in self._dc_db_extractors:
+            dc_extractor.extract_and_convert()
         for tgd_extractor in self._tgd_constraint_db_extractors:
             tgd_extractor.extract_and_convert()
 
@@ -115,8 +115,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                       'number_of_solver_variables': self._solver.NumVariables(),
                       'number_of_solver_constraints': self._solver.NumConstraints(),
                       'ilp_construction_time_abc(sec)': self._abc_setting_extractor.convert_to_ilp_timer,
-                      'ilp_construction_time_denial_constraint(sec)': sum([x.convert_to_ilp_timer for x in
-                                                                           self._denial_constraint_db_extractors]),
+                      'ilp_construction_time_dc(sec)': sum([x.convert_to_ilp_timer for x in
+                                                                           self._dc_db_extractors]),
                       'ilp_construction_time_tgd(sec)': sum([x.convert_to_ilp_timer for x in
                                                              self._tgd_constraint_db_extractors]),
                       'ilp_construction_time_total(sec)': self._abc_setting_extractor.convert_to_ilp_timer +

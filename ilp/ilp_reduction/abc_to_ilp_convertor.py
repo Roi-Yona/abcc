@@ -199,37 +199,37 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                                   for voter_id, score in
                                   self._model_voters_score_contribution_variables.items()]))
 
-    def define_denial_constraint(self, denial_candidates_sets):
-        """Set and convert to ILP a denial constraint.
+    def define_dc(self, dc_candidates_sets):
+        """Set and convert to ILP a dc.
 
-        :param denial_candidates_sets: A denial candidates groups.
+        :param dc_candidates_sets: A dc candidates groups.
         """
         if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
             # Create an empty graph.
-            denial_pairs_graph = nx.Graph()
+            dc_pairs_graph = nx.Graph()
 
             # Add edges to the graph.
             # TODO: Consider how hyper-graph should created, should it actually be with regular graph as I defined?
-            for denial_candidates_set in denial_candidates_sets:
-                denial_pairs_graph.add_edges_from(
-                    [(c1, c2) for c1 in denial_candidates_set for c2 in denial_candidates_set if c1 != c2])
+            for dc_candidates_set in dc_candidates_sets:
+                dc_pairs_graph.add_edges_from(
+                    [(c1, c2) for c1 in dc_candidates_set for c2 in dc_candidates_set if c1 != c2])
 
             # Find all cliques.
-            # Each clique is a list of all denial candidates in the clique.
-            new_denial_candidates_sets = list(nx.find_cliques(denial_pairs_graph))
+            # Each clique is a list of all dc candidates in the clique.
+            new_dc_candidates_sets = list(nx.find_cliques(dc_pairs_graph))
         else:
-            new_denial_candidates_sets = denial_candidates_sets
+            new_dc_candidates_sets = dc_candidates_sets
 
         # Construct the ILP.
-        # The denial length should be according to the original denial sets.
-        denial_group_length = 0
-        if len(denial_candidates_sets) > 0:
-            denial_group_length = len(denial_candidates_sets[0])
-        for candidates_set in new_denial_candidates_sets:
+        # The dc length should be according to the original dc sets.
+        dc_group_length = 0
+        if len(dc_candidates_sets) > 0:
+            dc_group_length = len(dc_candidates_sets[0])
+        for candidates_set in new_dc_candidates_sets:
             self._model.Add(
                 sum([self._model_candidates_variables[candidate_index] for candidate_index in candidates_set
                      if candidate_index in self._model_candidates_variables])
-                <= (denial_group_length - 1))
+                <= (dc_group_length - 1))
 
     def define_tgd_constraint(self, element_members_representor_sets: list):
         for element_members, tgd_representor_set in element_members_representor_sets:

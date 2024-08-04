@@ -44,11 +44,11 @@ class TestCombinedExperiment(unittest.TestCase):
                                  candidates_tables_start, candidates_tables_end, different_variables)]
         # TGD representor sets: ()->(1, 3, 4, 6); ()->(2, 7); ()->(5); ()->(8)
         # ----------------------------------------------------------------
-        # Define the denial constraint.
-        denial_constraint_dict = dict()
-        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+        # Define the dc.
+        dc_dict = dict()
+        dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
             [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
-        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+        dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
             [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']

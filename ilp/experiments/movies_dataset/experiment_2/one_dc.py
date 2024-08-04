@@ -19,15 +19,15 @@ if __name__ == '__main__':
     _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
     _tgd_constraints = []
 
-    _denial_constraint_dict = dict()
-    _denial_constraint_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-    _denial_constraint_dict[('movies_runtime', 't2')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
-    _denial_constraint_dict[('movies_genres', 't3')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-    _denial_constraint_dict[('movies_runtime', 't4')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
+    _dc_dict = dict()
+    _dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _dc_dict[('movies_runtime', 't2')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
+    _dc_dict[('movies_genres', 't3')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _dc_dict[('movies_runtime', 't4')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
     _committee_members_list = ['c1', 'c2']
     _candidates_tables = ['t1', 't2', 't3', 't4']
 
-    _denial_constraints = [(_denial_constraint_dict, _committee_members_list, _candidates_tables)]
+    _denial_constraints = [(_dc_dict, _committee_members_list, _candidates_tables)]
 
     _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)
 

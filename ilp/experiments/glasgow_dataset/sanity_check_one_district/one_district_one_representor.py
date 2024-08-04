@@ -31,7 +31,7 @@ if __name__ == '__main__':
                                     f"committee_size={_committee_size}")
 
     _tgd_constraints = []
-    _denial_constrains = []
+    _denial_constraints = []
 
     _experiment_name = config.glasgow_create_experiment_name(_experiment_number, 1)
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     experiments_results = pd.DataFrame()
     av_experiment = combined_constraints_experiment. \
         CombinedConstraintsExperiment(_experiment_name, config.GLASGOW_ELECTION_DB_NAME,
-                                      _denial_constrains, _tgd_constraints,
+                                      _denial_constraints, _tgd_constraints,
                                       _committee_size,
                                       _voters_starting_point, _candidates_starting_point,
                                       _voters_group_size, _candidates_group_size)

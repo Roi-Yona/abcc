@@ -6,7 +6,7 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 8
+_experiment_number = 9
 MODULE_NAME = f'Trip Advisor Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = 40
+    _committee_size = 50
 
     # TGD constraint.
     _tgd_constraint_dict_start = dict()
@@ -41,15 +41,15 @@ if __name__ == '__main__':
          _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]
 
     # Denial constraint.
-    denial_constraint_dict = dict()
-    denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+    dc_dict = dict()
+    dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
         [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
-    denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+    dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
         [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
     committee_members_list = ['c1', 'c2']
     candidates_tables = ['t1', 't2']
 
-    _denial_constraints = [(denial_constraint_dict, committee_members_list, candidates_tables)]
+    _denial_constraints = [(dc_dict, committee_members_list, candidates_tables)]
 
     # Define the experiment name.
     _experiment_name = config.trip_advisor_create_experiment_name(
