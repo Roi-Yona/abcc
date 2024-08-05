@@ -30,8 +30,8 @@ if __name__ == '__main__':
                                     f"voters_group_size={_voters_group_size}\n"
                                     f"committee_size={_committee_size}")
 
-    _tgd_constraints = []
-    _denial_constraints = []
+    _tgds = []
+    _dcs = []
 
     _experiment_name = config.glasgow_create_experiment_name(_experiment_number, 1)
 
@@ -39,10 +39,11 @@ if __name__ == '__main__':
     experiments_results = pd.DataFrame()
     av_experiment = combined_constraints_experiment. \
         CombinedConstraintsExperiment(_experiment_name, config.GLASGOW_ELECTION_DB_NAME,
-                                      _denial_constraints, _tgd_constraints,
+                                      _dcs, _tgds,
                                       _committee_size,
                                       _voters_starting_point, _candidates_starting_point,
                                       _voters_group_size, _candidates_group_size)
     experiments_results = experiment.save_result(experiments_results, av_experiment.run_experiment())
     experiment.experiment_save_excel(experiments_results, _experiment_name, av_experiment.results_file_path)
-    # In case of one approval from each voter, and AV as the voting rule - Sanity result: Candidate 7.
+    # In case of one approval from each voter (the default parse data does not define like this),
+    # and AV as the voting rule - Sanity result: Candidate 7.

@@ -1,20 +1,19 @@
 import sys
 import os
-
-sys.path.append(os.path.join('..', '..'))
 import pandas as pd
+sys.path.append(os.path.join('..', '..'))
 
 import config
 import ilp.ilp_db_data_extractors.abc_setting_extractor as abc_setting_extractor
 import ilp.ilp_db_data_extractors.dc_extractor as dc_extractor
-import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
+import ilp.ilp_db_data_extractors.tgd_extractor as tgd_extractor
 import ilp.experiments.experiment as experiment
 
 MODULE_NAME = "Combined Constraint Experiment"
 
 
-# FIXME: Consider a class representing dc.
-# FIXME: Consider creating a class representing TGD constraint.
+# FIXME: Consider a class representing DC.
+# FIXME: Consider creating a class representing TGD.
 
 
 class CombinedConstraintsExperiment(experiment.Experiment):
@@ -22,15 +21,15 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  experiment_name: str,
                  database_name: str,
 
-                 # Denial constraints parameters are:
+                 # DC parameters are:
                  # (dc_dict: dict, committee_members_list: list, candidates_tables: list)
-                 denial_constraints: list,
+                 dcs: list,
 
-                 # TGD constraints parameters are:
-                 # (tgd_constraint_dict_start: dict, committee_members_list_start: list,
-                 #  tgd_constraint_dict_end: dict, committee_members_list_end: list,
+                 # TGD parameters are:
+                 # (tgd_dict_start: dict, committee_members_list_start: list,
+                 #  tgd_dict_end: dict, committee_members_list_end: list,
                  #  candidates_tables_start: list, candidates_tables_end: list, different_variables: list)
-                 tgd_constraints: list,
+                 tgds: list,
 
                  # ABC settings:
                  committee_size: int,
@@ -47,29 +46,29 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         # Create the data extractors.
         # NOTE_1: Can alternative define here a dc data after extracting directly using SQL query.
         self._dc_db_extractors = []
-        for param_tuples in denial_constraints:
+        for param_tuples in dcs:
             local_dc_dict = param_tuples[0]
             local_committee_members_list = param_tuples[1]
             local_candidates_tables = param_tuples[2]
-            self._dc_db_extractors.append(dc_extractor.DenialConstraintExtractor(
+            self._dc_db_extractors.append(dc_extractor.DCExtractor(
                 self._abc_convertor, self._db_engine,
                 local_dc_dict, local_committee_members_list, local_candidates_tables,
                 committee_size, candidates_starting_point, candidates_size_limit))
 
-        self._tgd_constraint_db_extractors = []
-        for param_tuples in tgd_constraints:
-            local_tgd_constraint_dict_start = param_tuples[0]
+        self._tgd_db_extractors = []
+        for param_tuples in tgds:
+            local_tgd_dict_start = param_tuples[0]
             local_committee_members_list_start = param_tuples[1]
-            local_tgd_constraint_dict_end = param_tuples[2]
+            local_tgd_dict_end = param_tuples[2]
             local_committee_members_list_end = param_tuples[3]
             local_candidates_tables_start = param_tuples[4]
             local_candidates_tables_end = param_tuples[5]
             local_different_variables = param_tuples[6]
 
-            self._tgd_constraint_db_extractors.append(tgd_constraint_extractor.TGDConstraintExtractor(
+            self._tgd_db_extractors.append(tgd_extractor.TGDExtractor(
                 self._abc_convertor, self._db_engine,
-                local_tgd_constraint_dict_start, local_committee_members_list_start,
-                local_tgd_constraint_dict_end, local_committee_members_list_end,
+                local_tgd_dict_start, local_committee_members_list_start,
+                local_tgd_dict_end, local_committee_members_list_end,
                 local_candidates_tables_start, local_candidates_tables_end,
                 committee_size, candidates_starting_point, candidates_size_limit, local_different_variables))
 
@@ -82,10 +81,10 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         # Extract problem data from the database and convert to ILP.
         # NOTE_1: Can alternative convert to ilp directly using the _abc_convertor using a data that already extracted.
         self._abc_setting_extractor.extract_and_convert()
-        for dc_extractor in self._dc_db_extractors:
-            dc_extractor.extract_and_convert()
-        for tgd_extractor in self._tgd_constraint_db_extractors:
-            tgd_extractor.extract_and_convert()
+        for curr_dc_extractor in self._dc_db_extractors:
+            curr_dc_extractor.extract_and_convert()
+        for curr_tgd_extractor in self._tgd_db_extractors:
+            curr_tgd_extractor.extract_and_convert()
 
         # Run the experiment.
         solved_time = self.run_model()
@@ -118,38 +117,38 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                       'ilp_construction_time_dc(sec)': sum([x.convert_to_ilp_timer for x in
                                                                            self._dc_db_extractors]),
                       'ilp_construction_time_tgd(sec)': sum([x.convert_to_ilp_timer for x in
-                                                             self._tgd_constraint_db_extractors]),
+                                                             self._tgd_db_extractors]),
                       'ilp_construction_time_total(sec)': self._abc_setting_extractor.convert_to_ilp_timer +
                                                           sum([x.convert_to_ilp_timer for x in
-                                                               self._denial_constraint_db_extractors]) +
+                                                               self._dc_db_extractors]) +
                                                           sum([x.convert_to_ilp_timer for x in
-                                                               self._tgd_constraint_db_extractors]),
+                                                               self._tgd_db_extractors]),
                       'extract_data_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                 sum([x.extract_data_timer for x in
-                                                     self._denial_constraint_db_extractors]) +
+                                                     self._dc_db_extractors]) +
                                                 sum([x.extract_data_timer for x in
-                                                     self._tgd_constraint_db_extractors]),
+                                                     self._tgd_db_extractors]),
                       'total_construction_and_extraction_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                                      sum([x.extract_data_timer for x in
-                                                                          self._denial_constraint_db_extractors]) +
+                                                                          self._dc_db_extractors]) +
                                                                      sum([x.extract_data_timer for x in
-                                                                          self._tgd_constraint_db_extractors]) +
+                                                                          self._tgd_db_extractors]) +
                                                                      self._abc_setting_extractor.convert_to_ilp_timer +
                                                                      sum([x.convert_to_ilp_timer for x in
-                                                                          self._denial_constraint_db_extractors]) +
+                                                                          self._dc_db_extractors]) +
                                                                      sum([x.convert_to_ilp_timer for x in
-                                                                          self._tgd_constraint_db_extractors]),
+                                                                          self._tgd_db_extractors]),
                       'total_solution_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                   sum([x.extract_data_timer for x in
-                                                       self._denial_constraint_db_extractors]) +
+                                                       self._dc_db_extractors]) +
                                                   sum([x.extract_data_timer for x in
-                                                       self._tgd_constraint_db_extractors]) +
+                                                       self._tgd_db_extractors]) +
 
                                                   self._abc_setting_extractor.convert_to_ilp_timer +
                                                   sum([x.convert_to_ilp_timer for x in
-                                                       self._denial_constraint_db_extractors]) +
+                                                       self._dc_db_extractors]) +
                                                   sum([x.convert_to_ilp_timer for x in
-                                                       self._tgd_constraint_db_extractors]) +
+                                                       self._tgd_db_extractors]) +
                                                   solved_time,
                       'solving_status': self._abc_convertor.solver_status,
                       'resulted_committee': committee_string
@@ -160,8 +159,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
 
 # Functions------------------------------------------------------------------
 def combined_constraints_experiment_runner(experiment_name: str, database_name: str,
-                                           denial_constraints: list,
-                                           tgd_constraints: list,
+                                           dcs: list,
+                                           tgds: list,
                                            committee_size: int,
                                            voters_starting_point: int,
                                            voters_starting_ticking_size_limit: int,
@@ -179,7 +178,7 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
                                         f"voters_group_size_limit={voters_size_limit}\n"
                                         f"committee_size={committee_size}")
         current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
-                                                           denial_constraints, tgd_constraints,
+                                                           dcs, tgds,
                                                            committee_size,
                                                            voters_starting_point, candidates_starting_point,
                                                            voters_size_limit, candidates_size_limit)
@@ -193,7 +192,7 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
 
 def combined_constraints_experiment_runner_ticking_committee_size(
         experiment_name: str, database_name: str,
-        denial_constraints: list, tgd_constraints: list,
+        dcs: list, tgds: list,
         voters_starting_point: int,
         voters_size_limit: int,
         candidates_starting_point: int,
@@ -210,7 +209,7 @@ def combined_constraints_experiment_runner_ticking_committee_size(
                                         f"voters_group_size_limit={voters_size_limit}\n"
                                         f"committee_size={committee_size}")
         current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
-                                                           denial_constraints, tgd_constraints,
+                                                           dcs, tgds,
                                                            committee_size,
                                                            voters_starting_point, candidates_starting_point,
                                                            voters_size_limit, candidates_size_limit)
@@ -220,7 +219,7 @@ def combined_constraints_experiment_runner_ticking_committee_size(
 
 def combined_constraints_experiment_district_runner(
         experiment_name: str, database_name: str,
-        denial_constraints: list, tgd_constraints: list,
+        dcs: list, tgds: list,
         max_number_of_districts: int,
         number_of_candidates_from_each_district: dict):
     experiments_results = pd.DataFrame()
@@ -250,7 +249,7 @@ def combined_constraints_experiment_district_runner(
                                         f"voters_group_size_limit={voters_group_size}\n"
                                         f"committee_size={committee_size}")
         current_experiment = CombinedConstraintsExperiment(experiment_name, database_name,
-                                                           denial_constraints, tgd_constraints,
+                                                           dcs, tgds,
                                                            committee_size,
                                                            voters_starting_point, candidates_starting_point,
                                                            voters_group_size, candidates_group_size)

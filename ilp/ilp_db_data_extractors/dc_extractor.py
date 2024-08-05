@@ -1,13 +1,13 @@
-"""A class for converting an ABC contextual constraint - dc
+"""A class for converting an ABC contextual constraint - DC
    to an ILP constraint.
 
-       The problem original input is a logic formula of the form of dc:
+       The problem original input is a logic formula of the form of DC:
         For All c_i_1,...,c_i_l,x_j_1,...,x_j_l':
          not (R_h_1(...) AND ... AND R_h_l''(...) AND Committee(c_i_1) AND ... AND Committee(c_i_l))
 
-    relations_dict             Represents theta in the dc, for example -
+    relations_dict             Represents theta in the DC, for example -
                                relations_dict = {('R1', 'R1_a'): [('x', 'x_real_R1_name'), ('y','y_real_R1_name'),...,],...}.
-    committee_candidates_list  Represents theta' in the dc, for example -
+    committee_candidates_list  Represents theta' in the DC, for example -
                                committee_candidates_list = ['y', 'z'].
 """
 
@@ -16,10 +16,10 @@ from database import database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
-MODULE_NAME = "Denial Constraint DB Data Extractor"
+MODULE_NAME = "DC DB Data Extractor"
 
 
-class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
+class DCExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
@@ -48,14 +48,14 @@ class DenialConstraintExtractor(db_data_extractor.DBDataExtractor):
         dc_candidates_df = legal_assignments[self._committee_members_list]
 
         config.debug_print(MODULE_NAME,
-                           f"The denial constraints candidates are: {denial_constraint_candidates_df.head()}.")
+                           f"The DCs candidates are: {dc_candidates_df.head()}.")
 
-        # Save all denial groups in one set.
-        self._denial_candidates_sets = denial_constraint_candidates_df.values
+        # Save all DC groups in one set.
+        self._dc_candidates_sets = dc_candidates_df.values
 
     def _convert_to_ilp(self) -> None:
-        self._abc_convertor.define_denial_constraint(
-            self._denial_candidates_sets)
+        self._abc_convertor.define_dc(
+            self._dc_candidates_sets)
 
 
 if __name__ == '__main__':

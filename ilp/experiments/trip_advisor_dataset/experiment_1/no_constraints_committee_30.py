@@ -1,6 +1,5 @@
 import sys
 import os
-
 sys.path.append(os.path.join('..', '..', '..', '..'))
 
 import config
@@ -17,8 +16,8 @@ if __name__ == '__main__':
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
     _committee_size = config.TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE
-    _tgd_constraints = []
-    _denial_constraints = []
+    _tgds = []
+    _dcs = []
 
     _experiment_name = config.trip_advisor_create_experiment_name(
         _experiment_number, _candidates_group_size, _committee_size)
@@ -26,7 +25,7 @@ if __name__ == '__main__':
     # Run the experiment.
     combined_constraints_experiment. \
         combined_constraints_experiment_runner(_experiment_name, config.TRIP_ADVISOR_DB_NAME,
-                                               _denial_constraints, _tgd_constraints,
+                                               _dcs, _tgds,
                                                _committee_size,
                                                config.TRIP_ADVISOR_VOTERS_STARTING_POINT,
                                                config.TRIP_ADVISOR_VOTERS_STARTING_TICKING_SIZE_LIMIT,

@@ -3,16 +3,16 @@ from database import database_server_interface as db_interface
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ilp.ilp_db_data_extractors.db_data_extractor as db_data_extractor
 
-MODULE_NAME = "TGD Constraint DB Data Extractor"
+MODULE_NAME = "TGD DB Data Extractor"
 
 
-class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
+class TGDExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: abc_to_ilp_convertor.ABCToILPConvertor,
                  database_engine: db_interface.Database,
-                 tgd_constraint_dict_start: dict,
+                 tgd_dict_start: dict,
                  committee_members_list_start: list,
-                 tgd_constraint_dict_end: dict,
+                 tgd_dict_end: dict,
                  committee_members_list_end: list,
                  candidates_tables_start: list,
                  candidates_tables_end: list,
@@ -29,11 +29,11 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
 
         self._committee_size = committee_size
 
-        self._tgd_constraint_dict_start = tgd_constraint_dict_start
+        self._tgd_dict_start = tgd_dict_start
         self._committee_members_list_start = committee_members_list_start
         self._different_variables = different_variables
 
-        self._tgd_constraint_dict_end = tgd_constraint_dict_end
+        self._tgd_dict_end = tgd_dict_end
         self._committee_members_list_end = committee_members_list_end
         self._candidates_tables_start = candidates_tables_start
         self._candidates_tables_end = candidates_tables_end
@@ -47,7 +47,7 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
         at least one of their elements 'committee members set' are in committee.
         """
         # FIXME: Add here different variables as option as well (currently not needed).
-        legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_constraint_dict_start)
+        legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start)
         # Extract the committee members sets out of the resulted join.
         representor_sets = []
         for _, row in legal_assignments_start.iterrows():
@@ -55,7 +55,7 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
             config.debug_print(MODULE_NAME, "The current constants are: " + str(constants))
             current_element_committee_members = set(row[self._committee_members_list_start])
 
-            legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_constraint_dict_end,
+            legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
                                                      constants, self._different_variables)
             current_element_representor_set = legal_assignments_end[self._committee_members_list_end].values
 
@@ -65,10 +65,10 @@ class TGDConstraintExtractor(db_data_extractor.DBDataExtractor):
 
         # This is commented because it might be time-consuming.
         # config.debug_print(MODULE_NAME,
-        #                    f"The tgd representor set: {self._representor_sets}.")
+        #                    f"The TGD representor set: {self._representor_sets}.")
 
     def _convert_to_ilp(self) -> None:
-        self._abc_convertor.define_tgd_constraint(self._representor_sets)
+        self._abc_convertor.define_tgd(self._representor_sets)
 
 
 if __name__ == '__main__':

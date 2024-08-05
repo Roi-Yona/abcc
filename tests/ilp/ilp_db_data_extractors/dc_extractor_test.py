@@ -1,6 +1,6 @@
 import numpy as np
 
-import ilp.ilp_db_data_extractors.denial_constraint_extractor as denial_constraint_extractor
+import ilp.ilp_db_data_extractors.dc_extractor as dc_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface as db_interface
@@ -9,7 +9,7 @@ import config
 import unittest
 
 
-class TestDenialConstraintExtractor(unittest.TestCase):
+class TestDCExtractor(unittest.TestCase):
     def setUp(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
@@ -29,18 +29,18 @@ class TestDenialConstraintExtractor(unittest.TestCase):
         self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
 
     def test_extract_data_from_db_sanity(self):
-        # Define the denial constraint.
-        denial_constraint_dict = dict()
-        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+        # Define the DC.
+        dc_dict = dict()
+        dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
             [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
-        denial_constraint_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+        dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
             [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
-        # Define the denial constraint extractor.
-        extractor = denial_constraint_extractor.DenialConstraintExtractor(
+        # Define the DC extractor.
+        extractor = dc_extractor.DCExtractor(
             self.abc_convertor, self.db_engine,
-            denial_constraint_dict,
+            dc_dict,
             committee_members_list,
             candidates_tables,
             self.committee_size,
@@ -50,7 +50,7 @@ class TestDenialConstraintExtractor(unittest.TestCase):
         extractor._extract_data_from_db()
 
         # Test the result.
-        expected_denial_constraint_sets = \
+        expected_dc_sets = \
             [[1, 3],
              [1, 4],
              [1, 6],
@@ -59,4 +59,4 @@ class TestDenialConstraintExtractor(unittest.TestCase):
              [3, 6],
              [4, 6],
              ]
-        self.assertEqual(np.array_equal(expected_denial_constraint_sets, extractor._denial_candidates_sets), True)
+        self.assertEqual(np.array_equal(expected_dc_sets, extractor._dc_candidates_sets), True)

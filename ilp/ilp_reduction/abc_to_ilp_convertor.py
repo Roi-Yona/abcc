@@ -1,4 +1,3 @@
-import time
 from collections import Counter
 import networkx as nx
 import config
@@ -209,7 +208,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             dc_pairs_graph = nx.Graph()
 
             # Add edges to the graph.
-            # TODO: Consider how hyper-graph should created, should it actually be with regular graph as I defined?
+            # TODO: Consider how hyper-graph should be created, should it actually be with regular graph as I defined?
             for dc_candidates_set in dc_candidates_sets:
                 dc_pairs_graph.add_edges_from(
                     [(c1, c2) for c1 in dc_candidates_set for c2 in dc_candidates_set if c1 != c2])
@@ -231,7 +230,7 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                      if candidate_index in self._model_candidates_variables])
                 <= (dc_group_length - 1))
 
-    def define_tgd_constraint(self, element_members_representor_sets: list):
+    def define_tgd(self, element_members_representor_sets: list):
         for element_members, tgd_representor_set in element_members_representor_sets:
             # Whether element_members chosen or not.
             b = self._model.BoolVar('tgd_b_' + str(self._global_counter))

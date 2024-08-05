@@ -15,15 +15,15 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
-    _tgd_constraints = []
-    _denial_constraints = []
+    _tgds = []
+    _dcs = []
 
     _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)
 
     # Run the experiment.
     combined_constraints_experiment. \
         combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DATABASE_DB_NAME,
-                                               _denial_constraints, _tgd_constraints, _committee_size,
+                                               _dcs, _tgds, _committee_size,
                                                config.MOVIES_VOTERS_STARTING_POINT,
                                                config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT,
                                                config.MOVIES_VOTERS_TICKING_SIZE_LIMIT,

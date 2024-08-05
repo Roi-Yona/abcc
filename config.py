@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from ilp.ilp_reduction import thiele_functions
+from ilp.ilp_reduction import score_functions
 
 # General:
 # --------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ HOUR = MINUTE * 60
 
 SOLVER_TIME_LIMIT = HOUR * 2
 SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
-SCORE_FUNCTION = thiele_functions.pav_thiele_function
+SCORE_FUNCTION = score_functions.pav_thiele_function
 THIELE_RULE_NAME = 'PAV'
 
 LIFTED_INFERENCE = True

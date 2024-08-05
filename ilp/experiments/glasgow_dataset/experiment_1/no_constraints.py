@@ -16,14 +16,14 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     _max_number_of_districts = config.GLASGOW_TOTAL_NUMBER_OF_DISTRICTS
 
-    _tgd_constraints = []
-    _denial_constraints = []
+    _tgds = []
+    _dcs = []
 
     _experiment_name = config.glasgow_create_experiment_name(_experiment_number, _max_number_of_districts)
 
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
         _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
-        _denial_constraints, _tgd_constraints,
+        _dcs, _tgds,
         _max_number_of_districts,
         config.GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)

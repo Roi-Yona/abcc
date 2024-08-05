@@ -1,5 +1,5 @@
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
-import ilp.ilp_reduction.thiele_functions as thiele_functions
+import ilp.ilp_reduction.score_functions as score_functions
 import ortools.linear_solver.pywraplp as pywraplp
 
 import pandas as pd
@@ -25,7 +25,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         """
         config.LIFTED_INFERENCE = False
         self.committee_size = 3
-        self.thiele_function_score = thiele_functions.create_av_thiele_dict(self.committee_size + 1)
+        self.voting_rule_score_function = score_functions.av_thiele_function
         # ----------------------------------------------------------------
         # Define the ILP solver.
         solver_name = "CP_SAT"
@@ -41,7 +41,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score)
+                                              self.voting_rule_score_function)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -90,7 +90,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score)
+                                              self.voting_rule_score_function)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -122,19 +122,19 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
-    def test_convertor_with_denial_constraints(self):
+    def test_convertor_with_dcs(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
         data = {'Column1': [4, 3, 1],
                 'Column2': [1, 2, 3]}
-        denial_df = pd.DataFrame(data)
+        dc_df = pd.DataFrame(data)
         # ----------------------------------------------------------------
         # Convert to ILP domain.
         self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score)
-        self.abc_convertor.define_denial_constraint(denial_df.values)
+                                              self.voting_rule_score_function)
+        self.abc_convertor.define_dc(dc_df.values)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -173,7 +173,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.assertEqual(expected_result, str(self.abc_convertor),
                          f"ERROR: The solution is different than expected.\n")
 
-    def test_convertor_with_tgd_constraints(self):
+    def test_convertor_with_tgds(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
         candidates_set_start = {1}
@@ -192,8 +192,8 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score)
-        self.abc_convertor.define_tgd_constraint(represent_sets)
+                                              self.voting_rule_score_function)
+        self.abc_convertor.define_tgd(represent_sets)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -243,7 +243,7 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score)
+                                              self.voting_rule_score_function)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()
@@ -276,10 +276,10 @@ class TestABCToILPConvertor(unittest.TestCase):
     def test_convertor_with_combined_constraints(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
-        # Denial constraint.
+        # DC.
         data = {'c1': [4],
                 'c2': [1]}
-        denial_df = pd.DataFrame(data)
+        dc_df = pd.DataFrame(data)
 
         candidates_set_start = {1}
         option_1 = {2, 4}
@@ -296,9 +296,9 @@ class TestABCToILPConvertor(unittest.TestCase):
         self.abc_convertor.define_abc_setting(self.candidates_ids_set,
                                               self.approval_profile_dict,
                                               self.committee_size,
-                                              self.thiele_function_score)
-        self.abc_convertor.define_tgd_constraint(represent_sets)
-        self.abc_convertor.define_denial_constraint(denial_df.values)
+                                              self.voting_rule_score_function)
+        self.abc_convertor.define_tgd(represent_sets)
+        self.abc_convertor.define_dc(dc_df.values)
         # ----------------------------------------------------------------
         # Solve the ILP problem.
         self.abc_convertor.solve()

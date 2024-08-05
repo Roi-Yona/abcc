@@ -1,6 +1,6 @@
 import ilp.ilp_db_data_extractors.abc_setting_extractor as abc_setting_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
-import ilp.ilp_reduction.thiele_functions as thiele_functions
+import ilp.ilp_reduction.score_functions as score_functions
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface as db_interface
 import config
@@ -8,7 +8,7 @@ import config
 import unittest
 
 
-class TestThieleRuleExtractor(unittest.TestCase):
+class TestABCSettingExtractor(unittest.TestCase):
     def setUp(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
@@ -18,7 +18,7 @@ class TestThieleRuleExtractor(unittest.TestCase):
         self.voters_group_size = 8
         config.LIFTED_INFERENCE = False
         self.committee_size = 3
-        self._thiele_rule_dict = thiele_functions.create_av_thiele_dict(self.committee_size + 1)
+        self._voting_rule_score_function = score_functions.av_thiele_function
         # ----------------------------------------------------------------
         # Define the ILP solver.
         solver_name = "CP_SAT"
@@ -38,7 +38,7 @@ class TestThieleRuleExtractor(unittest.TestCase):
                                                               self.voters_starting_point,
                                                               self.candidates_starting_point,
                                                               self.voters_group_size, self.candidates_group_size,
-                                                              self._thiele_rule_dict)
+                                                              self._voting_rule_score_function)
 
         extractor._extract_data_from_db()
 

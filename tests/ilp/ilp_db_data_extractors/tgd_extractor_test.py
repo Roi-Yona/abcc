@@ -1,4 +1,4 @@
-import ilp.ilp_db_data_extractors.tgd_constraint_extractor as tgd_constraint_extractor
+import ilp.ilp_db_data_extractors.tgd_extractor as tgd_extractor
 import ilp.ilp_reduction.abc_to_ilp_convertor as abc_to_ilp_convertor
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface as db_interface
@@ -7,7 +7,7 @@ import config
 import unittest
 
 
-class TestTGDConstraintExtractor(unittest.TestCase):
+class TestTGDExtractor(unittest.TestCase):
     def setUp(self):
         # ----------------------------------------------------------------
         # Define ABC setting.
@@ -27,23 +27,24 @@ class TestTGDConstraintExtractor(unittest.TestCase):
         self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
 
     def test_extract_data_from_db_sanity(self):
-        # Define the tgd constraint.
-        tgd_constraint_dict_start = dict()
-        tgd_constraint_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
+        # Define the TGD.
+        tgd_dict_start = dict()
+        tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
         committee_members_list_start = []
         candidates_tables_start = ['t1']
 
-        tgd_constraint_dict_end = dict()
-        tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
+        tgd_dict_end = dict()
+        tgd_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
+                                                                       ('x', 'genres')]
         committee_members_list_end = ['c1']
         candidates_tables_end = ['t2']
 
-        # Define the tgd constraint extractor.
-        extractor = tgd_constraint_extractor.TGDConstraintExtractor(
+        # Define the TGD extractor.
+        extractor = tgd_extractor.TGDExtractor(
             self.abc_convertor, self.db_engine,
-            tgd_constraint_dict_start,
+            tgd_dict_start,
             committee_members_list_start,
-            tgd_constraint_dict_end,
+            tgd_dict_end,
             committee_members_list_end,
             candidates_tables_start,
             candidates_tables_end,

@@ -1,4 +1,4 @@
-import ilp.ilp_reduction.thiele_functions as thiele_functions
+import ilp.ilp_reduction.score_functions as score_functions
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import config
 
@@ -17,7 +17,7 @@ class TestCombinedExperiment(unittest.TestCase):
         self.voters_group_size = 8
         config.LIFTED_INFERENCE = False
         self.committee_size = 4
-        config.SCORE_FUNCTION = thiele_functions.av_thiele_function
+        config.SCORE_FUNCTION = score_functions.av_thiele_function
         config.THIELE_RULE_NAME = "AV"
         # ----------------------------------------------------------------
         # Define the ILP solver.
@@ -27,24 +27,24 @@ class TestCombinedExperiment(unittest.TestCase):
         self.db_name = config.TESTS_DB_DB_PATH
         self.experiment_name = 'test_experiment'
         # ----------------------------------------------------------------
-        # Define the tgd constraint.
-        tgd_constraint_dict_start = dict()
-        tgd_constraint_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
+        # Define the TGD.
+        tgd_dict_start = dict()
+        tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
         committee_members_list_start = []
         candidates_tables_start = ['t1']
 
-        tgd_constraint_dict_end = dict()
-        tgd_constraint_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
+        tgd_dict_end = dict()
+        tgd_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list_end = ['c1']
         candidates_tables_end = ['t2']
 
         different_variables = committee_members_list_end
-        self.tgd_constraints = [(tgd_constraint_dict_start, committee_members_list_start,
-                                 tgd_constraint_dict_end, committee_members_list_end,
-                                 candidates_tables_start, candidates_tables_end, different_variables)]
+        self.tgds = [(tgd_dict_start, committee_members_list_start,
+                      tgd_dict_end, committee_members_list_end,
+                      candidates_tables_start, candidates_tables_end, different_variables)]
         # TGD representor sets: ()->(1, 3, 4, 6); ()->(2, 7); ()->(5); ()->(8)
         # ----------------------------------------------------------------
-        # Define the dc.
+        # Define the DC.
         dc_dict = dict()
         dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
             [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
@@ -52,8 +52,8 @@ class TestCombinedExperiment(unittest.TestCase):
             [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
-        self.denial_constraints = [(denial_constraint_dict, committee_members_list, candidates_tables)]
-        # Denial candidates: (1, 3); (1, 4); (1, 6); (3, 4); (3, 6); (4, 6); (2, 7)
+        self.dcs = [(dc_dict, committee_members_list, candidates_tables)]
+        # DC candidates: (1, 3); (1, 4); (1, 6); (3, 4); (3, 6); (4, 6); (2, 7)
         """
            Candidate : Candidate AV total score : Relative_Place
            1         : 2                        : 1
@@ -70,7 +70,7 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            [], self.tgd_constraints,
+            [], self.tgds,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
@@ -85,7 +85,7 @@ class TestCombinedExperiment(unittest.TestCase):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            [], self.tgd_constraints,
+            [], self.tgds,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
@@ -95,12 +95,12 @@ class TestCombinedExperiment(unittest.TestCase):
         print(f"The resulted experiment df:\n{resulted_df}\n")
         # A valid committee: None.
 
-    def test_extract_data_from_db_sanity_one_denial_constraint_3(self):
+    def test_extract_data_from_db_sanity_one_dc_3(self):
         self.committee_size = 3
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.denial_constraints, [],
+            self.dcs, [],
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
@@ -110,11 +110,11 @@ class TestCombinedExperiment(unittest.TestCase):
         print(f"The resulted experiment df:\n{resulted_df}\n")
         # A valid committee: (1 or 3), (2 or 7), (5 or 8).
 
-    def test_extract_data_from_db_sanity_one_denial_constraint_4(self):
+    def test_extract_data_from_db_sanity_one_dc_4(self):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.denial_constraints, [],
+            self.dcs, [],
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
@@ -124,12 +124,12 @@ class TestCombinedExperiment(unittest.TestCase):
         print(f"The resulted experiment df:\n{resulted_df}\n")
         # A valid committee: (1 or 3), (2 or 7), (5), (8).
 
-    def test_extract_data_from_db_sanity_one_denial_constraint_5(self):
+    def test_extract_data_from_db_sanity_one_dc_5(self):
         self.committee_size = 5
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.denial_constraints, [],
+            self.dcs, [],
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
@@ -139,11 +139,11 @@ class TestCombinedExperiment(unittest.TestCase):
         print(f"The resulted experiment df:\n{resulted_df.head()}\n")
         # A valid committee: None.
 
-    def test_extract_data_from_db_sanity_one_denial_constraint_and_one_tgd(self):
+    def test_extract_data_from_db_sanity_one_dc_and_one_tgd(self):
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.denial_constraints, self.tgd_constraints,
+            self.dcs, self.tgds,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
@@ -153,12 +153,12 @@ class TestCombinedExperiment(unittest.TestCase):
         print(f"The resulted experiment df:\n{resulted_df}\n")
         # A valid committee: (1 or 3), (2 or 7), (5), (8).
 
-    def test_extract_data_from_db_sanity_one_denial_constraint_and_one_tgd_fail_due_to_tgd(self):
+    def test_extract_data_from_db_sanity_one_dc_and_one_tgd_fail_due_to_tgd(self):
         self.committee_size = 3
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.denial_constraints, self.tgd_constraints,
+            self.dcs, self.tgds,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
@@ -168,12 +168,12 @@ class TestCombinedExperiment(unittest.TestCase):
         print(f"The resulted experiment df:\n{resulted_df}\n")
         # A valid committee: None.
 
-    def test_extract_data_from_db_sanity_one_denial_constraint_and_one_tgd_fail_due_to_denial_constraint(self):
+    def test_extract_data_from_db_sanity_one_dc_and_one_tgd_fail_due_to_dc(self):
         self.committee_size = 6
         experiment = combined_constraints_experiment.CombinedConstraintsExperiment(
             self.experiment_name,
             self.db_name,
-            self.denial_constraints, self.tgd_constraints,
+            self.dcs, self.tgds,
             self.committee_size, self.voters_starting_point, self.candidates_starting_point,
             self.voters_group_size, self.candidates_group_size)
 
