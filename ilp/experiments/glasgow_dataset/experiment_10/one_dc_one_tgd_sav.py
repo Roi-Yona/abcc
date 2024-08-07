@@ -7,7 +7,7 @@ import ilp.experiments.combined_constraints_experiment as combined_constraints_e
 from ilp.ilp_reduction import score_functions
 import config
 
-_experiment_number = 4
+_experiment_number = 10
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
