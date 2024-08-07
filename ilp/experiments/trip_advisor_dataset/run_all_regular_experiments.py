@@ -10,7 +10,15 @@ scripts = [
     ('experiment_6', 'one_dc_one_tgd_committee_20.py'),
     ('experiment_7', 'one_dc_one_tgd_committee_30.py'),
     ('experiment_8', 'one_dc_one_tgd_committee_40.py'),
-    ('experiment_9', 'one_dc_one_tgd_committee_50.py')
+    ('experiment_9', 'one_dc_one_tgd_committee_50.py'),
+    ('experiment_10', 'one_dc_one_tgd_committee_15_av.py'),
+    ('experiment_11', 'one_dc_one_tgd_committee_15_pav.py'),
+    ('experiment_12', 'one_dc_one_tgd_committee_15_2_truncated_av.py'),
+    ('experiment_13', 'one_dc_one_tgd_committee_15_cc.py'),
+    ('experiment_14', 'one_dc_one_tgd_committee_15_sav.py'),
+    ('experiment_15', 'one_dc_one_tgd_committee_30_2_opt.py'),
+    ('experiment_16', 'one_dc_one_tgd_committee_30_1_opt.py'),
+    ('experiment_17', 'one_dc_one_tgd_committee_30_0_opt.py'),
 ]
 
 # Run each script with the updated global variable

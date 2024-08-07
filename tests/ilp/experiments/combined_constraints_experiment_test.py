@@ -18,7 +18,7 @@ class TestCombinedExperiment(unittest.TestCase):
         config.LIFTED_INFERENCE = False
         self.committee_size = 4
         config.SCORE_FUNCTION = score_functions.av_thiele_function
-        config.THIELE_RULE_NAME = "AV"
+        config.SCORE_RULE_NAME = "AV"
         # ----------------------------------------------------------------
         # Define the ILP solver.
         config.SOLVER_NAME = "CP_SAT"

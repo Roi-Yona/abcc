@@ -24,7 +24,7 @@ HOUR = MINUTE * 60
 SOLVER_TIME_LIMIT = HOUR * 2
 SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
 SCORE_FUNCTION = score_functions.pav_thiele_function
-THIELE_RULE_NAME = 'PAV'
+SCORE_RULE_NAME = 'PAV'
 
 LIFTED_INFERENCE = True
 MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = True
@@ -129,7 +129,7 @@ def debug_print(module_name, input_str):
 
 
 def default_experiment_name(experiment_number: int, candidates_group_size: int, committee_size: int):
-    return f'{experiment_number}_{THIELE_RULE_NAME}_' \
+    return f'{experiment_number}_{SCORE_RULE_NAME}_' \
            f'lifted={LIFTED_INFERENCE}_' \
            f'score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
            f'DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}_' \
@@ -137,7 +137,7 @@ def default_experiment_name(experiment_number: int, candidates_group_size: int, 
 
 
 def glasgow_create_experiment_name(experiment_number: int, max_number_of_districts: int):
-    return f'{experiment_number}_{THIELE_RULE_NAME}_' \
+    return f'{experiment_number}_{SCORE_RULE_NAME}_' \
            f'lifted={LIFTED_INFERENCE}_' \
            f'score={MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS}_' \
            f'DC={MINIMIZE_DC_CONSTRAINTS_EQUATIONS}_' \
