@@ -18,6 +18,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
+    _committee_size = config.TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE
     config.LIFTED_INFERENCE = False
     config.MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = False
     config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS = False
