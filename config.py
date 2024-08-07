@@ -154,6 +154,6 @@ def trip_advisor_create_experiment_name(experiment_number: int, candidates_group
 
 def get_total_construction_and_solving_time(df: pd.DataFrame) -> tuple:
     total_construction_time = df['total_construction_and_extraction_time(sec)']
-    total_solving_time = df['total_solution_time(sec)']
+    total_solving_time = df['ilp_solving_time(sec)']
     return total_construction_time, total_solving_time
 # --------------------------------------------------------------------------------

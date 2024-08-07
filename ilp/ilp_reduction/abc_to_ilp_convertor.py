@@ -1,24 +1,23 @@
+import ortools.linear_solver.pywraplp as pywraplp
 from collections import Counter
 import networkx as nx
 import config
-import ortools.linear_solver.pywraplp as pywraplp
 import ilp.ilp_reduction.ilp_convertor as ilp_convertor
 
 MODULE_NAME = "ABC to ILP Convertor"
 
 
 class ABCToILPConvertor(ilp_convertor.ILPConvertor):
-    """A class for converting ABC problem of finding
-       a winning committee given a voting rule score function
-       and contextual constraints to an ILP problem.
+    """A class for converting ABC problem of finding a winning committee,
+    given a voting rule score function and contextual constraints to an ILP problem.
 
-           The problem original input is:
-           C - Group of candidates.
-           V - Group of voters.
-           A(V) - Approval profile.
-           k - The committee size.
-           r - The voting rule score function.
-           Gamma - Set of contextual constraints.
+    The problem original input is:
+       C - Group of candidates.
+       V - Group of voters.
+       A(V) - Approval profile.
+       k - The committee size.
+       r - The voting rule score function.
+       Gamma - Set of contextual constraints.
     """
 
     def __init__(self, solver: pywraplp.Solver):

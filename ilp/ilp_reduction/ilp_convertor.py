@@ -22,7 +22,7 @@ class ILPConvertor:
 
     def solve(self) -> None:
         """Solve the ILP problem, and saves the time it took,
-        the status and if it solved indicator
+        the status and if it solved indicator.
         :return:
         """
         # Solve the ILP problem.
@@ -34,7 +34,7 @@ class ILPConvertor:
         self.solving_time = end_time - start_time
 
     def get_model_state(self) -> str:
-        """Creates a representation for the model current state.
+        """Creates representation for the model current state.
 
         :return: A string that represents the general problem assignment.
         """
@@ -42,9 +42,11 @@ class ILPConvertor:
         pass
 
     def __str__(self):
-        """Creates a str depending only on the solver state function if solver,
-        otherwise the solver status"""
-        solution = ""
+        """Creates representation for the module assignment,
+        if there is no solution than a proper string containing the solver status will return.
+
+        :return: The representative string.
+        """
         if self._solved:
             solution = self.get_model_state()
         else:
@@ -52,8 +54,7 @@ class ILPConvertor:
         return solution
 
     def print_all_model_variables(self) -> None:
-        """Print all the model variables.
-        :return:
+        """Print all the model variables (only if we are in DEBUG mode).
         """
         if config.DEBUG:
             if self._solved:
@@ -64,7 +65,7 @@ class ILPConvertor:
 def create_solver(solver_name: str, solver_time_limit: int) -> pywraplp.Solver:
     """Create a new pywraplp solver.
     :param solver_name: The solver name.
-    :param solver_time_limit: The solver time limit in seconds.
+    :param solver_time_limit: The solver time limit in milliseconds.
     :return:
     """
     if solver_name == "GUROBI":

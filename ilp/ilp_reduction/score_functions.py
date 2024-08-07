@@ -1,11 +1,10 @@
 """
-A utility functions for creating a
-thiele rule functions (and SAV scoring rule function).
+A utility module of different Thiele functions, and the score function SAV.
 """
 
 
 def av_thiele_function(v_approval_number: int, v_approval_profile_size: int) -> float:
-    """AV thiele function.
+    """AV Thiele function.
     :param v_approval_number: The size of the intersection between the chosen committee and voter 'v' approval profile.
     :param v_approval_profile_size: Voter 'v' approval profile size.
     :return: The score, calculated base on AV.
@@ -14,7 +13,7 @@ def av_thiele_function(v_approval_number: int, v_approval_profile_size: int) -> 
 
 
 def cc_thiele_function(v_approval_number: int, v_approval_profile_size: int) -> float:
-    """CC thiele function.
+    """CC Thiele function.
     :param v_approval_number: The size of the intersection between the chosen committee and voter 'v' approval profile.
     :param v_approval_profile_size: Voter 'v' approval profile size.
     :return: The score, calculated base on CC.
@@ -26,7 +25,7 @@ def cc_thiele_function(v_approval_number: int, v_approval_profile_size: int) -> 
 
 
 def pav_thiele_function(v_approval_number: int, v_approval_profile_size: int) -> float:
-    """PAV thiele function.
+    """PAV Thiele function.
     :param v_approval_number: The size of the intersection between the chosen committee and voter 'v' approval profile.
     :param v_approval_profile_size: Voter 'v' approval profile size.
     :return: The score, calculated base on PAV.
@@ -38,7 +37,7 @@ def pav_thiele_function(v_approval_number: int, v_approval_profile_size: int) ->
 
 
 def k_truncated_av_thiele_function(v_approval_number: int, v_approval_profile_size: int, k: int) -> float:
-    """K-Truncated AV thiele function.
+    """K-Truncated AV Thiele function.
     :param v_approval_number: The size of the intersection between the chosen committee and voter 'v' approval profile.
     :param v_approval_profile_size: Voter 'v' approval profile size.
     :param k: The point where the function becomes const.
@@ -51,7 +50,7 @@ def k_truncated_av_thiele_function(v_approval_number: int, v_approval_profile_si
 
 
 def k_2_truncated_av_thiele_function(v_approval_number: int, v_approval_profile_size: int) -> float:
-    """2-Truncated AV thiele function.
+    """2-Truncated AV Thiele function.
     :param v_approval_number: The size of the intersection between the chosen committee and voter 'v' approval profile.
     :param v_approval_profile_size: Voter 'v' approval profile size.
     :return: The score, calculated base on 2-Truncated AV function.
@@ -70,8 +69,12 @@ def sav_score_rule_function(v_approval_number: int, v_approval_profile_size: int
 
 if __name__ == '__main__':
     # Sanity tests.
-    print(av_thiele_function(4, 10))
-    print(cc_thiele_function(100, 10))
-    print(pav_thiele_function(3, 10))
-    print(k_2_truncated_av_thiele_function(10, 10))
-    print(sav_score_rule_function(2, 3))
+    assert av_thiele_function(4, 10) == 4
+    assert cc_thiele_function(100, 10) == 1
+    assert cc_thiele_function(0, 10) == 0
+    assert pav_thiele_function(2, 10) == 1.5
+    assert k_2_truncated_av_thiele_function(100, 10) == 2
+    assert k_2_truncated_av_thiele_function(2, 10) == 2
+    assert k_2_truncated_av_thiele_function(1, 10) == 1
+    assert k_2_truncated_av_thiele_function(0, 10) == 0
+    assert sav_score_rule_function(2, 4) == 0.5
