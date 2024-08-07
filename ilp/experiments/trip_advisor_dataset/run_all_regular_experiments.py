@@ -23,4 +23,4 @@ scripts = [
 
 # Run each script with the updated global variable
 for script_dir, script in scripts:
-    subprocess.run(['python', script], cwd=script_dir)
+    subprocess.run(['python3', script], cwd=script_dir)
