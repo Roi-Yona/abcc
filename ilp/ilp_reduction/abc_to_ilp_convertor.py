@@ -207,7 +207,6 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
             dc_pairs_graph = nx.Graph()
 
             # Add edges to the graph.
-            # TODO: Consider how hyper-graph should be created, should it actually be with regular graph as I defined?
             for dc_candidates_set in dc_candidates_sets:
                 dc_pairs_graph.add_edges_from(
                     [(c1, c2) for c1 in dc_candidates_set for c2 in dc_candidates_set if c1 != c2])

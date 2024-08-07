@@ -45,8 +45,10 @@ if __name__ == '__main__':
         [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'party')]
     dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
         [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'party')]
-    committee_members_list = ['c1', 'c2']
-    candidates_tables = ['t1', 't2']
+    dc_dict[(config.CANDIDATES_TABLE_NAME, 't3')] = \
+        [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'party')]
+    committee_members_list = ['c1', 'c2', 'c3']
+    candidates_tables = ['t1', 't2', 't3']
 
     _dcs = [(dc_dict, committee_members_list, candidates_tables)]
 
