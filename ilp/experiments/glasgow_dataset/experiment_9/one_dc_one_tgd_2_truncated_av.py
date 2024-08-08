@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
     # We find a winning committee with one DC and one TGD.
-    # DC: There are no two committee members from the same party.
+    # DC: There are no three committee members from the same party.
     # TGD: There is one committee member for each district.
     # ---------------------------------------------------------------------------
     _max_number_of_districts = config.GLASGOW_TOTAL_NUMBER_OF_DISTRICTS

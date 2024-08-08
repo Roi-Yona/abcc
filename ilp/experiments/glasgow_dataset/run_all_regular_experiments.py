@@ -6,7 +6,7 @@ scripts = [
     ('experiment_2', 'one_dc.py'),
     ('experiment_3', 'one_tgd.py'),
     ('experiment_4', 'one_dc_one_tgd.py'),
-    ('experiment_5', 'two_tgd.py'),
+    # ('experiment_5', 'two_tgd.py'),
     # ('experiment_6', 'one_tgd_3_representores_per_district.py'),
     ('experiment_7', 'one_dc_one_tgd_av.py'),
     ('experiment_8', 'one_dc_one_tgd_cc.py'),

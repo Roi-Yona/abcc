@@ -12,8 +12,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
     # We find a winning committee with one DC.
-    # DC: There are no two committee members from the same district.
-    # Note that in this case, the max number of districts is the max committee size.
+    # DC: There are no three committee members from the same party.
     # ---------------------------------------------------------------------------
     _max_number_of_districts = config.GLASGOW_TOTAL_NUMBER_OF_DISTRICTS
 
@@ -21,11 +20,13 @@ if __name__ == '__main__':
 
     dc_dict = dict()
     dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
-        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'district')]
+        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'party')]
     dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
-        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'district')]
-    committee_members_list = ['c1', 'c2']
-    candidates_tables = ['t1', 't2']
+        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'party')]
+    dc_dict[(config.CANDIDATES_TABLE_NAME, 't3')] = \
+        [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'party')]
+    committee_members_list = ['c1', 'c2', 'c3']
+    candidates_tables = ['t1', 't2', 't3']
 
     _dcs = [(dc_dict, committee_members_list, candidates_tables)]
 

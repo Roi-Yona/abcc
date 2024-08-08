@@ -87,8 +87,6 @@ for i in range(1, GLASGOW_TOTAL_NUMBER_OF_DISTRICTS + 1):
 GLASGOW_ELECTION_DB_NAME = "glasgow_city_council.db"
 GLASGOW_ELECTION_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "glasgow_city_council_elections")
 GLASGOW_ELECTION_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, GLASGOW_ELECTION_DB_NAME)
-
-
 # --------------------------------------------------------------------------------
 
 # Trip Advisor Dataset Consts:
@@ -115,6 +113,32 @@ TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE = 30
 # --------------------------------------------------------------------------------
 TESTS_DB_NAME = 'the_movies_database_tests.db'
 TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
+# --------------------------------------------------------------------------------
+
+# Results and Graphs Constants:
+# --------------------------------------------------------------------------------
+# Specify whether we save the graph or show.
+SHOW = True
+
+GRAPHS_FONT_SIZE_TITLE = 24
+GRAPHS_FONT_SIZE_LEGEND = 22
+GRAPHS_FONT_SIZE_TICKING = 17
+
+COLOR_DARK_SLATE_GRAY = '#2F4F4F'
+COLOR_MIDNIGHT_BLUE = '#191970'
+COLOR_DARK_OLIVE_GREEN = '#556B2F'
+COLOR_SADDLE_BROWN = '#8B4513'
+COLOR_MAROON = '#800000'
+
+COLOR_RED = '#FF0000'
+COLOR_GREEN = '#008000'
+COLOR_BLUE = '#0000FF'
+COLOR_BROWN = '#A52A2A'
+COLOR_ORANGE = '#FFA500'
+COLOR_SKY_BLUE = '#17becf'
+
+
+GLASGOW_DIFFERENT_CONSTRAINTS_RESULTS_PATH = '..\\results\\glasgow_election\\glasgow_election_different_constraints.eps'
 # --------------------------------------------------------------------------------
 
 
