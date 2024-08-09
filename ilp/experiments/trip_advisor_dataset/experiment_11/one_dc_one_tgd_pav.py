@@ -19,7 +19,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = 15
+    _committee_size = config.TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE
     config.SCORE_FUNCTION = score_functions.pav_thiele_function
     config.SCORE_RULE_NAME = "PAV"
 

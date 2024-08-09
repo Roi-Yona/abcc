@@ -118,27 +118,39 @@ TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
 # Results and Graphs Constants:
 # --------------------------------------------------------------------------------
 # Specify whether we save the graph or show.
-SHOW = True
+SHOW = False
 
-GRAPHS_FONT_SIZE_TITLE = 24
-GRAPHS_FONT_SIZE_LEGEND = 22
-GRAPHS_FONT_SIZE_TICKING = 17
+GRAPHS_FONT_SIZE_TITLE = 35
+GRAPHS_FONT_SIZE_LEGEND = 20
+GRAPHS_FONT_SIZE_TICKING = 22
+GRAPHS_FONT_SIZE_HATCH = 1.1
+
+BAR_CHART_WIDTH = 0.175
 
 COLOR_DARK_SLATE_GRAY = '#2F4F4F'
 COLOR_MIDNIGHT_BLUE = '#191970'
 COLOR_DARK_OLIVE_GREEN = '#556B2F'
 COLOR_SADDLE_BROWN = '#8B4513'
 COLOR_MAROON = '#800000'
-
-COLOR_RED = '#FF0000'
-COLOR_GREEN = '#008000'
 COLOR_BLUE = '#0000FF'
 COLOR_BROWN = '#A52A2A'
-COLOR_ORANGE = '#FFA500'
+
+COLOR_RED = '#DC143C'
+COLOR_GREEN = '#008000'
 COLOR_SKY_BLUE = '#17becf'
+COLOR_ORANGE = '#CC5500'
+COLOR_PURPLE = '#9467bd'
+
+RESULTS_BASE_PATH = '..\\results\\glasgow_election\\'
+
+GLASGOW_VOTERS_COEFFICIENT = 0.001
+GLASGOW_DIFFERENT_CONSTRAINTS_RESULTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_different_constraints.eps'
+GLASGOW_DIFFERENT_VOTING_RULE_RESULTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_different_voting_rules.eps'
+GLASGOW_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_optimization_total_time.eps'
+GLASGOW_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_optimization_constraints.eps'
+GLASGOW_DIFFERENT_OPTIMIZATIONS_VARIABLES_PATH = RESULTS_BASE_PATH + 'glasgow_election_optimization_variables.eps'
 
 
-GLASGOW_DIFFERENT_CONSTRAINTS_RESULTS_PATH = '..\\results\\glasgow_election\\glasgow_election_different_constraints.eps'
 # --------------------------------------------------------------------------------
 
 

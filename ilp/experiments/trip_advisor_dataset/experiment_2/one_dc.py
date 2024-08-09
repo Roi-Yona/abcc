@@ -12,19 +12,20 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
     # We find a winning committee with one DC.
-    # DC: There are no two committee members with the same location in the committee.
+    # DC: There are no two committee members with the same location and the same price.
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
     _committee_size = config.TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE
+
     _tgds = []
 
     # DC.
     dc_dict = dict()
     dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
-        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location')]
+        [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
     dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
-        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location')]
+        [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
     committee_members_list = ['c1', 'c2']
     candidates_tables = ['t1', 't2']
 

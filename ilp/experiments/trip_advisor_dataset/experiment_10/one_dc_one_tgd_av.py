@@ -6,7 +6,7 @@ import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 import ilp.ilp_reduction.score_functions as score_functions
 
-_experiment_number = 12
+_experiment_number = 10
 MODULE_NAME = f'Trip Advisor Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -19,9 +19,9 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
 
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
-    _committee_size = 15
-    config.SCORE_FUNCTION = score_functions.k_2_truncated_av_thiele_function
-    config.SCORE_RULE_NAME = "2_TRUNCATED_AV"
+    _committee_size = config.TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE
+    config.SCORE_FUNCTION = score_functions.av_thiele_function
+    config.SCORE_RULE_NAME = "AV"
 
     # TGD.
     _tgds_dict_start = dict()
