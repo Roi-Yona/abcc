@@ -106,7 +106,7 @@ TRIP_ADVISOR_VOTERS_FINAL_TICKING_SIZE_LIMIT = TRIP_ADVISOR_TOTAL_NUMBER_OF_VOTE
                                                TRIP_ADVISOR_VOTERS_TICKING_SIZE_LIMIT
 TRIP_ADVISOR_NUMBER_OF_DIFFERENT_LOCATIONS = 66
 
-TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE = 30
+TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE = 10
 # --------------------------------------------------------------------------------
 
 # Tests Dataset Consts:
@@ -125,7 +125,8 @@ GRAPHS_FONT_SIZE_LEGEND = 20
 GRAPHS_FONT_SIZE_TICKING = 22
 GRAPHS_FONT_SIZE_HATCH = 1.1
 
-BAR_CHART_WIDTH = 0.175
+BAR_CHART_WIDTH_VOTING_RULES = 0.175
+BAR_CHART_WIDTH_CONSTRAINTS = 0.21
 
 COLOR_DARK_SLATE_GRAY = '#2F4F4F'
 COLOR_MIDNIGHT_BLUE = '#191970'
@@ -141,16 +142,20 @@ COLOR_SKY_BLUE = '#17becf'
 COLOR_ORANGE = '#CC5500'
 COLOR_PURPLE = '#9467bd'
 
-RESULTS_BASE_PATH = '..\\results\\glasgow_election\\'
+RESULTS_BASE_PATH = '..\\results'
 
 GLASGOW_VOTERS_COEFFICIENT = 0.001
-GLASGOW_DIFFERENT_CONSTRAINTS_RESULTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_different_constraints.eps'
-GLASGOW_DIFFERENT_VOTING_RULE_RESULTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_different_voting_rules.eps'
-GLASGOW_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_optimization_total_time.eps'
-GLASGOW_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_PATH = RESULTS_BASE_PATH + 'glasgow_election_optimization_constraints.eps'
-GLASGOW_DIFFERENT_OPTIMIZATIONS_VARIABLES_PATH = RESULTS_BASE_PATH + 'glasgow_election_optimization_variables.eps'
+GLASGOW_RESULTS_BASE_PATH = f'{RESULTS_BASE_PATH}\\glasgow_election'
+GLASGOW_DIFFERENT_CONSTRAINTS_RESULTS_PATH = GLASGOW_RESULTS_BASE_PATH + '\\glasgow_election_different_constraints.eps'
+GLASGOW_DIFFERENT_VOTING_RULE_RESULTS_PATH = GLASGOW_RESULTS_BASE_PATH + '\\glasgow_election_different_voting_rules.eps'
+GLASGOW_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = GLASGOW_RESULTS_BASE_PATH + '\\glasgow_election_optimization_total_time.eps'
+GLASGOW_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_PATH = GLASGOW_RESULTS_BASE_PATH + '\\glasgow_election_optimization_constraints.eps'
+GLASGOW_DIFFERENT_OPTIMIZATIONS_VARIABLES_PATH = GLASGOW_RESULTS_BASE_PATH + '\\glasgow_election_optimization_variables.eps'
 
-
+TRIP_ADVISOR_VOTERS_COEFFICIENT = 0.001
+'..\\results\\trip_advisor\\trip_advisor_different_constraints.eps'
+TRIP_ADVISOR_RESULTS_BASE_PATH = f'{RESULTS_BASE_PATH}\\trip_advisor'
+TRIP_ADVISOR_DIFFERENT_CONSTRAINTS_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_different_constraints.eps'
 # --------------------------------------------------------------------------------
 
 
