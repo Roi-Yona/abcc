@@ -12,8 +12,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
     # We find a winning committee with one TGD.
-    # TGD: There is a committee member for every original language from the important languages table with a
-    # long runtime.
+    # TGD: There is a committee member for every original language from the important languages table.
     # ---------------------------------------------------------------------------
 
     _database_name = 'the_movies_database'

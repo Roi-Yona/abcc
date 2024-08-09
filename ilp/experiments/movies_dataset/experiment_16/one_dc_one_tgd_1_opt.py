@@ -5,21 +5,30 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 7
+_experiment_number = 16
 MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
-    # We find a winning committee with one TGD.
+    # We find a winning committee with one DC and one TGD.
+    # DC: There are no two committee members (i.e. movies) with both the same genre and the same runtime.
     # TGD: There is a committee member for every original language from the important languages table.
     # ---------------------------------------------------------------------------
 
-    _database_name = 'the_movies_database'
-
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
-    _committee_size = 30
-    _dcs = []
+    _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
+    config.MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = False
+    config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS = False
+
+    _dc_dict = dict()
+    _dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _dc_dict[('movies_runtime', 't2')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
+    _dc_dict[('movies_genres', 't3')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _dc_dict[('movies_runtime', 't4')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
+    _committee_members_list = ['c1', 'c2']
+    _candidates_tables = ['t1', 't2', 't3', 't4']
+    _dcs = [(_dc_dict, _committee_members_list, _candidates_tables)]
 
     _tgd_dict_start = dict()
     _tgd_dict_start['important_languages', 't1'] = [('x', 'original_language')]
@@ -31,6 +40,7 @@ if __name__ == '__main__':
                                                        ('x', 'original_language')]
     _committee_members_list_end = ['c1']
     _candidates_tables_end = ['t2']
+
     _different_variables = _committee_members_list_end
 
     _tgds = [
@@ -48,4 +58,3 @@ if __name__ == '__main__':
                                                config.MOVIES_VOTERS_TICKING_SIZE_LIMIT,
                                                config.MOVIES_VOTERS_FINAL_TICKING_SIZE_LIMIT,
                                                config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)
-

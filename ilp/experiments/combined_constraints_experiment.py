@@ -188,6 +188,9 @@ def combined_constraints_experiment_runner(experiment_name: str, database_name: 
             break
         previous_number_of_voters = experiments_results['voters_group_size'].iloc[-1]
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
+        if experiments_results['solving_status'].iloc[-1] == config.SOLVER_TIMEOUT_STATUS:
+            # We reached a point of timeout.
+            break
 
 
 def combined_constraints_experiment_runner_ticking_committee_size(
@@ -215,6 +218,9 @@ def combined_constraints_experiment_runner_ticking_committee_size(
                                                            voters_size_limit, candidates_size_limit)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
+        if experiments_results['solving_status'].iloc[-1] == config.SOLVER_TIMEOUT_STATUS:
+            # We reached a point of timeout.
+            break
 
 
 def combined_constraints_experiment_district_runner(
@@ -255,6 +261,9 @@ def combined_constraints_experiment_district_runner(
                                                            voters_group_size, candidates_group_size)
         experiments_results = experiment.save_result(experiments_results, current_experiment.run_experiment())
         experiment.experiment_save_excel(experiments_results, experiment_name, current_experiment.results_file_path)
+        if experiments_results['solving_status'].iloc[-1] == config.SOLVER_TIMEOUT_STATUS:
+            # We reached a point of timeout.
+            break
 
 
 if __name__ == '__main__':
