@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     # Experiment summary:
     # We find a winning committee with one DC and one TGD.
-    # DC: There are no two committee members (i.e. movies) with both the same genre and the same runtime.
+    # DC: There are no three committee members (i.e. movies) with the same genre.
     # TGD: There is a committee member for every original language from the important languages table.
     # ---------------------------------------------------------------------------
 
@@ -24,11 +24,11 @@ if __name__ == '__main__':
 
     _dc_dict = dict()
     _dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-    _dc_dict[('movies_runtime', 't2')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
-    _dc_dict[('movies_genres', 't3')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-    _dc_dict[('movies_runtime', 't4')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('t', 'runtime')]
-    _committee_members_list = ['c1', 'c2']
-    _candidates_tables = ['t1', 't2', 't3', 't4']
+    _dc_dict[('movies_genres', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _dc_dict[('movies_genres', 't3')] = [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+    _committee_members_list = ['c1', 'c2', 'c3']
+    _candidates_tables = ['t1', 't2', 't3']
+
     _dcs = [(_dc_dict, _committee_members_list, _candidates_tables)]
 
     _tgd_dict_start = dict()
