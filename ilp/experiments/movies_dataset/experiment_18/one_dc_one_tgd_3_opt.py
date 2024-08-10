@@ -5,7 +5,7 @@ sys.path.append(os.path.join('..', '..', '..', '..'))
 import config
 import ilp.experiments.combined_constraints_experiment as combined_constraints_experiment
 
-_experiment_number = 17
+_experiment_number = 18
 MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
@@ -18,9 +18,6 @@ if __name__ == '__main__':
 
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
-    config.LIFTED_INFERENCE = False
-    config.MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = False
-    config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS = False
 
     _dc_dict = dict()
     _dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]

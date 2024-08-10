@@ -155,7 +155,6 @@ GLASGOW_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_PATH = GLASGOW_RESULTS_BASE_PATH + '
 GLASGOW_DIFFERENT_OPTIMIZATIONS_VARIABLES_PATH = GLASGOW_RESULTS_BASE_PATH + '\\glasgow_election_optimization_variables.eps'
 
 TRIP_ADVISOR_VOTERS_COEFFICIENT = 0.001
-'..\\results\\trip_advisor\\trip_advisor_different_constraints.eps'
 TRIP_ADVISOR_RESULTS_BASE_PATH = f'{RESULTS_BASE_PATH}\\trip_advisor'
 TRIP_ADVISOR_DIFFERENT_COMMITTEE_SIZE_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_different_committee_size.eps'
 TRIP_ADVISOR_DIFFERENT_CONSTRAINTS_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_different_constraints.eps'
@@ -163,6 +162,15 @@ TRIP_ADVISOR_DIFFERENT_VOTING_RULES_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PAT
 TRIP_ADVISOR_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_optimization_total_time.eps'
 TRIP_ADVISOR_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_optimization_constraints.eps'
 TRIP_ADVISOR_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_optimization_variables.eps'
+
+MOVIES_VOTERS_COEFFICIENT = 0.001
+MOVIES_RESULTS_BASE_PATH = f'{RESULTS_BASE_PATH}\\movies'
+MOVIES_DIFFERENT_COMMITTEE_SIZE_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_committee_size.eps'
+MOVIES_DIFFERENT_CONSTRAINTS_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_constraints.eps'
+MOVIES_DIFFERENT_VOTING_RULES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_voting_rules.eps'
+MOVIES_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_optimization_total_time.eps'
+MOVIES_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_optimization_constraints.eps'
+MOVIES_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_optimization_variables.eps'
 
 # --------------------------------------------------------------------------------
 
@@ -205,4 +213,25 @@ def get_total_construction_and_solving_time(df: pd.DataFrame) -> tuple:
     total_construction_time = df['total_construction_and_extraction_time(sec)']
     total_solving_time = df['ilp_solving_time(sec)']
     return total_construction_time, total_solving_time
+
+
+def select_points(df, num_points=7):
+    # Number of rows in the DataFrame
+    n = len(df)
+
+    # If there are fewer than the desired number of points, return all
+    if n <= num_points:
+        return df
+
+    # Calculate the step size for evenly spaced selection
+    step = n / (num_points - 1)
+
+    # Get indices by sampling uniformly across the DataFrame
+    indices = [int(j * step) for j in range(num_points - 1)]
+    indices.append(n - 1)  # Ensure the last point is included
+
+    # Select the points
+    selected_points = df.iloc[indices]
+
+    return selected_points
 # --------------------------------------------------------------------------------
