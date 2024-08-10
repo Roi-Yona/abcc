@@ -52,7 +52,7 @@ if __name__ == '__main__':
         combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DATABASE_DB_NAME,
                                                _dcs, _tgds, _committee_size,
                                                config.MOVIES_VOTERS_STARTING_POINT,
-                                               5000,
-                                               5000,
-                                               config.MOVIES_TOTAL_NUMBER_OF_VOTERS + 5000,
+                                               config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT,
+                                               config.MOVIES_VOTERS_TICKING_SIZE_LIMIT,
+                                               config.MOVIES_VOTERS_FINAL_TICKING_SIZE_LIMIT,
                                                config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)
