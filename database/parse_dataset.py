@@ -114,10 +114,10 @@ def create_movie_runtime_metadata(original_csv_file_path: str, new_csv_file_path
     columns_to_keep = ['candidate_id', 'runtime']
     df = df[columns_to_keep]
 
-    # Drop duplicate rows
+    # Drop duplicate rows.
     df = df.drop_duplicates()
 
-    # Find the one-third and two-third values
+    # Find the median.
     median_value = df['runtime'].quantile(0.5)
     config.debug_print(MODULE_NAME, f"The Movies dataset - median: {median_value}")
 
