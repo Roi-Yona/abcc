@@ -73,9 +73,9 @@ MOVIES_DEFAULT_CANDIDATE_SIZE = 100
 # --------------------------------------------------------------------------------
 GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES = {1: 9, 2: 11, 3: 10, 4: 11, 5: 10, 6: 10, 7: 13, 8: 10, 9: 11, 10: 9, 11: 10, 12: 8,
                                           13: 11, 14: 8, 15: 9, 16: 10, 17: 9, 18: 9, 19: 11, 20: 9, 21: 10}
-GLASGOW_DISTRICTS_NUMBER_OF_VOTERS = {1: 6900, 2: 10376, 3: 5199, 4: 8624, 5: 11052, 6: 8680, 7: 9078, 8: 70160, 9: 9650,
+GLASGOW_DISTRICTS_NUMBER_OF_VOTERS = {1: 6900, 2: 10376, 3: 5199, 4: 8624, 5: 11052, 6: 8680, 7: 9078, 8: 10160, 9: 9560,
                                       10: 8682, 11: 8984, 12: 9334, 13: 9567, 14: 9901, 15: 8654, 16: 8363, 17: 12744, 18: 9567,
-                                      19: 8803, 20: 8783, 21: 5410}
+                                      19: 8803, 20: 8738, 21: 5410}
 
 GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT = dict()
 GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3 = dict()
@@ -120,7 +120,7 @@ TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
 # Results and Graphs Constants:
 # --------------------------------------------------------------------------------
 # Specify whether we save the graph or show.
-SHOW = True
+SHOW = False
 
 GRAPHS_FONT_SIZE_TITLE = 30
 GRAPHS_FONT_SIZE_LEGEND = 19
