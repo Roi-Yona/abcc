@@ -198,9 +198,9 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                                   self._model_voters_score_contribution_variables.items()]))
 
     def define_dc(self, dc_candidates_sets):
-        """Set and convert to ILP a dc.
+        """Set and convert to ILP a DC.
 
-        :param dc_candidates_sets: A dc candidates groups.
+        :param dc_candidates_sets: A DC candidates groups.
         """
         if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
             # Create an empty graph.

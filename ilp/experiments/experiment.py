@@ -36,7 +36,6 @@ class Experiment:
         self._experiment_name = experiment_name
         self._database_name = database_name
         self.results_file_path = RESULTS_PATH
-        # self._db_engine = db_interface.database_connect(SERVER, self._database_name)
         db_path = os.path.join(f"{self._database_name}")
         self._db_engine = db_interface.Database(db_path)
 

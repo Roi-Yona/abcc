@@ -14,11 +14,9 @@ if __name__ == '__main__':
     # We find a winning committee with one TGD.
     # TGD: There is a committee member for every original language from the important languages table.
     # ---------------------------------------------------------------------------
-
-    _database_name = 'the_movies_database'
-
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = 50
+
     _dcs = []
 
     _tgd_dict_start = dict()
@@ -33,7 +31,6 @@ if __name__ == '__main__':
     _candidates_tables_end = ['t2']
 
     _different_variables = _committee_members_list_end
-
     _tgds = [
         (_tgd_dict_start, _committee_members_list_start, _tgd_dict_end,
          _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]

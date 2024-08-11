@@ -16,7 +16,6 @@ if __name__ == '__main__':
     # DC: There are no three committee members (i.e. movies) with the same genre.
     # TGD: There is a committee member for every original language from the important languages table.
     # ---------------------------------------------------------------------------
-
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
     config.SCORE_FUNCTION = score_functions.pav_thiele_function
@@ -28,7 +27,6 @@ if __name__ == '__main__':
     _dc_dict[('movies_genres', 't3')] = [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
     _committee_members_list = ['c1', 'c2', 'c3']
     _candidates_tables = ['t1', 't2', 't3']
-
     _dcs = [(_dc_dict, _committee_members_list, _candidates_tables)]
 
     _tgd_dict_start = dict()
@@ -43,7 +41,6 @@ if __name__ == '__main__':
     _candidates_tables_end = ['t2']
 
     _different_variables = _committee_members_list_end
-
     _tgds = [
         (_tgd_dict_start, _committee_members_list_start, _tgd_dict_end,
          _committee_members_list_end, _candidates_tables_start, _candidates_tables_end, _different_variables)]

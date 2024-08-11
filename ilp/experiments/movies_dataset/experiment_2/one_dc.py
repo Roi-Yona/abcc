@@ -14,9 +14,9 @@ if __name__ == '__main__':
     # We find a winning committee with one DC.
     # DC: There are no three committee members (i.e. movies) with the same genre.
     # ---------------------------------------------------------------------------
-
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
+
     _tgds = []
 
     _dc_dict = dict()
@@ -25,7 +25,6 @@ if __name__ == '__main__':
     _dc_dict[('movies_genres', 't3')] = [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
     _committee_members_list = ['c1', 'c2', 'c3']
     _candidates_tables = ['t1', 't2', 't3']
-
     _dcs = [(_dc_dict, _committee_members_list, _candidates_tables)]
 
     _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)

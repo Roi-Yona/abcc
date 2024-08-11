@@ -15,6 +15,7 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = config.MOVIES_DEFAULT_COMMITTEE_SIZE
+
     _tgds = []
     _dcs = []
 
