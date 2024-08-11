@@ -46,7 +46,7 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         Meaning that for each of 'possible representing groups'
         at least one of their elements 'committee members set' are in committee.
         """
-        # FIXME: Add here different variables as option as well (currently not needed).
+        # Note: Add here different variables as option as well (currently not needed).
         legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start)
         # Extract the committee members sets out of the resulted join.
         representor_sets = []

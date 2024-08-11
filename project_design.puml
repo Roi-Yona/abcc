@@ -27,7 +27,7 @@ abstract class DBDataExtractor{
 ABCToILPConvertor o-- DBDataExtractor
 DBEngine o-- DBDataExtractor
 
-class ThieleRuleExtractor{
+class ABCSettingExtractor{
     -voters_id_starts_from_one
     -voting_table_name
     -candidates_table_name
@@ -38,7 +38,7 @@ class ThieleRuleExtractor{
     +extract_data_from_db()
     +convert_to_ilp()
 }
-DBDataExtractor <|-- ThieleRuleExtractor
+DBDataExtractor <|-- ABCSettingExtractor
 
 abstract class Experiment{
     -experiment_name
@@ -57,16 +57,15 @@ abstract class Experiment{
 Experiment --* ABCToILPConvertor
 Experiment --* DBDataExtractor
 
-class ThieleRuleExperiment{
+class CombinedConstraintsExperiment{
     -voters_group_size
     -committee_size
     -candidates_group_size
     -av_db_data_extractor
     +create_results_df()
     +run_experiment()
-    +model_save_graph()
-    +thiele_rule_experiment_runner()
+    +experiment_runner()
 }
-Experiment <|-- ThieleRuleExperiment
+Experiment <|-- CombinedConstraintsExperiment
 
 @enduml

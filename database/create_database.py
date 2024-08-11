@@ -214,7 +214,6 @@ def create_movies_voting_table(cur, con):
 
 
 def create_movies_candidates_table(cur, con):
-    # FIXME: Recheck those types.
     # Create the voting table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
        adult NVARCHAR(50),
@@ -345,7 +344,9 @@ def create_glasgow_voting_table(cur, con, district_index: int):
 
 
 def create_glasgow_candidates_table(cur, con):
-    # FIXME: In order to enable different number of candidates per district, I should add a table per district.
+    # Note: In order to enable different number of candidates per district,
+    # I should add a table per district (Currently not needed)
+
     # Creating the candidates table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
     {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,

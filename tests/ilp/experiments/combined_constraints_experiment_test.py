@@ -4,8 +4,6 @@ import config
 
 import unittest
 
-# FIXME: Automate all tests manually committee validation tests (relevant to other tests as well).
-
 
 class TestCombinedExperiment(unittest.TestCase):
     def setUp(self):
@@ -182,5 +180,3 @@ class TestCombinedExperiment(unittest.TestCase):
         # Test the result.
         print(f"The resulted experiment df:\n{resulted_df}\n")
         # A valid committee: None.
-# FIXME: Add test that use different starting point.
-# FIXME: Add test that use lifted inference setting.

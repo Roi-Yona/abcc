@@ -12,10 +12,6 @@ import ilp.experiments.experiment as experiment
 MODULE_NAME = "Combined Constraint Experiment"
 
 
-# FIXME: Consider a class representing DC.
-# FIXME: Consider creating a class representing TGD.
-
-
 class CombinedConstraintsExperiment(experiment.Experiment):
     def __init__(self,
                  experiment_name: str,
