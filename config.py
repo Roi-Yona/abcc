@@ -120,9 +120,9 @@ TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
 # Results and Graphs Constants:
 # --------------------------------------------------------------------------------
 # Specify whether we save the graph or show.
-SHOW = False
+SHOW = True
 
-GRAPHS_FONT_SIZE_TITLE = 35
+GRAPHS_FONT_SIZE_TITLE = 30
 GRAPHS_FONT_SIZE_LEGEND = 19
 GRAPHS_FONT_SIZE_TICKING = 23
 GRAPHS_FONT_SIZE_HATCH = 1.1
