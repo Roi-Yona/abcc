@@ -120,7 +120,7 @@ TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
 # Results and Graphs Constants:
 # --------------------------------------------------------------------------------
 # Specify whether we save the graph or show.
-SHOW = False
+SHOW = True
 
 GRAPHS_FONT_SIZE_TITLE = 30
 GRAPHS_FONT_SIZE_LEGEND = 19
@@ -157,6 +157,7 @@ GLASGOW_DIFFERENT_OPTIMIZATIONS_VARIABLES_PATH = GLASGOW_RESULTS_BASE_PATH + '\\
 TRIP_ADVISOR_VOTERS_COEFFICIENT = 0.001
 TRIP_ADVISOR_RESULTS_BASE_PATH = f'{RESULTS_BASE_PATH}\\trip_advisor'
 TRIP_ADVISOR_DIFFERENT_COMMITTEE_SIZE_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_different_committee_size.eps'
+TRIP_ADVISOR_DIFFERENT_COMMITTEE_SIZE_TGD_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_different_committee_size_tgd.eps'
 TRIP_ADVISOR_DIFFERENT_CONSTRAINTS_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_different_constraints.eps'
 TRIP_ADVISOR_DIFFERENT_VOTING_RULES_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_different_voting_rules.eps'
 TRIP_ADVISOR_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = TRIP_ADVISOR_RESULTS_BASE_PATH + '\\trip_advisor_optimization_total_time.eps'
