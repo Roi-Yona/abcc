@@ -26,6 +26,11 @@ scripts = [
     ('experiment_22', 'one_dc_one_tgd.py'),
     ('experiment_23', 'one_dc_two_tgds.py'),
     ('experiment_24', 'one_dc_three_tgds.py'),
+    ('experiment_25', 'no_constraints_committee_10.py'),
+    ('experiment_26', 'no_constraints_committee_20.py'),
+    ('experiment_27', 'no_constraints_committee_30.py'),
+    ('experiment_28', 'no_constraints_committee_40.py'),
+    ('experiment_29', 'no_constraints_committee_50.py'),
 ]
 
 # Run each script with the updated global variable
