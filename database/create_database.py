@@ -296,7 +296,36 @@ def create_movies_runtime_table(cur, con):
     df.to_sql("movies_runtime", con, if_exists='append', index=False)
 
 
-def movies_create_important_languages_table(cur, con):
+def create_movies_runtime_categories_table(cur, con):
+    # Create the important price ranges table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS runtime_categories (
+                        runtime TEXT NOT NULL PRIMARY KEY)''')
+
+    # Insert multiple rows into the table
+    new_data = [
+        ('short',),
+        ('long',),
+    ]
+
+    cur.executemany("INSERT INTO runtime_categories (runtime) values (?)", new_data)
+
+
+def create_movies_important_genres_table(cur, con):
+    # Create the important price ranges table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS important_genres (
+                        genre TEXT NOT NULL PRIMARY KEY)''')
+
+    # Insert multiple rows into the table
+    new_data = [
+        ('Comedy',),
+        ('Action',),
+        ('Drama',),
+    ]
+
+    cur.executemany("INSERT INTO important_genres (genre) values (?)", new_data)
+
+
+def create_movies_important_languages_table(cur, con):
     # Create the important locations table.
     cur.execute('''CREATE TABLE IF NOT EXISTS important_languages (
                         original_language TEXT NOT NULL)''')
@@ -325,8 +354,10 @@ def the_movies_database_create_database_main():
     create_movies_genres_table(cur, con)
     create_movies_spoken_languages_table(cur, con)
     create_movies_runtime_table(cur, con)
-    movies_create_important_languages_table(cur, con)
+    create_movies_important_languages_table(cur, con)
     create_movies_original_language_table(cur, con)
+    create_movies_runtime_categories_table(cur, con)
+    create_movies_important_genres_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -438,6 +469,6 @@ def glasgow_create_database_main():
 
 if __name__ == '__main__':
     # db_tests_create_database_main()
-    # the_movies_database_create_database_main()
+    the_movies_database_create_database_main()
     # trip_advisor_create_database_main()
-    glasgow_create_database_main()
+    # glasgow_create_database_main()
