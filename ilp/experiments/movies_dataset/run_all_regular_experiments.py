@@ -24,8 +24,8 @@ scripts = [
     ('experiment_20', 'one_dc.py'),
     ('experiment_21', 'one_tgd.py'),
     ('experiment_22', 'one_dc_one_tgd.py'),
-    ('experiment_23', 'one_dc_two_tgd.py'),
-    ('experiment_24', 'one_dc_three_tgd.py'),
+    ('experiment_23', 'one_dc_two_tgds.py'),
+    ('experiment_24', 'one_dc_three_tgds.py'),
 ]
 
 # Run each script with the updated global variable
