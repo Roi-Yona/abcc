@@ -8,14 +8,13 @@ In order to solve this new problem we build an appropriate MIP program.
 In our existing experiments we use datasets of three different domains, and in order to use them you should download the 
 datasets, and refer to the next chapter to see how to add it to the project and create a database properly.
 The used datasets are:
-* The Glasgow City Council Election Dataset. This dataset is taken from Preflib at https://preflib.simonrey.fr/dataset/
-00008 and donated by Jeffery O’Neill. Open STV. www.OpenSTV.org, 2013.
+* The Glasgow City Council Election Dataset. This dataset is taken from Preflib at 
+https://preflib.simonrey.fr/dataset/00008 and donated by Jeffery O’Neill. Open STV. www.OpenSTV.org, 2013.
 * The Trip Advisor Dataset. This dataset is taken from Preflib at https://preflib.simonrey.fr/dataset/00040 and was
 scraped and denoted by Hongning Wang, first introduced in (Wang, Lu, and Zhai 2010).
-* The Movies Dataset. This dataset is taken from Kag-
-gle at https://www.kaggle.com/datasets/rounakbanik/the-
-movies-dataset/data, the dataset is an ensemble of data col-
-lected from TMDB and GroupLens.
+* The Movies Dataset. This dataset is taken from Kaggle 
+at https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset/data, the dataset is an ensemble of data 
+collected from TMDB and GroupLens.
 
 ### How to add new database?
 All datasets should locate under:
