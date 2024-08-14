@@ -120,7 +120,7 @@ TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
 # Results and Graphs Constants:
 # --------------------------------------------------------------------------------
 # Specify whether we save the graph or show.
-SHOW = False
+SHOW = True
 
 GRAPHS_FONT_SIZE_TITLE = 30
 GRAPHS_FONT_SIZE_LEGEND = 19
@@ -167,6 +167,7 @@ TRIP_ADVISOR_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = TRIP_ADVISOR_RESUL
 MOVIES_VOTERS_COEFFICIENT = 0.001
 MOVIES_RESULTS_BASE_PATH = f'{RESULTS_BASE_PATH}\\movies'
 MOVIES_DIFFERENT_COMMITTEE_SIZE_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_committee_size.eps'
+MOVIES_DIFFERENT_COMMITTEE_SIZE_NO_CONSTRAINTS_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_committee_size_no_constraints.eps'
 MOVIES_DIFFERENT_CONSTRAINTS_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_constraints.eps'
 MOVIES_DIFFERENT_CONSTRAINTS_V2_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_constraints_v2.eps'
 MOVIES_DIFFERENT_VOTING_RULES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_different_voting_rules.eps'
