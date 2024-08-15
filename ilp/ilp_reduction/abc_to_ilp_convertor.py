@@ -19,7 +19,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
        r - The voting rule score function.
        Gamma - Set of contextual constraints.
     """
-
+    # This implementation is described in the section:
+    # Mixed Integer Programming Implementation - Winning committee without constraints.
     def __init__(self, solver: pywraplp.Solver):
         """Initializing the convertor.
         :param solver: The input solver wrapper.
@@ -116,6 +117,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         # Union all voters with the same approval profile in order to 'lifted inference' those voters
         # and represent them as one weighted voter.
+        # This implementation is described in the section:
+        # Optimizations - Grouping similar voters.
         if config.LIFTED_INFERENCE:
             # Make the approval profiles hash-ables.
             for i, j in self._approval_profile.items():
@@ -173,6 +176,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
         # Add the constraint about the voter score contribution.
         for voter_id in self._approval_profile.keys():
             max_candidate_approval = self._committee_size
+            # This implementation is described in the section:
+            # Optimizations - Pruning infeasible scores.
             if config.MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS:
                 max_candidate_approval = min(self._committee_size, len(self._approval_profile[voter_id]))
             for i in range(0, max_candidate_approval + 1):
@@ -202,6 +207,10 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
 
         :param dc_candidates_sets: A DC candidates groups.
         """
+        # This implementation is described in the section:
+        # Mixed Integer Programming Implementation - Incorporating DC.
+        # And the optimization is described in the section:
+        # Optimizations - Contracting DC constraints via hypercliques.
         if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
             # Create an empty graph.
             dc_pairs_graph = nx.Graph()
@@ -229,6 +238,8 @@ class ABCToILPConvertor(ilp_convertor.ILPConvertor):
                 <= (dc_group_length - 1))
 
     def define_tgd(self, element_members_representor_sets: list):
+        # This implementation is described in the section:
+        # Mixed Integer Programming Implementation - Incorporating TGD.
         for element_members, tgd_representor_set in element_members_representor_sets:
             # Whether element_members chosen or not.
             b = self._model.BoolVar('tgd_b_' + str(self._global_counter))
