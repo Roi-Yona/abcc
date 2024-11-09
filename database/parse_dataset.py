@@ -1,13 +1,13 @@
 """This module is for parsing and cleaning the given datasets,
 to prepare the data before creating a proper database.
-Therefor, should be used before create database script.
+Therefore, should be used before the create database script.
 """
 import os
-import config
-
 import numpy as np
 import pandas as pd
 import ast
+
+import config
 
 MODULE_NAME = "Parse Dataset"
 
@@ -381,23 +381,30 @@ def print_best_hotels_by_av(dataset_path: str):
 
 
 def the_movies_dataset_main():
-    clean_movie_dataset_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata.csv'),
-                                 os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'))
-    clean_movie_dataset_rating(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'ratings.csv'),
-                               os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'ratings_new.csv'))
-    create_movie_genre_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
-                                os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_genres.csv'))
-    create_movie_spoken_languages_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
-                                           os.path.join(config.MOVIES_DATASET_FOLDER_PATH,
-                                                        f'movies_spoken_languages.csv'))
-    create_movie_runtime_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
-                                  os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_runtime.csv'))
-    create_movie_original_language_metadata(os.path.join(config.MOVIES_DATASET_FOLDER_PATH, f'movies_metadata_new.csv'),
-                                            os.path.join(config.MOVIES_DATASET_FOLDER_PATH,
-                                                         f'movies_original_language.csv'))
+    config.create_folder_if_not_exists(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME)
+    clean_movie_dataset_metadata(
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.ORIGINAL_DATA_FOLDER_NAME, f'movies_metadata.csv'),
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'))
+    clean_movie_dataset_rating(
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.ORIGINAL_DATA_FOLDER_NAME, f'ratings.csv'),
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'ratings_new.csv'))
+    create_movie_genre_metadata(
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_genres.csv'))
+    create_movie_spoken_languages_metadata(
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_spoken_languages.csv'))
+    create_movie_runtime_metadata(
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_runtime.csv'))
+    create_movie_original_language_metadata(
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
+                     f'movies_original_language.csv'))
 
 
 def glasgow_dataset_main():
+    config.create_folder_if_not_exists(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME)
     candidates_starting_point = 0
     voters_starting_point = 0
 
@@ -405,9 +412,13 @@ def glasgow_dataset_main():
         t = str(i)
         if i < 10:
             t = '0' + t
-        _soi_file_path = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, f'data\\00008-000000{t}.soi')
-        _new_csv_file_path = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, f'00008-000000{t}_pre.csv')
-        _new_csv_file_path_c = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, f'00008-000000{t}_pre_candidates.csv')
+        _soi_file_path = os.path.join(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH, config.ORIGINAL_DATA_FOLDER_NAME,
+                                      f'00008-000000{t}.soi')
+        _new_csv_file_path = os.path.join(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
+                                          f'00008-000000{t}_pre.csv')
+        _new_csv_file_path_c = os.path.join(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH,
+                                            config.PARSED_DATA_FOLDER_NAME,
+                                            f'00008-000000{t}_pre_candidates.csv')
         soi_to_csv_voting(_soi_file_path, _new_csv_file_path, candidates_starting_point, voters_starting_point)
         soi_to_csv_candidates(_soi_file_path, _new_csv_file_path_c)
 
@@ -415,9 +426,13 @@ def glasgow_dataset_main():
         t = str(i)
         if i < 10:
             t = '0' + t
-        _soi_file_path = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, f'data\\00008-000000{t}.soi')
-        _new_csv_file_path = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, f'00008-000000{t}.csv')
-        _new_csv_file_path_c = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, f'00008-000000{t}_candidates.csv')
+        _soi_file_path = os.path.join(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH, config.ORIGINAL_DATA_FOLDER_NAME,
+                                      f'00008-000000{t}.soi')
+        _new_csv_file_path = os.path.join(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
+                                          f'00008-000000{t}.csv')
+        _new_csv_file_path_c = os.path.join(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH,
+                                            config.PARSED_DATA_FOLDER_NAME,
+                                            f'00008-000000{t}_candidates.csv')
         soi_to_csv_voting(_soi_file_path, _new_csv_file_path, candidates_starting_point, voters_starting_point)
         soi_to_csv_candidates(_soi_file_path, _new_csv_file_path_c, candidates_starting_point)
         voters_starting_point += config.GLASGOW_DISTRICTS_NUMBER_OF_VOTERS[i]
@@ -425,7 +440,8 @@ def glasgow_dataset_main():
 
 
 def glasgow_dataset_analyze_district(district_number: int):
-    soi_file_path = os.path.join(config.GLASGOW_ELECTION_FOLDER_PATH, 'data', f'00008-0000000{district_number}.soi')
+    soi_file_path = os.path.join(config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH, config.ORIGINAL_DATA_FOLDER_NAME,
+                                 f'00008-0000000{district_number}.soi')
 
     # Number of candidates that is larger than all districts number of candidates.
     max_number_of_candidates = 20
@@ -462,20 +478,28 @@ def glasgow_dataset_analyze():
 
 
 def trip_advisor_dataset_main():
-    clean_trip_advisor_dat_file(os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'00040-00000001.dat'),
-                                os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'00040-00000001_new.dat'))
+    config.create_folder_if_not_exists(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME)
+    clean_trip_advisor_dat_file(
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.ORIGINAL_DATA_FOLDER_NAME, f'00040-00000001.dat'),
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
+                     f'00040-00000001_new.dat'))
 
-    trip_advisor_dat_to_csv_voting(os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'00040-00000001_new.dat'),
-                                   os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'voting_table.csv'))
+    trip_advisor_dat_to_csv_voting(
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
+                     f'00040-00000001_new.dat'),
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'voting_table.csv'))
     trip_advisor_dat_to_csv_candidates(
-        os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'00040-00000001_new.dat'),
-        os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'candidates_table.csv'))
-    trip_advisor_locations_csv(os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'candidates_table.csv'),
-                               os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'locations_table.csv'))
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
+                     f'00040-00000001_new.dat'),
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'candidates_table.csv'))
+    trip_advisor_locations_csv(
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'candidates_table.csv'),
+        os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'locations_table.csv'))
 
 
 def trip_advisor_dataset_analyze():
-    new_dat_file_path = os.path.join(config.TRIP_ADVISOR_FOLDER_PATH, f'00040-00000001_new.dat')
+    new_dat_file_path = os.path.join(config.TRIP_ADVISOR_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
+                                     f'00040-00000001_new.dat')
     print_trip_advisor_dataset_frequency_of_voters(new_dat_file_path)
     print_best_hotels_by_av(new_dat_file_path)
 

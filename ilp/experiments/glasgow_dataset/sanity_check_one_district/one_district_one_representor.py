@@ -38,7 +38,7 @@ if __name__ == '__main__':
     # Run the experiment.
     experiments_results = pd.DataFrame()
     av_experiment = combined_constraints_experiment. \
-        CombinedConstraintsExperiment(_experiment_name, config.GLASGOW_ELECTION_DB_NAME,
+        CombinedConstraintsExperiment(_experiment_name, config.GLASGOW_ELECTIONS_DB_NAME,
                                       _dcs, _tgds,
                                       _committee_size,
                                       _voters_starting_point, _candidates_starting_point,

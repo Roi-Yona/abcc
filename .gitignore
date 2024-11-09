@@ -26,7 +26,7 @@
 *.sql
 *.sqlite
 *.db
-database/databases/*
+database/data/*
 tests/ddnnf/CNF_results/*
 **/results/
 **/old_results/

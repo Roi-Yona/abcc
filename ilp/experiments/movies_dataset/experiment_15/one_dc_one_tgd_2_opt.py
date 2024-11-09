@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment. \
-        combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DATABASE_DB_NAME,
+        combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DB_NAME,
                                                _dcs, _tgds, _committee_size,
                                                config.MOVIES_VOTERS_STARTING_POINT,
                                                config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT,

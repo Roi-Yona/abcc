@@ -54,30 +54,6 @@ def database_run_query(input_db_engine: sa.engine.Engine, query: str) -> pd.Data
 
 
 if __name__ == '__main__':
-    # # Set up the connection parameters
-    # server = 'LAPTOP-MO1JPG72'
-    # database = 'the_basketball_synthetic_db'
-    # db_engine = database_connect(server, database)
-    #
-    # df = database_run_query(db_engine, 'SELECT * FROM basketball_metadata')
-    # print(df)
     db = Database("databases/sqlite_databases/the_movies_database.db")
     print(db.run_query("SELECT * FROM candidates WHERE candidate_id=3"))
     db.close()
-
-# Alternative option (gives warning):
-# import pyodbc
-# import pandas as pd
-#
-# # Create the connection string
-# connection_string = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-#
-# # Connect to the SQL Server
-# conn = pyodbc.connect(connection_string)
-#
-# # Execute a SQL query and fetch data into a DataFrame
-# query = 'SELECT * FROM basketball_metadata'
-# df = pd.read_sql(query, conn)
-#
-# # Close the connection
-# conn.close()

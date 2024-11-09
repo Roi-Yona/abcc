@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment.combined_constraints_experiment_district_runner(
-        _experiment_name, config.GLASGOW_ELECTION_DB_NAME,
+        _experiment_name, config.GLASGOW_ELECTIONS_DB_NAME,
         _dcs, _tgds,
         _max_number_of_districts,
         config.GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT)

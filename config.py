@@ -11,9 +11,12 @@ pd.set_option('display.max_rows', None)  # None means unlimited rows
 pd.set_option('display.max_columns', None)  # None means unlimited columns
 
 HOME_PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
-DATABASES_FOLDER_PATH = os.path.join(HOME_PROJECT_PATH, "database", "databases")
-DATASETS_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "datasets_data")
-SQLITE_DATABASE_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "sqlite_databases")
+DATABASES_FOLDER_PATH = os.path.join(HOME_PROJECT_PATH, "database", "data")
+DATASETS_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, "datasets")
+DATABASES_DIRECTORY_NAME = "sqlite_databases"
+SQLITE_DATABASE_FOLDER_PATH = os.path.join(DATABASES_FOLDER_PATH, DATABASES_DIRECTORY_NAME)
+ORIGINAL_DATA_FOLDER_NAME = "original_data"
+PARSED_DATA_FOLDER_NAME = "parsed_data"
 # --------------------------------------------------------------------------------
 
 # Experiments configuration:
@@ -52,10 +55,6 @@ NUMBER_OF_APPROVED_CANDIDATE = 3
 
 # The Movies Dataset Consts:
 # --------------------------------------------------------------------------------
-MOVIES_DATABASE_DB_NAME = "the_movies_database.db"
-MOVIES_DATASET_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "the_movies_database")
-MOVIES_DATABASE_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, MOVIES_DATABASE_DB_NAME)
-
 MOVIES_CANDIDATES_STARTING_POINT = 2  # 31, 64
 MOVIES_VOTERS_STARTING_POINT = 1
 MOVIES_TOTAL_NUMBER_OF_CANDIDATES = 45404
@@ -67,14 +66,21 @@ MOVIES_NUMBER_OF_DIFFERENT_GENRES = 20
 
 MOVIES_DEFAULT_COMMITTEE_SIZE = 10
 MOVIES_DEFAULT_CANDIDATE_SIZE = 100
+
+MOVIES_DB_NAME = "the_movies_database.db"
+MOVIES_DATASET_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "kaggle_movies_dataset")
+MOVIES_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, MOVIES_DB_NAME)
 # --------------------------------------------------------------------------------
 
 # Glasgow Dataset Consts:
 # --------------------------------------------------------------------------------
-GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES = {1: 9, 2: 11, 3: 10, 4: 11, 5: 10, 6: 10, 7: 13, 8: 10, 9: 11, 10: 9, 11: 10, 12: 8,
+GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES = {1: 9, 2: 11, 3: 10, 4: 11, 5: 10, 6: 10, 7: 13, 8: 10, 9: 11, 10: 9, 11: 10,
+                                          12: 8,
                                           13: 11, 14: 8, 15: 9, 16: 10, 17: 9, 18: 9, 19: 11, 20: 9, 21: 10}
-GLASGOW_DISTRICTS_NUMBER_OF_VOTERS = {1: 6900, 2: 10376, 3: 5199, 4: 8624, 5: 11052, 6: 8680, 7: 9078, 8: 10160, 9: 9560,
-                                      10: 8682, 11: 8984, 12: 9334, 13: 9567, 14: 9901, 15: 8654, 16: 8363, 17: 12744, 18: 9567,
+GLASGOW_DISTRICTS_NUMBER_OF_VOTERS = {1: 6900, 2: 10376, 3: 5199, 4: 8624, 5: 11052, 6: 8680, 7: 9078, 8: 10160,
+                                      9: 9560,
+                                      10: 8682, 11: 8984, 12: 9334, 13: 9567, 14: 9901, 15: 8654, 16: 8363, 17: 12744,
+                                      18: 9567,
                                       19: 8803, 20: 8738, 21: 5410}
 
 GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT = dict()
@@ -86,18 +92,14 @@ for i in range(1, GLASGOW_TOTAL_NUMBER_OF_DISTRICTS + 1):
     GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT[i] = 1
     GLASGOW_NUMBER_OF_CANDIDATES_FROM_EACH_DISTRICT_3[i] = 3
 
-GLASGOW_ELECTION_DB_NAME = "glasgow_city_council.db"
-GLASGOW_ELECTION_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "glasgow_city_council_elections")
-GLASGOW_ELECTION_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, GLASGOW_ELECTION_DB_NAME)
+GLASGOW_ELECTIONS_DB_NAME = "glasgow_elections.db"
+GLASGOW_ELECTIONS_DATASET_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH,
+                                                     "glasgow_city_council_elections_2007_dataset")
+GLASGOW_ELECTIONS_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, GLASGOW_ELECTIONS_DB_NAME)
 # --------------------------------------------------------------------------------
 
 # Trip Advisor Dataset Consts:
 # --------------------------------------------------------------------------------
-TRIP_ADVISOR_DB_NAME = "the_trip_advisor_database.db"
-TRIP_ADVISOR_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "trip_advisor_database")
-TRIP_ADVISOR_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TRIP_ADVISOR_DB_NAME)
-
-
 TRIP_ADVISOR_CANDIDATES_STARTING_POINT = 72572
 TRIP_ADVISOR_VOTERS_STARTING_POINT = 1
 TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES = 1845
@@ -109,6 +111,10 @@ TRIP_ADVISOR_VOTERS_FINAL_TICKING_SIZE_LIMIT = TRIP_ADVISOR_TOTAL_NUMBER_OF_VOTE
 TRIP_ADVISOR_NUMBER_OF_DIFFERENT_LOCATIONS = 66
 
 TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE = 10
+
+TRIP_ADVISOR_DB_NAME = "trip_advisor.db"
+TRIP_ADVISOR_DATASET_FOLDER_PATH = os.path.join(DATASETS_FOLDER_PATH, "trip_advisor_dataset")
+TRIP_ADVISOR_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TRIP_ADVISOR_DB_NAME)
 # --------------------------------------------------------------------------------
 
 # Tests Dataset Consts:
@@ -180,6 +186,16 @@ MOVIES_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH
 
 # Functions:
 # --------------------------------------------------------------------------------
+def create_folder_if_not_exists(path, folder_name):
+    # Combine the path and folder name to get the full path.
+    folder_path = os.path.join(path, folder_name)
+
+    # Check if the folder exists.
+    if not os.path.exists(folder_path):
+        # Create the folder if it does not exist.
+        os.makedirs(folder_path)
+
+
 def debug_print(module_name, input_str):
     if DEBUG:
         print(f"DEBUG - {module_name}")

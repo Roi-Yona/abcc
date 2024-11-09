@@ -19,19 +19,21 @@ The used datasets are:
   at https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset/data, the dataset is an ensemble of data
   collected from TMDB and GroupLens.
 
+Furthermore, for the Glasgow Elections dataset, we have our own additional csv ('00008-00000000_candidates') containing 
+the combined candidates list from all district with context (such as the candidate party association) that we have
+collected from the internet.
+
+
 ### How to add new database?
 
 All datasets should locate under:
-```database/databases/datasets_data/<new_dataset_folder>```
+```database/data/datasets/<new_dataset_folder>/original_data```
 All ```.db``` sqlite databases should locate under:
 ```database/databases/sqlite_databases/<database_name>```
 
-After adding the datasets to the project properly, you should run ```parse_dataset``` python script.
-A parsing for the three datasets describe above is already implemented.
+After adding the datasets to the project properly, you should run ```parse_dataset_and_create_db``` python script.
+Parsing, cleaning and creating for the three datasets describe above is already implemented.
 Any new datasets should have a proper parsing implementation.
-After parsing the data, you should run ```create_database``` python script, to create a new ```.db``` sqlite file given
-an appropriate csv files that describes the relations. The three databases above creation is
-already implemented and any new datasets should have a proper creation implementation.
 
 In our work, we show several examples of handling soi, dat, and csv datasets cleaning and preparation, and exports a
 general functionality to handle similar cases.

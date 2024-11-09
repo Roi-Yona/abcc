@@ -1,9 +1,8 @@
 """This module is for creating the sqlite databases,
 and should be used after cleaning and parsing the datasets.
 """
-import os.path
-import sqlite3
 import os
+import sqlite3
 import pandas as pd
 
 import config
@@ -99,7 +98,7 @@ def create_tests_db(cur):
     cur.executemany(f"INSERT INTO {config.VOTING_TABLE_NAME} VALUES (?, ?, ?)", new_data)
 
 
-def db_tests_create_database_main():
+def create_tests_db_main():
     # Remove the current database if exists.
     remove_file(config.TESTS_DB_DB_PATH)
 
@@ -127,7 +126,8 @@ def create_trip_advisor_candidates_table(cur, con):
     price_range TEXT NOT NULL)''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"candidates_table.csv"))
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
@@ -137,7 +137,8 @@ def trip_advisor_create_locations_table(cur, con):
     location TEXT NOT NULL PRIMARY KEY)''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"locations_table.csv"))
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"locations_table.csv"))
     df.to_sql('locations', con, if_exists='append', index=False)
 
 
@@ -185,7 +186,9 @@ def trip_advisor_create_database_main():
     con = sqlite3.connect(config.TRIP_ADVISOR_DB_PATH)
     cur = con.cursor()
 
-    create_voting_table(cur, con, os.path.join(f"{config.TRIP_ADVISOR_FOLDER_PATH}", f"voting_table.csv"))
+    create_voting_table(cur, con,
+                        os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                     f"voting_table.csv"))
     create_trip_advisor_candidates_table(cur, con)
     trip_advisor_create_locations_table(cur, con)
     trip_advisor_create_important_locations_table(cur, con)
@@ -209,7 +212,8 @@ def create_movies_voting_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "ratings_new.csv"))
+    df = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "ratings_new.csv"))
     df.to_sql(config.VOTING_TABLE_NAME, con, if_exists='append', index=False)
 
 
@@ -243,7 +247,8 @@ def create_movies_candidates_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_metadata_new.csv"))
+    df = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_metadata_new.csv"))
 
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
@@ -256,7 +261,8 @@ def create_movies_genres_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_genres.csv"))
+    df = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_genres.csv"))
     df.to_sql("movies_genres", con, if_exists='append', index=False)
 
 
@@ -268,7 +274,8 @@ def create_movies_spoken_languages_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_spoken_languages.csv"))
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  "movies_spoken_languages.csv"))
     df.to_sql("movies_spoken_languages", con, if_exists='append', index=False)
 
 
@@ -280,7 +287,8 @@ def create_movies_original_language_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_original_language.csv"))
+    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  "movies_original_language.csv"))
     df.to_sql("movies_original_language", con, if_exists='append', index=False)
 
 
@@ -292,7 +300,8 @@ def create_movies_runtime_table(cur, con):
        )''')
 
     # Insert data from the DataFrame into the table.
-    df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", "movies_runtime.csv"))
+    df = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_runtime.csv"))
     df.to_sql("movies_runtime", con, if_exists='append', index=False)
 
 
@@ -342,11 +351,11 @@ def create_movies_important_languages_table(cur, con):
 
 def the_movies_database_create_database_main():
     # Remove the current database if exists.
-    remove_file(config.MOVIES_DATABASE_DB_PATH)
+    remove_file(config.MOVIES_DB_PATH)
 
     # Connect the db in the current working directory,
     # implicitly creating one if it does not exist.
-    con = sqlite3.connect(config.MOVIES_DATABASE_DB_PATH)
+    con = sqlite3.connect(config.MOVIES_DB_PATH)
     cur = con.cursor()
 
     create_movies_voting_table(cur, con)
@@ -371,7 +380,8 @@ def create_glasgow_voting_table(cur, con, district_index: int):
     if district_index < 10:
         district_index = '0' + str(district_index)
     create_voting_table(cur, con,
-                        os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-000000{district_index}.csv"))
+                        os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                     f"00008-000000{district_index}.csv"))
 
 
 def create_glasgow_candidates_table(cur, con):
@@ -384,7 +394,8 @@ def create_glasgow_candidates_table(cur, con):
     district INTEGER NOT NULL, 
     party TEXT NOT NULL)''')
 
-    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-00000000_candidates.csv"))
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
 
     # Filter the relevant columns.
     df = df[[config.CANDIDATES_COLUMN_NAME, 'district', 'party']]
@@ -416,7 +427,8 @@ def create_glasgow_context_degree_db(cur, con):
                         candidate_id INTEGER NOT NULL,
                         degree_status TEXT NOT NULL)''')
 
-    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-00000000_candidates.csv"))
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
 
     # Filter the relevant columns.
     df = df[[config.CANDIDATES_COLUMN_NAME, 'degree_status']]
@@ -434,7 +446,8 @@ def create_glasgow_context_domain_db(cur, con):
                         candidate_id INTEGER NOT NULL,
                         domain TEXT NOT NULL)''')
 
-    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTION_FOLDER_PATH}", f"00008-00000000_candidates.csv"))
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
 
     # Filter the relevant columns.
     df = df[[config.CANDIDATES_COLUMN_NAME, 'domain']]
@@ -448,11 +461,11 @@ def create_glasgow_context_domain_db(cur, con):
 
 def glasgow_create_database_main():
     # Remove the current database if exists.
-    remove_file(config.GLASGOW_ELECTION_DB_PATH)
+    remove_file(config.GLASGOW_ELECTIONS_DB_PATH)
 
     # Connect the db in the current working directory,
     # implicitly creating one if it does not exist.
-    con = sqlite3.connect(config.GLASGOW_ELECTION_DB_PATH)
+    con = sqlite3.connect(config.GLASGOW_ELECTIONS_DB_PATH)
     cur = con.cursor()
 
     for i in range(1, 22):
@@ -468,7 +481,7 @@ def glasgow_create_database_main():
 
 
 if __name__ == '__main__':
-    # db_tests_create_database_main()
+    # create_tests_db_main()
     the_movies_database_create_database_main()
     trip_advisor_create_database_main()
     glasgow_create_database_main()
