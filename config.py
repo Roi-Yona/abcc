@@ -1,4 +1,5 @@
 import pandas as pd
+import shutil
 import os
 
 from ilp.ilp_reduction import score_functions
@@ -186,7 +187,33 @@ MOVIES_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH
 
 # Functions:
 # --------------------------------------------------------------------------------
-def create_folder_if_not_exists(path, folder_name):
+def remove_file(file_path: str):
+    # Remove a file if it exists.
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+
+
+def copy_file(src_path: str, dst_path: str):
+    # Copy a file from src to dst.
+    shutil.copy2(src_path, dst_path)
+
+
+def copy_db(db_name: str):
+    # Determine the db path, based on the db name (override if exists).
+    db_path = os.path.join(SQLITE_DATABASE_FOLDER_PATH, db_name)
+    # Copy the required db to the current experiment directory (enabling parallel usage of the db).
+    copy_file(db_path, os.getcwd())
+
+
+def remove_db(db_name: str):
+    # Remove the db from the current experiment directory (after experiment is done) - the main db is saved elsewhere.
+    try:
+        remove_file(os.path.join('.', db_name))
+    except:
+        pass
+
+
+def create_folder_if_not_exists(path: str, folder_name: str):
     # Combine the path and folder name to get the full path.
     folder_path = os.path.join(path, folder_name)
 

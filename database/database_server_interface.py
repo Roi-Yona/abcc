@@ -17,12 +17,15 @@ class Database:
         self._cur.execute(query)
         return pd.read_sql_query(query, self._con)
 
-    def close(self):
-        # Committing changes
-        self._con.commit()
+    def __del__(self):
+        try:
+            # Committing changes
+            self._con.commit()
 
-        # Closing the connection
-        self._con.close()
+            # Closing the connection
+            self._con.close()
+        except:
+            pass
 
 
 def database_connect(server_name: str, database_name: str, username='', password='') -> sa.engine.Engine:
@@ -56,4 +59,3 @@ def database_run_query(input_db_engine: sa.engine.Engine, query: str) -> pd.Data
 if __name__ == '__main__':
     db = Database("databases/sqlite_databases/the_movies_database.db")
     print(db.run_query("SELECT * FROM candidates WHERE candidate_id=3"))
-    db.close()

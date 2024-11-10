@@ -60,3 +60,6 @@ class Experiment:
 
     def run_experiment(self):
         pass
+
+    def __del__(self):
+        self._db_engine.__del__()

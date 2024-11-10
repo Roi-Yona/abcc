@@ -47,12 +47,9 @@ The experiments are located under:
 To run an experiment can simply run the python file.
 
 Note that ```config.py``` holds important settings for your experiment, such as DEBUG mode.
-The current experiments of the three database described above, assume that you place a copy of your ```.db``` file in
-your experiment folder, (because in order to run experiments in parallel you should access to different db files).
-Therefore, you should copy your db file to your experiment folder. This can be easily changed to point to a
-shared db file by using a full path to the db (instead the use of ```config.MOVIES_DATABASE_DB_NAME``` in the Movies
-Dataset experiments use ```config.MOVIES_DATABASE_DB_PATH``` for example). The result of this experiments can be found
-under ```ilp/experiments/<dataset_name>/results```.
+Note thay when running the experiment, a copy from the database directory of the ```.db``` file will be created in your 
+experiment directory, in order to enable parallel running.
+The result of this experiments can be found under ```ilp/experiments/<dataset_name>/results```.
 
 ### How to define a new experiment?
 

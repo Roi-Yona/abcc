@@ -33,6 +33,10 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  voters_size_limit: int, candidates_size_limit: int):
 
         super().__init__(experiment_name, database_name)
+
+        # Copy the required db to the experiment folder.
+        config.copy_db(self._database_name)
+
         self._candidates_starting_point = candidates_starting_point
         self._voters_starting_point = voters_starting_point
         self._voters_group_size = voters_size_limit
@@ -151,6 +155,11 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                       }
 
         return pd.DataFrame([new_result])
+
+    def __del__(self):
+        super().__del__()
+        # Clean the experiment directory by removing the copied db.
+        config.remove_db(self._database_name)
 
 
 # Functions------------------------------------------------------------------
