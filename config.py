@@ -2,12 +2,13 @@ import pandas as pd
 import shutil
 import os
 
-from ilp.ilp_reduction import score_functions
+from mip.mip_reduction import score_functions
 
 # General:
 # --------------------------------------------------------------------------------
 DEBUG = True
 
+# Enable to print big Dataframe without any cutting.
 pd.set_option('display.max_rows', None)  # None means unlimited rows
 pd.set_option('display.max_columns', None)  # None means unlimited columns
 
@@ -124,7 +125,7 @@ TESTS_DB_NAME = 'the_movies_database_tests.db'
 TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
 # --------------------------------------------------------------------------------
 
-# Results and Graphs Constants:
+# Results and Graphs Consts:
 # --------------------------------------------------------------------------------
 # Specify whether we save the graph or show.
 SHOW = True
@@ -185,7 +186,7 @@ MOVIES_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH
 # --------------------------------------------------------------------------------
 
 
-# Functions:
+# Utility Functions:
 # --------------------------------------------------------------------------------
 def remove_file(file_path: str):
     # Remove a file if it exists.
@@ -257,7 +258,7 @@ def trip_advisor_create_experiment_name(experiment_number: int, candidates_group
 
 def get_total_construction_and_solving_time(df: pd.DataFrame) -> tuple:
     total_construction_time = df['total_construction_and_extraction_time(sec)']
-    total_solving_time = df['ilp_solving_time(sec)']
+    total_solving_time = df['mip_solving_time(sec)']
     return total_construction_time, total_solving_time
 
 

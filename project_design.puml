@@ -1,6 +1,6 @@
 @startuml
 
-abstract class ILPConvertor {
+abstract class MIPConvertor {
     +solver_status
     +solving_time
 
@@ -11,20 +11,21 @@ abstract class ILPConvertor {
     +str()
     +print_all_model_variables()
 }
-solver o-- ILPConvertor
+solver o-- MIPConvertor
 
-class ABCToILPConvertor{
+class ABCToMIPConvertor{
    +get_model_state()
    +define_<problem/constraint>()
 }
-ILPConvertor <|-- ABCToILPConvertor
+MIPConvertor <|-- ABCToMIPConvertor
+ScoreFunctions o-- ABCToMIPConvertor
 
 abstract class DBDataExtractor{
     +extract_data_from_db()
-    +convert_to_ilp()
+    +convert_to_mip()
     +extract_and_convert()
 }
-ABCToILPConvertor o-- DBDataExtractor
+ABCToMIPConvertor o-- DBDataExtractor
 DBEngine o-- DBDataExtractor
 
 class ABCSettingExtractor{
@@ -36,9 +37,35 @@ class ABCSettingExtractor{
     -approval_column_name
 
     +extract_data_from_db()
-    +convert_to_ilp()
+    +convert_to_mip()
 }
 DBDataExtractor <|-- ABCSettingExtractor
+
+class DCExtractor{
+    -dc_dict
+    -committee_members_list
+    -candidates_tables
+    -dc_candidates_sets
+
+    +extract_data_from_db()
+    +convert_to_mip()
+}
+DBDataExtractor <|-- DCExtractor
+
+class TGDExtractor{
+    -tgd_dict_start
+    -committee_members_list_start
+    -different_variables
+    -tgd_dict_end = tgd_dict_end
+    -committee_members_list_end
+    -candidates_tables_start
+    -candidates_tables_end
+    -tgd_tuples_list
+
+    +extract_data_from_db()
+    +convert_to_mip()
+}
+DBDataExtractor <|-- TGDExtractor
 
 abstract class Experiment{
     -experiment_name
@@ -54,7 +81,7 @@ abstract class Experiment{
     +run_model()
     +run_experiment()
 }
-Experiment --* ABCToILPConvertor
+Experiment --* ABCToMIPConvertor
 Experiment --* DBDataExtractor
 
 class CombinedConstraintsExperiment{

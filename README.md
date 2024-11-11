@@ -43,13 +43,13 @@ general functionality to handle similar cases.
 This project requires python3, sqlite3, ortools (and any additional solver you want to define for the ortools wrapper,
 we found Gurobi to work well on this problem).
 The experiments are located under:
-```ilp/experiments/<dataset_name>/<experiment_number>/<experiment_file>```
+```mip/experiments/<dataset_name>/<experiment_number>/<experiment_file>```
 To run an experiment can simply run the python file.
 
 Note that ```config.py``` holds important settings for your experiment, such as DEBUG mode.
 Note thay when running the experiment, a copy from the database directory of the ```.db``` file will be created in your 
 experiment directory, in order to enable parallel running.
-The result of this experiments can be found under ```ilp/experiments/<dataset_name>/results```.
+The result of this experiments can be found under ```mip/experiments/<dataset_name>/results```.
 
 ### How to define a new experiment?
 
@@ -60,5 +60,5 @@ for further information.
 
 ### How to add a new score function?
 
-Under ```ilp/ilp_reduction/score_functions``` you can define a new function with the appropriate interface of score
+Under ```mip/mip_reduction/score_functions``` you can define a new function with the appropriate interface of score
 function, that returns the voter committee score contribution, and use it in your experiment.
