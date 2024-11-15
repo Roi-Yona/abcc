@@ -100,11 +100,11 @@ def create_tests_db(cur):
 
 def create_tests_db_main():
     # Remove the current database if exists.
-    remove_file(config.TESTS_DB_DB_PATH)
+    remove_file(config.TESTS_DB_PATH)
 
     # Connect the db in the current working directory,
     # implicitly creating one if it does not exist.
-    con = sqlite3.connect(config.TESTS_DB_DB_PATH)
+    con = sqlite3.connect(config.TESTS_DB_PATH)
     cur = con.cursor()
 
     create_tests_db(cur)

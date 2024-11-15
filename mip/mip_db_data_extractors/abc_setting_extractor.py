@@ -38,9 +38,13 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
                     f"ORDER BY {config.CANDIDATES_COLUMN_NAME} " \
                     f"LIMIT {self._candidates_size_limit};"
         candidates_id_columns = self._db_engine.run_query(sql_query)
+        # The resulted ids' set.
         self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
+        # The smallest id in candidates ids' range.
         self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
+        # The largest id in candidates ids' range.
         self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
+        # The resulted number of candidates.
         self._candidates_size_limit = len(self._candidates_ids_set)
 
         if self._committee_size > len(candidates_id_columns):

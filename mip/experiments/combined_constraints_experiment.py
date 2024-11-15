@@ -1,3 +1,4 @@
+# TODO: CR this module.
 import sys
 import os
 import pandas as pd
@@ -18,7 +19,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  database_name: str,
 
                  # DC parameters are:
-                 # (dc_dict: dict, committee_members_list: list, candidates_tables: list)
+                 # (dc_dict: dict, committee_members_list: list, candidates_tables: list, comparison_atoms: list,
+                 #  constants: dict)
                  dcs: list,
 
                  # TGD parameters are:
@@ -50,10 +52,14 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             local_dc_dict = param_tuples[0]
             local_committee_members_list = param_tuples[1]
             local_candidates_tables = param_tuples[2]
+            local_comparison_atoms = param_tuples[3]
+            local_constants = param_tuples[4]
+
             self._dc_db_extractors.append(dc_extractor.DCExtractor(
                 self._abc_convertor, self._db_engine,
-                local_dc_dict, local_committee_members_list, local_candidates_tables,
-                committee_size, candidates_starting_point, candidates_size_limit))
+                local_dc_dict, local_comparison_atoms, local_constants,
+                local_committee_members_list, local_candidates_tables,
+                candidates_starting_point, candidates_size_limit))
 
         self._tgd_db_extractors = []
         for param_tuples in tgds:

@@ -1,10 +1,11 @@
+# TODO: Update according to recent changes.
+import unittest
+
+import config
 import mip.mip_db_data_extractors.tgd_extractor as tgd_extractor
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface as db_interface
-import config
-
-import unittest
 
 
 class TestTGDExtractor(unittest.TestCase):
@@ -24,7 +25,7 @@ class TestTGDExtractor(unittest.TestCase):
         self.abc_convertor = abc_to_mip_convertor.ABCToMIPConvertor(self.solver)
         # ----------------------------------------------------------------
         # Create the database engine.
-        self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
+        self.db_engine = db_interface.Database(config.TESTS_DB_PATH)
 
     def test_extract_data_from_db_sanity(self):
         # Define the TGD.

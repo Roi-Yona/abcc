@@ -22,9 +22,11 @@ if __name__ == '__main__':
     _dc_dict = dict()
     _dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
     _dc_dict[('movies_genres', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-    _committee_members_list = ['c1', 'c2']
-    _candidates_tables = ['t1', 't2']
-    _dcs = [(_dc_dict, _committee_members_list, _candidates_tables)]
+    _dc_committee_members_list = ['c1', 'c2']
+    _dc_candidates_tables = ['t1', 't2']
+    _dc_comparison_atoms = [('c1', '<', 'c2')]
+    _dc_constants = None
+    _dcs = [(_dc_dict, _dc_committee_members_list, _dc_candidates_tables, _dc_comparison_atoms, _dc_constants)]
 
     _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)
 

@@ -122,7 +122,7 @@ TRIP_ADVISOR_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TRIP_ADVISOR_DB
 # Tests Dataset Consts:
 # --------------------------------------------------------------------------------
 TESTS_DB_NAME = 'the_movies_database_tests.db'
-TESTS_DB_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
+TESTS_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, TESTS_DB_NAME)
 # --------------------------------------------------------------------------------
 
 # Results and Graphs Consts:

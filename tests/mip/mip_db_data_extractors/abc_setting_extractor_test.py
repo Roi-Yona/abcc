@@ -1,11 +1,12 @@
+import unittest
+import os.path
+
 import mip.mip_db_data_extractors.abc_setting_extractor as abc_setting_extractor
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 import mip.mip_reduction.score_functions as score_functions
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface as db_interface
 import config
-
-import unittest
 
 
 class TestABCSettingExtractor(unittest.TestCase):
@@ -29,7 +30,11 @@ class TestABCSettingExtractor(unittest.TestCase):
         self.abc_convertor = abc_to_mip_convertor.ABCToMIPConvertor(self.solver)
         # ----------------------------------------------------------------
         # Create the database engine.
-        self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
+        config.copy_db(config.TESTS_DB_NAME)
+        self.db_engine = db_interface.Database(os.path.join('.', config.TESTS_DB_NAME))
+
+    def tearDown(self):
+        config.remove_db(config.TESTS_DB_NAME)
 
     def test_extract_data_from_db_sanity(self):
         # Define the abc setting extractor.
@@ -43,7 +48,7 @@ class TestABCSettingExtractor(unittest.TestCase):
         extractor._extract_data_from_db()
 
         # Test the result.
-        self.assertEqual(extractor._candidates_ending_point, 4)
+        self.assertEqual(extractor._candidates_ending_point, 5)
         self.assertEqual(extractor._voters_ending_point, 3)
         expected_approval_profile = dict()
         expected_approval_profile[1] = {3}

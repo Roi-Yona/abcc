@@ -1,6 +1,6 @@
+import os
 from datetime import datetime
 import pandas as pd
-import os
 
 import config
 from database import database_server_interface as db_interface
@@ -8,8 +8,9 @@ import mip.mip_reduction.mip_convertor as mip_convertor
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 
 MODULE_NAME = 'Experiment'
+# The results of an experiment are with a saved to .xlsx located in the experiments db folder (the parent folder of the
+# experiment) within a folder name results.
 RESULTS_PATH = os.path.join('..', 'results')
-SERVER = 'LAPTOP-MO1JPG72'
 
 
 def save_result(experiment_results: pd.DataFrame, new_result: pd.DataFrame) -> pd.DataFrame:

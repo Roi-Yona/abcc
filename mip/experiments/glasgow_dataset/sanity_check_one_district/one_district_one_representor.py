@@ -1,7 +1,7 @@
+import pandas as pd
 import sys
 import os
 sys.path.append(os.path.join('..', '..', '..'))
-import pandas as pd
 
 import mip.experiments.experiment as experiment
 import mip.experiments.combined_constraints_experiment as combined_constraints_experiment

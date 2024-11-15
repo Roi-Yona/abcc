@@ -21,15 +21,16 @@ if __name__ == '__main__':
     _tgds = []
 
     # DC.
-    dc_dict = dict()
-    dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
+    _dc_dict = dict()
+    _dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
         [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
-    dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
+    _dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
         [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
-    committee_members_list = ['c1', 'c2']
-    candidates_tables = ['t1', 't2']
-
-    _dcs = [(dc_dict, committee_members_list, candidates_tables)]
+    _dc_committee_members_list = ['c1', 'c2']
+    _dc_candidates_tables = ['t1', 't2']
+    _dc_comparison_atoms = [('c1', '<', 'c2')]
+    _dc_constants = None
+    _dcs = [(_dc_dict, _dc_committee_members_list, _dc_candidates_tables, _dc_comparison_atoms, _dc_constants)]
 
     # Define the experiment name.
     _experiment_name = config.trip_advisor_create_experiment_name(

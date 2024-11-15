@@ -1,12 +1,12 @@
+import unittest
 import numpy as np
+import os
 
+import config
 import mip.mip_db_data_extractors.dc_extractor as dc_extractor
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 import ortools.linear_solver.pywraplp as pywraplp
 import database.database_server_interface as db_interface
-import config
-
-import unittest
 
 
 class TestDCExtractor(unittest.TestCase):
@@ -26,7 +26,11 @@ class TestDCExtractor(unittest.TestCase):
         self.abc_convertor = abc_to_mip_convertor.ABCToMIPConvertor(self.solver)
         # ----------------------------------------------------------------
         # Create the database engine.
-        self.db_engine = db_interface.Database(config.TESTS_DB_DB_PATH)
+        config.copy_db(config.TESTS_DB_NAME)
+        self.db_engine = db_interface.Database(os.path.join('.', config.TESTS_DB_NAME))
+
+    def tearDown(self):
+        config.remove_db(config.TESTS_DB_NAME)
 
     def test_extract_data_from_db_sanity(self):
         # Define the DC.
@@ -35,17 +39,17 @@ class TestDCExtractor(unittest.TestCase):
             [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
             [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
+        comparison_atoms = [('c1', '<', 'c2')]
+        constants = None
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
+
         # Define the DC extractor.
         extractor = dc_extractor.DCExtractor(
             self.abc_convertor, self.db_engine,
-            dc_dict,
-            committee_members_list,
-            candidates_tables,
-            self.committee_size,
-            self.candidates_starting_point,
-            self.candidates_group_size)
+            dc_dict, comparison_atoms, constants,
+            committee_members_list, candidates_tables,
+            self.candidates_starting_point, self.candidates_group_size)
 
         extractor._extract_data_from_db()
 
@@ -59,4 +63,5 @@ class TestDCExtractor(unittest.TestCase):
              [3, 6],
              [4, 6],
              ]
+        print(f"The expected output is: {expected_dc_sets}\nThe actual output is: {extractor._dc_candidates_sets}")
         self.assertEqual(np.array_equal(expected_dc_sets, extractor._dc_candidates_sets), True)

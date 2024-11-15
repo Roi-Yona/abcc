@@ -1,8 +1,9 @@
+# TODO: Update according to recent changes.
+import unittest
+
+import config
 import mip.mip_reduction.score_functions as score_functions
 import mip.experiments.combined_constraints_experiment as combined_constraints_experiment
-import config
-
-import unittest
 
 
 class TestCombinedExperiment(unittest.TestCase):
@@ -22,7 +23,7 @@ class TestCombinedExperiment(unittest.TestCase):
         config.SOLVER_NAME = "CP_SAT"
         # ----------------------------------------------------------------
         # Save experiment setting.
-        self.db_name = config.TESTS_DB_DB_PATH
+        self.db_name = config.TESTS_DB_NAME
         self.experiment_name = 'test_experiment'
         # ----------------------------------------------------------------
         # Define the TGD.
@@ -48,9 +49,11 @@ class TestCombinedExperiment(unittest.TestCase):
             [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
             [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
+        comparison_atoms = [('c1', '<', 'c2')]
+        constants = None
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
-        self.dcs = [(dc_dict, committee_members_list, candidates_tables)]
+        self.dcs = [(dc_dict, committee_members_list, candidates_tables, comparison_atoms, constants)]
         # DC candidates: (1, 3); (1, 4); (1, 6); (3, 4); (3, 6); (4, 6); (2, 7)
         """
            Candidate : Candidate AV total score : Relative_Place

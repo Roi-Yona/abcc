@@ -1,4 +1,5 @@
 import time
+
 import config
 import pandas as pd
 import database.database_server_interface as db_interface
@@ -8,7 +9,7 @@ MODULE_NAME = "Database Extractor"
 
 
 class DBDataExtractor:
-    """An abstract class for an MIP experiment.
+    """An abstract class for ABC problem with contextual constraints data extractor.
     """
 
     def __init__(self,
@@ -22,33 +23,44 @@ class DBDataExtractor:
         self.extract_data_timer = -1
         self._candidates_starting_point = candidates_starting_point
 
-        # ----------------------------------------------
-        # Extract the candidates group ids.
+        # Extract the candidates group ids. Starting from the id of candidates_starting_point, up to
+        # candidates_size_limit ids.
         sql_query = f"SELECT DISTINCT {config.CANDIDATES_COLUMN_NAME} FROM {config.CANDIDATES_TABLE_NAME} " \
                     f"WHERE {config.CANDIDATES_COLUMN_NAME} >= {self._candidates_starting_point} " \
                     f"ORDER BY {config.CANDIDATES_COLUMN_NAME} " \
                     f"LIMIT {candidates_size_limit};"
         candidates_id_columns = self._db_engine.run_query(sql_query)
-        self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
-        self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
-        self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
-        self._candidates_size_limit = len(self._candidates_ids_set)
-        # ----------------------------------------------
 
-    def join_tables(self, candidate_tables: list, tables_dict: dict, constants=None,
-                    different_variables=None) -> pd.DataFrame:
+        # The resulted ids' set.
+        self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
+        # The smallest id in candidates ids' range.
+        self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
+        # The largest id in candidates ids' range.
+        self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
+        # The resulted number of candidates.
+        self._candidates_size_limit = len(self._candidates_ids_set)
+
+    def join_tables(self, candidate_tables: list, tables_dict: dict, constants: [dict] = None,
+                    comparison_atoms: list = None) -> pd.DataFrame:
         """Extract from the DB a join between all the tables in the tables list.
         An input tables list example:
-        tables_dict[('candidates', 't1')] = [('x', 'user_id'), ... ]
-        When there are shared columns join natural inner join, otherwise, cross join.
+        tables_dict[('candidates', 't1')] = [('x', 'user_id'), ('y', 'lives_in')]
+        tables_dict[('cities', 't2')] = [('y', 'city')]
+        In this case 'candidates' is the db table name, 't1' is the new name for the query, 'user_id' is the table
+        column name, and 'x' is the new name for the query. The resulted join is between candidates and cities (when the
+        shared column is 'y').
+        For shared columns - join using natural inner join, if there are no shared columns - cross join.
 
-        :param candidate_tables: All the tables containing config.CANDIDATES_COLUMN_NAME.
-        :param constants: A constants variables, dict with the new variable name and his const value.
-        :param tables_dict: A dict as described in the brief.
-        :param different_variables: A list of variables (with the new naming) that should differ from one another.
-        :return: The resulted df of the join operation,
-        with names given to the tables_dict.
+        :param candidate_tables: All the tables containing config.CANDIDATES_COLUMN_NAME (in this table we add the
+        restriction about the candidates ids range).
+        :param constants: A constants variables dict, dict with the new variable name and his const value (for the
+        example above it could be constants['y']='Paris', enforcing the constant value to all tables with column 'y').
+        :param tables_dict: A tables as described in the brief.
+        :param comparison_atoms: A list of tuples of the form ('x','<','y') that enforce to comparison atom
+        i.e. '<'/'>'/'='/'!=' between two (new) column names.
+        :return: The resulted df of the join operation, with the new names (such as 'x').
         """
+
         if constants is None:
             constants = dict()
 
@@ -87,7 +99,7 @@ class DBDataExtractor:
                 if i != (len(new_table_names) - 2):
                     where_phrase = self.sql_concat_and(where_phrase)
 
-        # Add group range constraint.
+        # Add candidates ids' range constraint.
         for table_name in candidate_tables:
             where_phrase = self.sql_concat_and(where_phrase)
             where_phrase += f"{table_name}.{config.CANDIDATES_COLUMN_NAME} " \
@@ -104,12 +116,10 @@ class DBDataExtractor:
                     where_phrase += f"{new_table_name}.{original_variable_name}={str_value}"
 
         # Add the different variable constraint.
-        if different_variables is not None:
-            # Make sure they differ.
-            # Make sure they don't repeat in different order.
-            for i in range(len(different_variables)-1):
+        if comparison_atoms is not None:
+            for comparison_atom in comparison_atoms:
                 where_phrase = self.sql_concat_and(where_phrase)
-                where_phrase += f"{different_variables[i]}<{different_variables[i+1]}"
+                where_phrase += f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}"
 
         where_phrase += '\n'
 
@@ -139,7 +149,8 @@ class DBDataExtractor:
         # Abstract function.
         pass
 
-    def sql_concat_and(self, input_str) -> str:
+    @staticmethod
+    def sql_concat_and(input_str) -> str:
         if input_str != "WHERE " and input_str[-4:] != 'AND ':
             input_str += " AND "
         return input_str

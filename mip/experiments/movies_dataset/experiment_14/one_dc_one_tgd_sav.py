@@ -25,9 +25,11 @@ if __name__ == '__main__':
     _dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
     _dc_dict[('movies_genres', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
     _dc_dict[('movies_genres', 't3')] = [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-    _committee_members_list = ['c1', 'c2', 'c3']
-    _candidates_tables = ['t1', 't2', 't3']
-    _dcs = [(_dc_dict, _committee_members_list, _candidates_tables)]
+    _dc_committee_members_list = ['c1', 'c2', 'c3']
+    _dc_candidates_tables = ['t1', 't2', 't3']
+    _dc_comparison_atoms = [('c1', '<', 'c2'), ('c2', '<', 'c3')]
+    _dc_constants = None
+    _dcs = [(_dc_dict, _dc_committee_members_list, _dc_candidates_tables, _dc_comparison_atoms, _dc_constants)]
 
     _tgd_dict_start = dict()
     _tgd_dict_start['important_languages', 't1'] = [('x', 'original_language')]

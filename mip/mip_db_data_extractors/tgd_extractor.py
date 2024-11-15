@@ -1,3 +1,5 @@
+"""A class for extracting the db data of an ABC contextual constraint - TGD to a MIP constraint.
+"""
 import config
 from database import database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
@@ -20,10 +22,11 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
                  candidates_size_limit: int,
                  # Different variables indicates that these vars in the join should be different.
                  # Usually used for committee_members_list_end.
-                 # For example, different committee members should represent district 1 if I demand three represents.
+                 # For example, different committee members should represent district 1 if I demand three
+                 # representatives.
                  different_variables=None
                  ):
-
+        # TODO: Document the function input properly...
         super().__init__(abc_convertor, database_engine, candidates_starting_point, candidates_size_limit)
 
         self._tgd_dict_start = tgd_dict_start
@@ -47,7 +50,12 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         the chosen committee, then 2 and 4 *or* 3 and 5 must be as well.
         Note: The first place in the tuple could be empty (i.e. the TGD should always be enforced).
         """
-        # Note: Add here different variables as option as well (currently not needed).
+        # TODO: Update according to the join_tables interface changes.
+        # TODO: Consider support different variables at the start as well (and if so, update experiments usage
+        #  accordingly).
+        # NOTE: 'different variables' implementation is not part of the framework for TGDs, but can easily be extended.
+        # If needed, we can also extend this option for the tgd dict start (currently implemented only for end).
+
         legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start)
         # Extract the committee members sets out of the resulted join.
         tgd_tuples_list = []
