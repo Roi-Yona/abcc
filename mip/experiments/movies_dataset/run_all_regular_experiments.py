@@ -1,6 +1,6 @@
 import subprocess
 
-# List of scripts to run
+# List of scripts to run.
 scripts = [
     ('experiment_1', 'no_constraints.py'),
     ('experiment_2', 'one_dc.py'),
@@ -33,6 +33,6 @@ scripts = [
     ('experiment_29', 'no_constraints_committee_50.py'),
 ]
 
-# Run each script with the updated global variable
+# Run each script with the updated global variable.
 for script_dir, script in scripts:
     subprocess.run(['python3', script], cwd=script_dir)

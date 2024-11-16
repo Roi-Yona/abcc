@@ -15,10 +15,8 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = 5
-
     _tgds = []
     _dcs = []
-
     _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)
 
     # Run the experiment.

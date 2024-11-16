@@ -11,10 +11,7 @@ _experiment_number = 0
 MODULE_NAME = f'Glasgow Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
-    # ---------------------------------------------------------------------------
-    # Experiment summary:
     # We find a winning committee with no constraints, one district, and committee size=1.
-    # ---------------------------------------------------------------------------
     _number_of_districts = 1
     _candidates_starting_point = 1
     _candidates_group_size = 0
@@ -29,10 +26,8 @@ if __name__ == '__main__':
                                     f"voters_starting_point={_voters_starting_point}\n"
                                     f"voters_group_size={_voters_group_size}\n"
                                     f"committee_size={_committee_size}")
-
     _tgds = []
     _dcs = []
-
     _experiment_name = config.glasgow_create_experiment_name(_experiment_number, 1)
 
     # Run the experiment.

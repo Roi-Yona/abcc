@@ -41,7 +41,7 @@ general functionality to handle similar cases.
 ### How to run an experiment?
 
 This project requires python3, sqlite3, ortools (and any additional solver you want to define for the ortools wrapper,
-we found Gurobi to work well on this problem).
+we found Gurobi to work well on this problem, the default solver defined in ```config.py``` is SAT).
 The experiments are located under:
 ```mip/experiments/<dataset_name>/<experiment_number>/<experiment_file>```
 To run an experiment can simply run the python file.

@@ -9,16 +9,10 @@ _experiment_number = 1
 MODULE_NAME = f'Trip Advisor Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
-    # ---------------------------------------------------------------------------
-    # Experiment summary:
-    # We find a winning committee with no constraints.
-    # ---------------------------------------------------------------------------
-
     _candidates_group_size = config.TRIP_ADVISOR_TOTAL_NUMBER_OF_CANDIDATES
     _committee_size = config.TRIP_ADVISOR_DEFAULT_COMMITTEE_SIZE
     _tgds = []
     _dcs = []
-
     _experiment_name = config.trip_advisor_create_experiment_name(
         _experiment_number, _candidates_group_size, _committee_size)
 

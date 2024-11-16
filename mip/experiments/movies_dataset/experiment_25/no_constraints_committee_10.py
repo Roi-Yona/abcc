@@ -9,16 +9,10 @@ _experiment_number = 25
 MODULE_NAME = f'Movies Experiment {_experiment_number}:'
 
 if __name__ == '__main__':
-    # ---------------------------------------------------------------------------
-    # Experiment summary:
-    # We find a winning committee no constraints.
-    # ---------------------------------------------------------------------------
     _candidates_group_size = config.MOVIES_DEFAULT_CANDIDATE_SIZE
     _committee_size = 10
-
     _dcs = []
     _tgds = []
-
     _experiment_name = config.movies_create_experiment_name(_experiment_number, _candidates_group_size, _committee_size)
 
     # Run the experiment.
@@ -30,4 +24,3 @@ if __name__ == '__main__':
                                                config.MOVIES_VOTERS_TICKING_SIZE_LIMIT,
                                                config.MOVIES_VOTERS_FINAL_TICKING_SIZE_LIMIT,
                                                config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)
-
