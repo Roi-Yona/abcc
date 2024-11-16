@@ -14,26 +14,27 @@ class DCExtractor(db_data_extractor.DBDataExtractor):
                  database_engine: db_interface.Database,
                  dc_dict: dict,
                  comparison_atoms: list,
-                 constants: [dict],
+                 constants: dict,
                  committee_members_list: list,
                  candidates_tables: list,
                  candidates_starting_point: int,
                  candidates_size_limit: int,
                  ):
-        """A class for extracting the DB the MIP data for constructing the DC constraint.
+        """A class for extracting from the DB the required data for constructing a MIP constraints representing the DC
+        constraint.
 
-        :param abc_convertor: An instance of the class of ABC to MIP convertor.
+        :param abc_convertor: An instance of the class of an ABC to MIP convertor.
         :param database_engine: An instance of the database engine.
         :param dc_dict: The tables-variable dict of the DC.
-        :param comparison_atoms: A list of tuples A list of tuples of the form ('x','<','y') that enforce to comparison
-        atom i.e. '<'/'>'/'='/'!=' between two (new) column names.
+        :param comparison_atoms: A list of tuples of the form ('x','<','y') that enforce to comparison atom i.e.
+        '<'/'>'/'='/'!=' between two (new) column names.
         :param constants: A constants variables dict, dict with the new variable name and his const value (for the
         example above it could be constants['y']='Paris', enforcing the constant value to all tables with column 'y').
         :param committee_members_list: The committee members list (i.e. c1, c2 vars that are in the relation COM).
         :param candidates_tables: The tables (new) names that containing the candidate id column (in order to enforce
-        candidates range).
+        candidates range constraint).
         :param candidates_starting_point: The candidates starting point (id to start from ids' range).
-        :param candidates_size_limit: The candidates starting point (id to end with the ids' range).
+        :param candidates_size_limit: The candidates id's group size limit, (the ending point is determined by it).
         """
         super().__init__(abc_convertor, database_engine, candidates_starting_point, candidates_size_limit)
 
@@ -45,8 +46,8 @@ class DCExtractor(db_data_extractor.DBDataExtractor):
         self._dc_candidates_sets = None
 
     def _extract_data_from_db(self) -> None:
-        legal_assignments = self.join_tables(self._candidates_tables, self._dc_dict,
-                                             constants=self._constants, comparison_atoms=self._comparison_atoms)
+        legal_assignments = self.join_tables(self._candidates_tables, self._dc_dict, self._constants,
+                                             self._comparison_atoms)
 
         # Extract the committee members sets out of the resulted join.
         dc_candidates_df = legal_assignments[self._committee_members_list]

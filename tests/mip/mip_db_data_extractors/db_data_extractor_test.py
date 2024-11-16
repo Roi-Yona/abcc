@@ -39,6 +39,7 @@ class TestDBDataExtractor(unittest.TestCase):
         candidate_tables = ['t1']
         constants = dict()
         constants['y'] = 'false'
+        comparison_atoms = []
 
         # Define the data constraint extractor.
         extractor = db_data_extractor.DBDataExtractor(
@@ -46,8 +47,7 @@ class TestDBDataExtractor(unittest.TestCase):
             self.candidates_starting_point,
             self.candidates_group_size)
 
-        legal_assignments = extractor.join_tables(candidate_tables, tables_dict,
-                                                  comparison_atoms=None, constants=constants)
+        legal_assignments = extractor.join_tables(candidate_tables, tables_dict, constants, comparison_atoms)
 
         # Test the result.
         data = {
@@ -66,6 +66,7 @@ class TestDBDataExtractor(unittest.TestCase):
         tables_dict[(config.CANDIDATES_TABLE_NAME, 't3')] = [('c3', config.CANDIDATES_COLUMN_NAME), ('z', 'genres')]
         tables_dict[(config.CANDIDATES_TABLE_NAME, 't4')] = [('c4', config.CANDIDATES_COLUMN_NAME), ('g', 'genres')]
         candidate_tables = ['t1', 't2', 't3', 't4']
+        constants = dict()
         comparison_atoms = [('c1', '<', 'c2'), ('c2', '<', 'c3'), ('c3', '<', 'c4')]
 
         # Define the data constraint extractor.
@@ -74,8 +75,7 @@ class TestDBDataExtractor(unittest.TestCase):
             self.candidates_starting_point,
             self.candidates_group_size)
 
-        legal_assignments = extractor.join_tables(candidate_tables, tables_dict,
-                                                  constants=None, comparison_atoms=comparison_atoms)
+        legal_assignments = extractor.join_tables(candidate_tables, tables_dict, constants, comparison_atoms)
 
         print(legal_assignments)
         # Make sure manually that there are no same candidates.

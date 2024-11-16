@@ -40,7 +40,7 @@ class TestDCExtractor(unittest.TestCase):
         dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
             [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         comparison_atoms = [('c1', '<', 'c2')]
-        constants = None
+        constants = dict()
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
 

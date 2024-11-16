@@ -1,4 +1,3 @@
-# TODO: Update according to recent changes.
 import unittest
 
 import config
@@ -29,18 +28,19 @@ class TestCombinedExperiment(unittest.TestCase):
         # Define the TGD.
         tgd_dict_start = dict()
         tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
-        committee_members_list_start = []
-        candidates_tables_start = ['t1']
-
+        tgd_committee_members_list_start = []
+        tgd_candidates_tables_start = ['t1']
+        tgd_constants_start = dict()
+        tgd_comparison_atoms_start = []
         tgd_dict_end = dict()
         tgd_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
-        committee_members_list_end = ['c1']
-        candidates_tables_end = ['t2']
-
-        different_variables = committee_members_list_end
-        self.tgds = [(tgd_dict_start, committee_members_list_start,
-                      tgd_dict_end, committee_members_list_end,
-                      candidates_tables_start, candidates_tables_end, different_variables)]
+        tgd_committee_members_list_end = ['c1']
+        tgd_candidates_tables_end = ['t2']
+        tgd_constants_end = dict()
+        tgd_comparison_atoms_end = []
+        self.tgds = [(tgd_dict_start, tgd_committee_members_list_start, tgd_candidates_tables_start,
+                      tgd_constants_start, tgd_comparison_atoms_start, tgd_dict_end, tgd_committee_members_list_end,
+                      tgd_candidates_tables_end, tgd_constants_end, tgd_comparison_atoms_end)]
         # TGD tuples: ()->(1, 3, 4, 6); ()->(2, 7); ()->(5); ()->(8)
         # ----------------------------------------------------------------
         # Define the DC.
@@ -50,7 +50,7 @@ class TestCombinedExperiment(unittest.TestCase):
         dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
             [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         comparison_atoms = [('c1', '<', 'c2')]
-        constants = None
+        constants = dict()
         committee_members_list = ['c1', 'c2']
         candidates_tables = ['t1', 't2']
         self.dcs = [(dc_dict, committee_members_list, candidates_tables, comparison_atoms, constants)]

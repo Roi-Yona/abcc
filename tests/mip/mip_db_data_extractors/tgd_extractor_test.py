@@ -1,4 +1,3 @@
-# TODO: Update according to recent changes.
 import unittest
 
 import config
@@ -33,22 +32,28 @@ class TestTGDExtractor(unittest.TestCase):
         tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't1'] = [('x', 'genres')]
         committee_members_list_start = []
         candidates_tables_start = ['t1']
-
+        constants_start = dict()
+        comparison_atoms_start = []
         tgd_dict_end = dict()
-        tgd_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME),
-                                                                       ('x', 'genres')]
+        tgd_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genres')]
         committee_members_list_end = ['c1']
         candidates_tables_end = ['t2']
+        constants_end = dict()
+        comparison_atoms_end = []
 
         # Define the TGD extractor.
         extractor = tgd_extractor.TGDExtractor(
             self.abc_convertor, self.db_engine,
             tgd_dict_start,
             committee_members_list_start,
+            candidates_tables_start,
+            constants_start,
+            comparison_atoms_start,
             tgd_dict_end,
             committee_members_list_end,
-            candidates_tables_start,
             candidates_tables_end,
+            constants_end,
+            comparison_atoms_end,
             self.candidates_starting_point,
             self.candidates_group_size)
 

@@ -65,18 +65,19 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         for param_tuples in tgds:
             local_tgd_dict_start = param_tuples[0]
             local_committee_members_list_start = param_tuples[1]
-            local_tgd_dict_end = param_tuples[2]
-            local_committee_members_list_end = param_tuples[3]
-            local_candidates_tables_start = param_tuples[4]
-            local_candidates_tables_end = param_tuples[5]
-            local_different_variables = param_tuples[6]
-
+            local_candidates_tables_start = param_tuples[2]
+            local_constants_start = param_tuples[3]
+            local_comparison_atoms_start = param_tuples[4]
+            local_tgd_dict_end = param_tuples[5]
+            local_committee_members_list_end = param_tuples[6]
+            local_candidates_tables_end = param_tuples[7]
+            local_constants_end = param_tuples[8]
+            local_comparison_atoms_end = param_tuples[9]
             self._tgd_db_extractors.append(tgd_extractor.TGDExtractor(
-                self._abc_convertor, self._db_engine,
-                local_tgd_dict_start, local_committee_members_list_start,
-                local_tgd_dict_end, local_committee_members_list_end,
-                local_candidates_tables_start, local_candidates_tables_end,
-                candidates_starting_point, candidates_size_limit, local_different_variables))
+                self._abc_convertor, self._db_engine, local_tgd_dict_start, local_committee_members_list_start,
+                local_candidates_tables_start, local_constants_start, local_comparison_atoms_start, local_tgd_dict_end,
+                local_committee_members_list_end, local_candidates_tables_end, local_constants_end,
+                local_comparison_atoms_end, candidates_starting_point, candidates_size_limit))
 
         self._abc_setting_extractor = abc_setting_extractor.ABCSettingExtractor(
             self._abc_convertor, self._db_engine,

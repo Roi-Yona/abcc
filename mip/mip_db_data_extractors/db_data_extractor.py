@@ -9,14 +9,18 @@ MODULE_NAME = "Database Extractor"
 
 
 class DBDataExtractor:
-    """An abstract class for ABC problem with contextual constraints data extractor.
-    """
-
     def __init__(self,
                  abc_convertor: abc_to_mip_convertor.ABCToMIPConvertor,
                  database_engine: db_interface.Database,
                  candidates_starting_point: int,
                  candidates_size_limit: int):
+        """An abstract class for ABC problem with contextual constraints data extractor.
+
+        :param abc_convertor: An instance of an ABC to MIP convertor.
+        :param database_engine: An instance of a database engine.
+        :param candidates_starting_point: The candidates starting point (id to start from ids' range).
+        :param candidates_size_limit: The candidates id's group size limit, (the ending point is determined by it).
+        """
         self._abc_convertor = abc_convertor
         self._db_engine = database_engine
         self.convert_to_mip_timer = -1
@@ -40,8 +44,8 @@ class DBDataExtractor:
         # The resulted number of candidates.
         self._candidates_size_limit = len(self._candidates_ids_set)
 
-    def join_tables(self, candidate_tables: list, tables_dict: dict, constants: [dict] = None,
-                    comparison_atoms: list = None) -> pd.DataFrame:
+    def join_tables(self, candidate_tables: list, tables_dict: dict, constants: dict,
+                    comparison_atoms: list) -> pd.DataFrame:
         """Extract from the DB a join between all the tables in the tables list.
         An input tables list example:
         tables_dict[('candidates', 't1')] = [('x', 'user_id'), ('y', 'lives_in')]
@@ -60,10 +64,6 @@ class DBDataExtractor:
         i.e. '<'/'>'/'='/'!=' between two (new) column names.
         :return: The resulted df of the join operation, with the new names (such as 'x').
         """
-
-        if constants is None:
-            constants = dict()
-
         # Link between the new variable name to the new table name.
         # For instance variable_dict['x'] = [('t1', 'original_x_column_name'), ...].
         variables_dict = dict()
@@ -116,10 +116,9 @@ class DBDataExtractor:
                     where_phrase += f"{new_table_name}.{original_variable_name}={str_value}"
 
         # Add the different variable constraint.
-        if comparison_atoms is not None:
-            for comparison_atom in comparison_atoms:
-                where_phrase = self.sql_concat_and(where_phrase)
-                where_phrase += f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}"
+        for comparison_atom in comparison_atoms:
+            where_phrase = self.sql_concat_and(where_phrase)
+            where_phrase += f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}"
 
         where_phrase += '\n'
 
