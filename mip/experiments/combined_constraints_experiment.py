@@ -1,4 +1,3 @@
-# TODO: CR this module.
 import sys
 import os
 import pandas as pd
@@ -33,7 +32,23 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                  committee_size: int,
                  voters_starting_point: int, candidates_starting_point: int,
                  voters_size_limit: int, candidates_size_limit: int):
+        """A class for running experiments combining both TGD and DC constraints.
 
+        :param experiment_name: The experiment name.
+        :param database_name: The database name.
+        :param dcs: A list containing tuples of the DCs settings. Each tuple has the following structure -
+        (dc_dict: dict, committee_members_list: list, candidates_tables: list, comparison_atoms: list, constants: dict)
+        Further information about this structure can be found in the DC Extractor class.
+        :param tgds: A list containing tuples of the TGDs settings. Each tuple has the following structure -
+        (tgd_dict_start: dict, committee_members_list_start: list, tgd_dict_end: dict, committee_members_list_end: list,
+         candidates_tables_start: list, candidates_tables_end: list, different_variables: list)
+        Further information about this structure can be found in the TGD Extractor class.
+        :param committee_size: The committee size.
+        :param voters_starting_point: The voters starting point (id to start from ids' range).
+        :param candidates_starting_point: The candidates starting point (id to start from ids' range).
+        :param voters_size_limit: The voters id's group size limit (the ending point is determined by it).
+        :param candidates_size_limit: The candidates id's group size limit (the ending point is determined by it).
+        """
         super().__init__(experiment_name, database_name)
 
         # Copy the required db to the experiment folder.
@@ -46,7 +61,6 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         self._committee_size = committee_size
 
         # Create the data extractors.
-        # NOTE_1: Can alternative define here a dc data after extracting directly using SQL query.
         self._dc_db_extractors = []
         for param_tuples in dcs:
             local_dc_dict = param_tuples[0]
@@ -86,7 +100,6 @@ class CombinedConstraintsExperiment(experiment.Experiment):
 
     def run_experiment(self):
         # Extract problem data from the database and convert to MIP.
-        # NOTE_1: Can alternative convert to mip directly using the _abc_convertor using a data that already extracted.
         self._abc_setting_extractor.extract_and_convert()
         for curr_dc_extractor in self._dc_db_extractors:
             curr_dc_extractor.extract_and_convert()
@@ -103,7 +116,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         committee_string = ""
         if self._abc_convertor.solver_status == 0:
             # If solved the problem successfully.
-            for key, value in self._abc_convertor._model_candidates_variables.items():
+            for key, value in self._abc_convertor.model_candidates_variables.items():
                 if value.solution_value() == 1:
                     # If the candidate is chosen to the committee.
                     committee_string += f"{key}, "
@@ -170,20 +183,41 @@ class CombinedConstraintsExperiment(experiment.Experiment):
 
 
 # Functions------------------------------------------------------------------
-def combined_constraints_experiment_runner(experiment_name: str, database_name: str,
-                                           dcs: list,
-                                           tgds: list,
-                                           committee_size: int,
-                                           voters_starting_point: int,
-                                           voters_starting_ticking_size_limit: int,
-                                           voters_ticking_size_limit: int,
-                                           voters_final_ticking_size_limit: int,
-                                           candidates_starting_point: int,
-                                           candidates_size_limit: int):
+def combined_constraints_experiment_runner_ticking_voters_size_limit(experiment_name: str, database_name: str,
+                                                                     dcs: list,
+                                                                     tgds: list,
+                                                                     committee_size: int,
+                                                                     voters_starting_point: int,
+                                                                     voters_size_limit_starting_value: int,
+                                                                     voters_size_limit_ticking_value: int,
+                                                                     voters_size_limit_ending_value: int,
+                                                                     candidates_starting_point: int,
+                                                                     candidates_size_limit: int):
+    """Runner for an ABC with context settings, for a ticking size of voter group.
+
+    :param experiment_name: The experiment name.
+    :param database_name: The database name.
+    :param dcs: A list containing tuples of the DCs settings. Each tuple has the following structure -
+    (dc_dict: dict, committee_members_list: list, candidates_tables: list, comparison_atoms: list, constants: dict)
+    Further information about this structure can be found in the DC Extractor class.
+    :param tgds: A list containing tuples of the TGDs settings. Each tuple has the following structure -
+    (tgd_dict_start: dict, committee_members_list_start: list, tgd_dict_end: dict, committee_members_list_end: list,
+     candidates_tables_start: list, candidates_tables_end: list, different_variables: list)
+    Further information about this structure can be found in the TGD Extractor class.
+    :param committee_size: The committee size.
+    :param voters_starting_point: The voters starting point (id to start from ids' range).
+    :param voters_size_limit_starting_value: The voters size limit starting value (we iterate over different voters
+    size limits).
+    :param voters_size_limit_ticking_value: The voters size limit ticking value (i.e. the step size).
+    :param voters_size_limit_ending_value: The voters size limit end value (i.e. the end of the range of values to
+    iterate over).
+    :param candidates_starting_point: The candidates starting point (id to start from ids' range).
+    :param candidates_size_limit: The candidates id's group size limit (the ending point is determined by it).
+    """
     experiments_results = pd.DataFrame()
     previous_number_of_voters = -1
-    for voters_size_limit in range(voters_starting_ticking_size_limit, voters_final_ticking_size_limit,
-                                   voters_ticking_size_limit):
+    for voters_size_limit in range(voters_size_limit_starting_value, voters_size_limit_ending_value,
+                                   voters_size_limit_ticking_value):
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
                                         f"candidates_group_size_limit={candidates_size_limit}\n"
                                         f"voters_starting_point={voters_starting_point}\n"
@@ -212,12 +246,32 @@ def combined_constraints_experiment_runner_ticking_committee_size(
         voters_size_limit: int,
         candidates_starting_point: int,
         candidates_size_limit: int,
-        committee_size_ticking_start_point: int,
-        committee_size_ticking_step: int,
-        committee_size_ticking_end_point: int):
+        committee_size_starting_value: int,
+        committee_size_ticking_value: int,
+        committee_size_ending_value: int):
+    """Runner for an ABC with context settings, for a ticking committee size.
+
+    :param experiment_name: The experiment name.
+    :param database_name: The database name.
+    :param dcs: A list containing tuples of the DCs settings. Each tuple has the following structure -
+    (dc_dict: dict, committee_members_list: list, candidates_tables: list, comparison_atoms: list, constants: dict)
+    Further information about this structure can be found in the DC Extractor class.
+    :param tgds: A list containing tuples of the TGDs settings. Each tuple has the following structure -
+    (tgd_dict_start: dict, committee_members_list_start: list, tgd_dict_end: dict, committee_members_list_end: list,
+     candidates_tables_start: list, candidates_tables_end: list, different_variables: list)
+    Further information about this structure can be found in the TGD Extractor class.
+    :param voters_starting_point: The voters starting point (id to start from ids' range).
+    :param voters_size_limit: The voters size limit (the ending point is determined by it).
+    :param candidates_starting_point: The candidates starting point (id to start from ids' range).
+    :param candidates_size_limit: The candidates size limit (the ending point is determined by it).
+    :param committee_size_starting_value: The committee size starting value (we iterate over different committee sizes).
+    :param committee_size_ticking_value: The committee size ticking value (i.e. the step size).
+    :param committee_size_ending_value: The committee size end value (i.e. the end of the range of committee sizes to
+    iterate over).
+    """
     experiments_results = pd.DataFrame()
-    for committee_size in range(committee_size_ticking_start_point, committee_size_ticking_end_point,
-                                committee_size_ticking_step):
+    for committee_size in range(committee_size_starting_value, committee_size_ending_value,
+                                committee_size_ticking_value):
         config.debug_print(MODULE_NAME, f"candidates_starting_point={candidates_starting_point}\n"
                                         f"candidates_group_size_limit={candidates_size_limit}\n"
                                         f"voters_starting_point={voters_starting_point}\n"
@@ -240,6 +294,21 @@ def combined_constraints_experiment_district_runner(
         dcs: list, tgds: list,
         max_number_of_districts: int,
         number_of_candidates_from_each_district: dict):
+    """Runner for an ABC with context settings, for a ticking number of districts.
+
+    :param experiment_name: The experiment name
+    :param database_name: The database name.
+    :param dcs: A list containing tuples of the DCs settings. Each tuple has the following structure -
+    (dc_dict: dict, committee_members_list: list, candidates_tables: list, comparison_atoms: list, constants: dict)
+    Further information about this structure can be found in the DC Extractor class.
+    :param tgds: A list containing tuples of the TGDs settings. Each tuple has the following structure -
+    (tgd_dict_start: dict, committee_members_list_start: list, tgd_dict_end: dict, committee_members_list_end: list,
+     candidates_tables_start: list, candidates_tables_end: list, different_variables: list)
+    Further information about this structure can be found in the TGD Extractor class.
+    :param max_number_of_districts: The max number of districts (we iterate over different number of districts).
+    :param number_of_candidates_from_each_district: A dict with district number as key and the number of candidates in
+    this district as key.
+    """
     experiments_results = pd.DataFrame()
 
     for current_district_number in range(1, max_number_of_districts + 1):

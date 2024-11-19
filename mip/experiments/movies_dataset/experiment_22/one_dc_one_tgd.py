@@ -18,10 +18,10 @@ if __name__ == '__main__':
 
     # Run the experiment.
     combined_constraints_experiment. \
-        combined_constraints_experiment_runner(_experiment_name, config.MOVIES_DB_NAME,
-                                               _dcs, _tgds, _committee_size,
-                                               config.MOVIES_VOTERS_STARTING_POINT,
-                                               config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT,
-                                               1,
-                                               config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT + 1,
-                                               config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)
+        combined_constraints_experiment_runner_ticking_voters_size_limit(_experiment_name, config.MOVIES_DB_NAME,
+                                                                         _dcs, _tgds, _committee_size,
+                                                                         config.MOVIES_VOTERS_STARTING_POINT,
+                                                                         config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT,
+                                                                         1,
+                                                                         config.MOVIES_VOTERS_STARTING_TICKING_SIZE_LIMIT + 1,
+                                                                         config.MOVIES_CANDIDATES_STARTING_POINT, _candidates_group_size)

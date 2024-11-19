@@ -51,7 +51,7 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         :param comparison_atoms_end: A list of tuples of the form ('x','<','y') that enforce to comparison atom i.e.
         '<'/'>'/'='/'!=' between two (new) column names on the right hand side of the TGD.
         :param candidates_starting_point: The candidates starting point (id to start from ids' range).
-        :param candidates_size_limit: The candidates id's group size limit, (the ending point is determined by it).
+        :param candidates_size_limit: The candidates id's group size limit (the ending point is determined by it).
 
         Note: The comparison atoms functionality is an extension of the TGD framework.
         """
@@ -72,8 +72,8 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         self._tgd_tuples_list = None
 
     def _extract_data_from_db(self) -> None:
-        """
-        :return: A list of tuples - such that each tuple contain in the first place the
+        """Extracts the TGD data from the DB, save the result within the class.
+        The data is a list of tuples - such that each tuple contain in the first place the
         condition for the TGD (i.e. set of candidate the if they are in the committee then the TGD should be enforced,
         the so called 'left hand side' of the TGD), and in the second place there is set of sets (of candidates), such
         that at least one set of candidate should be chosen (the 'right hand side' of the TGD).

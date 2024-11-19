@@ -16,6 +16,19 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
                  voters_size_limit: int,
                  candidates_size_limit: int,
                  score_function):
+        """A class for extracting from the DB the required data for constructing a MIP constraints representing the ABC
+        settings.
+
+        :param abc_convertor: An instance of the class of an ABC to MIP convertor.
+        :param database_engine: An instance of the database engine.
+        :param committee_size: The committee size.
+        :param voters_starting_point: The voters starting point (id to start from ids' range).
+        :param candidates_starting_point: The candidates starting point (id to start from ids' range).
+        :param voters_size_limit: The voters id's group size limit (the ending point is determined by it).
+        :param candidates_size_limit: The candidates id's group size limit (the ending point is determined by it).
+        :param score_function: The ABC score function (the input the number of voter approved candidates, his approval
+        profile size and the output is a score contribution of the voter for the chosen committee).
+        """
         super().__init__(abc_convertor, database_engine, candidates_starting_point, candidates_size_limit)
 
         # Initializing ABC setting variables.
@@ -28,7 +41,6 @@ class ABCSettingExtractor(db_data_extractor.DBDataExtractor):
         self._approval_profile = dict()
         self._committee_size = committee_size
         self._score_function = score_function
-        self._lifted_voters = dict()
 
     def _extract_data_from_db(self) -> None:
         # ----------------------------------------------

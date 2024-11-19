@@ -1,4 +1,5 @@
 """This module contains constraints that are repeated in the experiments.
+Note - For improved interface one might consider creating classes for the different constraints and the ABC settings.
 """
 import config
 

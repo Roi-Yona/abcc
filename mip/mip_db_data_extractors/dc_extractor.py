@@ -34,7 +34,7 @@ class DCExtractor(db_data_extractor.DBDataExtractor):
         :param candidates_tables: The tables (new) names that containing the candidate id column (in order to enforce
         candidates range constraint).
         :param candidates_starting_point: The candidates starting point (id to start from ids' range).
-        :param candidates_size_limit: The candidates id's group size limit, (the ending point is determined by it).
+        :param candidates_size_limit: The candidates id's group size limit (the ending point is determined by it).
         """
         super().__init__(abc_convertor, database_engine, candidates_starting_point, candidates_size_limit)
 
@@ -46,6 +46,10 @@ class DCExtractor(db_data_extractor.DBDataExtractor):
         self._dc_candidates_sets = None
 
     def _extract_data_from_db(self) -> None:
+        """Extracts the DC data from the DB, save the result within the class. 
+        The data is a list (numpy array) containing lists (numpy arrays) of the DC candidates groups, i.e. each list is
+        a combination of candidates ids that cannot be in the committee together.
+        """""
         legal_assignments = self.join_tables(self._candidates_tables, self._dc_dict, self._constants,
                                              self._comparison_atoms)
 

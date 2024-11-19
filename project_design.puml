@@ -29,53 +29,24 @@ ABCToMIPConvertor o-- DBDataExtractor
 DBEngine o-- DBDataExtractor
 
 class ABCSettingExtractor{
-    -voters_id_starts_from_one
-    -voting_table_name
-    -candidates_table_name
-    -candidates_column_name
-    -voters_column_name
-    -approval_column_name
-
     +extract_data_from_db()
     +convert_to_mip()
 }
 DBDataExtractor <|-- ABCSettingExtractor
 
 class DCExtractor{
-    -dc_dict
-    -committee_members_list
-    -candidates_tables
-    -dc_candidates_sets
-
     +extract_data_from_db()
     +convert_to_mip()
 }
 DBDataExtractor <|-- DCExtractor
 
 class TGDExtractor{
-    -tgd_dict_start
-    -committee_members_list_start
-    -different_variables
-    -tgd_dict_end = tgd_dict_end
-    -committee_members_list_end
-    -candidates_tables_start
-    -candidates_tables_end
-    -tgd_tuples_list
-
     +extract_data_from_db()
     +convert_to_mip()
 }
 DBDataExtractor <|-- TGDExtractor
 
 abstract class Experiment{
-    -experiment_name
-    -database_name
-    -solver_time_limit = int(MINUTE * 0.5)
-    -solver_name
-    -solver
-    -abc_convector
-    +results_file_path
-
     +create_results_df()
     +save_results()
     +run_model()
@@ -85,10 +56,6 @@ Experiment --* ABCToMIPConvertor
 Experiment --* DBDataExtractor
 
 class CombinedConstraintsExperiment{
-    -voters_group_size
-    -committee_size
-    -candidates_group_size
-    -av_db_data_extractor
     +create_results_df()
     +run_experiment()
     +experiment_runner()

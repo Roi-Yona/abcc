@@ -42,7 +42,7 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
         self._max_score_function_value = 0
 
         # The model variables.
-        self._model_candidates_variables = dict()
+        self.model_candidates_variables = dict()
         self._model_voters_score_contribution_variables = dict()
         self._model_voters_approval_candidates_sum_variables = dict()
 
@@ -56,7 +56,7 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
         """
         solution = f""
         count = 0
-        for key, value in self._model_candidates_variables.items():
+        for key, value in self.model_candidates_variables.items():
             solution += f"Candidate id: {key}, Candidate value: {value.solution_value()}.\n"
             count += 1
             if count > 50:
@@ -158,7 +158,7 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
     def _define_abc_setting_variables(self) -> None:
         # Create the committee MIP variables.
         for candidate_id in self._candidates_ids_set:
-            self._model_candidates_variables[candidate_id] = self._model.BoolVar("c_" + str(candidate_id))
+            self.model_candidates_variables[candidate_id] = self._model.BoolVar("c_" + str(candidate_id))
 
         # Create the voters approval candidates sum variables.
         for voter_id in self._approval_profile.keys():
@@ -172,13 +172,13 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
 
     def _define_abc_setting_constraints(self) -> None:
         # Add the constraint about the number of candidates in the committee.
-        self._model.Add(sum(self._model_candidates_variables.values()) == self._committee_size)
+        self._model.Add(sum(self.model_candidates_variables.values()) == self._committee_size)
 
         # Add constraints for voters approval candidates sum vars to be equal to the sum of their approved candidates.
         for voter_id in self._approval_profile.keys():
             self._model.Add(self._model_voters_approval_candidates_sum_variables[voter_id] ==
-                            sum([self._model_candidates_variables[candidate_id] for candidate_id in
-                                 self._approval_profile[voter_id] if candidate_id in self._model_candidates_variables]))
+                            sum([self.model_candidates_variables[candidate_id] for candidate_id in
+                                 self._approval_profile[voter_id] if candidate_id in self.model_candidates_variables]))
 
         # Add the constraint about the voter score contribution.
         for voter_id in self._approval_profile.keys():
@@ -243,8 +243,8 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
             dc_group_length = len(dc_candidates_sets[0])
         for candidates_set in new_dc_candidates_sets:
             self._model.Add(
-                sum([self._model_candidates_variables[candidate_index] for candidate_index in candidates_set
-                     if candidate_index in self._model_candidates_variables])
+                sum([self.model_candidates_variables[candidate_index] for candidate_index in candidates_set
+                     if candidate_index in self.model_candidates_variables])
                 <= (dc_group_length - 1))
 
     def define_tgd(self, tgd_tuples_list: list):
@@ -265,8 +265,8 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
             b = self._model.BoolVar('tgd_b_' + str(self._global_counter))
             self._global_counter += 1
             self._model.Add(
-                sum([self._model_candidates_variables[x] for x in element_members
-                     if x in self._model_candidates_variables])
+                sum([self.model_candidates_variables[x] for x in element_members
+                     if x in self.model_candidates_variables])
                 <= (b - 1 + len(element_members)))
 
             # List of possible representatives sets.
@@ -276,8 +276,8 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
                 self._global_counter += 1
                 b_representatives_list.append(current_b)
                 self._model.Add(
-                    sum([self._model_candidates_variables[x] for x in representatives_set
-                         if x in self._model_candidates_variables])
+                    sum([self.model_candidates_variables[x] for x in representatives_set
+                         if x in self.model_candidates_variables])
                     >= (current_b * len(representatives_set)))
 
             # If b chosen, chose at least one representatives_set.

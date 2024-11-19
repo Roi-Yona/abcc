@@ -19,7 +19,7 @@ class DBDataExtractor:
         :param abc_convertor: An instance of an ABC to MIP convertor.
         :param database_engine: An instance of a database engine.
         :param candidates_starting_point: The candidates starting point (id to start from ids' range).
-        :param candidates_size_limit: The candidates id's group size limit, (the ending point is determined by it).
+        :param candidates_size_limit: The candidates id's group size limit (the ending point is determined by it).
         """
         self._abc_convertor = abc_convertor
         self._db_engine = database_engine
@@ -164,7 +164,7 @@ class DBDataExtractor:
         # Extract problem data from the database.
         self.extract_data_from_db()
 
-        # Convert to MIP problem (add the model properties)
+        # Convert to MIP problem (add the model properties).
         self.convert_to_mip()
 
 
