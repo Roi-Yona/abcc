@@ -12,7 +12,7 @@ import config
 # ---------------------------------------------------------------------------
 def remove_file(file_path: str):
     if os.path.exists(file_path):
-        # Delete the file
+        # Delete the file.
         os.remove(file_path)
 
 
@@ -66,7 +66,7 @@ def create_tests_db(cur):
                         {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
                         {config.APPROVAL_COLUMN_NAME} FLOAT NOT NULL)''')
 
-    # Insert multiple rows into the table
+    # Insert multiple rows into the table.
     new_data = [
         (1, 3, 4.1),
         (1, 4, 3.1),
@@ -148,7 +148,7 @@ def trip_advisor_create_important_locations_table(cur, con):
                         location TEXT NOT NULL,
                         price_range TEXT NOT NULL)''')
 
-    # Insert multiple rows into the table
+    # Insert multiple rows into the table.
     new_data = [
         ('Dallas Texas', 'low'),
         ('Madrid', 'low'),
@@ -167,7 +167,7 @@ def trip_advisor_create_price_ranges_table(cur, con):
     cur.execute('''CREATE TABLE IF NOT EXISTS hotels_price_ranges (
                         price_range TEXT NOT NULL PRIMARY KEY)''')
 
-    # Insert multiple rows into the table
+    # Insert multiple rows into the table.
     new_data = [
         ('high',),
         ('medium',),
@@ -310,7 +310,7 @@ def create_movies_runtime_categories_table(cur, con):
     cur.execute('''CREATE TABLE IF NOT EXISTS runtime_categories (
                         runtime TEXT NOT NULL PRIMARY KEY)''')
 
-    # Insert multiple rows into the table
+    # Insert multiple rows into the table.
     new_data = [
         ('short',),
         ('long',),
@@ -324,7 +324,7 @@ def create_movies_important_genres_table(cur, con):
     cur.execute('''CREATE TABLE IF NOT EXISTS important_genres (
                         genre TEXT NOT NULL PRIMARY KEY)''')
 
-    # Insert multiple rows into the table
+    # Insert multiple rows into the table.
     new_data = [
         ('Comedy',),
         ('Action',),
@@ -339,7 +339,7 @@ def create_movies_important_languages_table(cur, con):
     cur.execute('''CREATE TABLE IF NOT EXISTS important_languages (
                         original_language TEXT NOT NULL)''')
 
-    # Insert multiple rows into the table
+    # Insert multiple rows into the table.
     new_data = [
         ('en',),
         ('fr',),
@@ -386,7 +386,7 @@ def create_glasgow_voting_table(cur, con, district_index: int):
 
 def create_glasgow_candidates_table(cur, con):
     # Note: In order to enable different number of candidates per district,
-    # I should add a table per district (Currently not needed)
+    # I should add a table per district (Currently not needed).
 
     # Creating the candidates table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
@@ -409,7 +409,7 @@ def create_glasgow_important_parties_db(cur, con):
     cur.execute('''CREATE TABLE IF NOT EXISTS important_parties (
                         party TEXT PRIMARY KEY)''')
 
-    # Insert multiple rows into the table
+    # Insert multiple rows into the table.
     # The parties that left out: Solidarity, Liberal Democrats, Scottish Socialist, Scottish Unionist
     new_data = [
         ('Scottish Green',),

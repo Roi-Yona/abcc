@@ -7,6 +7,7 @@ from mip.mip_reduction import score_functions
 # General:
 # --------------------------------------------------------------------------------
 DEBUG = True
+unique_key_index = 0
 
 # Enable to print big Dataframe without any cutting.
 pd.set_option('display.max_rows', None)  # None means unlimited rows
@@ -26,12 +27,35 @@ PARSED_DATA_FOLDER_NAME = "parsed_data"
 MINUTE = 1000 * 60
 HOUR = MINUTE * 60
 
+# Solver status:
+
+# Success, found optimal solution.
+SOLVER_FOUND_OPTIMAL_STATUS = 0
+# Found feasible but not optimal due to timeout.
 SOLVER_TIMEOUT_STATUS = 1
+# Proved that there is no feasible solution.
+SOLVER_PROVEN_INFEASIBLE_STATUS = 2
+# The problem is unbounded, meaning the objective function can increase (or decrease) indefinitely without violating
+# constraints.
+SOLVER_PROVEN_UNBOUNDED_STATUS = 3
+# The solver terminated abnormally, and the result is inconclusive.
+SOLVER_ABNORMAL_ERROR_STATUS = 4
+# The model is invalid (for example NaN coefficients).
+SOLVER_MODEL_INVALID_ERROR_STATUS = 5
+# solve() function is yet to be called.
+SOLVER_MODEL_NOT_SOLVED_ERROR_STATUS = 6
 
 SOLVER_TIME_LIMIT = int(0.5 * HOUR)
-SOLVER_NAME = "SAT"  # Options: "CP_SAT", "SAT", "GLPK", "GUROBI"
-SCORE_FUNCTION = score_functions.pav_thiele_function
+SOLVER_NAMES = ["SAT", "CP_SAT", "SAT", "GLPK", "GUROBI"]
+SOLVER_NAME = SOLVER_NAMES[0]
+SCORE_RULES = {
+    'PAV': score_functions.pav_thiele_function,
+    'AV': score_functions.av_thiele_function,
+    'CC': score_functions.cc_thiele_function,
+    '2_TRUNCATED_AV': score_functions.k_2_truncated_av_thiele_function,
+    'SAV': score_functions.sav_score_rule_function}
 SCORE_RULE_NAME = 'PAV'
+SCORE_FUNCTION = SCORE_RULES[SCORE_RULE_NAME]
 
 LIFTED_INFERENCE = True
 MINIMIZE_VOTER_CONTRIBUTION_EQUATIONS = True
@@ -183,7 +207,11 @@ MOVIES_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = MOVIES_RESULTS_BASE_PAT
 MOVIES_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_optimization_constraints.eps'
 MOVIES_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_optimization_variables.eps'
 
+
 # --------------------------------------------------------------------------------
+DB_NAME_LIST = [MOVIES_DB_NAME, GLASGOW_ELECTIONS_DB_NAME, TRIP_ADVISOR_DB_NAME]
+COMMITTEE_RELATION_NAME = 'Com'
+COMPARISON_SINGS = ['<', '>', '=']
 
 
 # Utility Functions:
@@ -281,4 +309,11 @@ def select_points(df, num_points=7):
     selected_points = df.iloc[indices]
 
     return selected_points
+
+
+def generate_unique_key_string() -> str:
+    global unique_key_index
+    key = f"name_{unique_key_index}"
+    unique_key_index += 1
+    return key
 # --------------------------------------------------------------------------------
