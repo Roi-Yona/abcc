@@ -30,6 +30,8 @@ All datasets should locate under:
 ```database/data/datasets/<new_dataset_folder>/original_data```
 All ```.db``` sqlite databases should locate under:
 ```database/databases/sqlite_databases/<database_name>```
+The ```<new_dataset_folder>``` and the ```<database_name>``` should also be defined in the ```config.py``` file 
+(and the current ones are already defined). 
 
 After adding the datasets to the project properly, you should run ```parse_dataset_and_create_db``` python script.
 Parsing, cleaning and creating for the three datasets describe above is already implemented.
@@ -47,7 +49,7 @@ The experiments are located under:
 To run an experiment can simply run the python file.
 
 Note that ```config.py``` holds important settings for your experiment, such as DEBUG mode.
-Note thay when running the experiment, a copy from the database directory of the ```.db``` file will be created in your 
+Note they when running the experiment, a copy from the database directory of the ```.db``` file will be created in your 
 experiment directory, in order to enable parallel running.
 The result of this experiments can be found under ```mip/experiments/<dataset_name>/results```.
 
