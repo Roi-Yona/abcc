@@ -1,3 +1,5 @@
+from typing import List, Dict
+
 import streamlit as st
 import re
 import os
@@ -43,16 +45,16 @@ def check_string_type(input_str: str) -> str:
     return "name"
 
 
-def advance_column_index(index, number_of_columns):
+def advance_column_index(index: int, number_of_columns: int) -> int:
     new_index = (index + 1) % number_of_columns
     return new_index
 
 
-def generate_committee_member_attribute_name(current_index) -> str:
+def generate_committee_member_attribute_name(current_index: int) -> str:
     return f"c_{current_index}"
 
 
-def test_committee_member_name(argument_name: str, current_highest_index: int):
+def test_committee_member_name(argument_name: str, current_highest_index: int) -> bool:
     match = re.match(r'c_(\d+)', argument_name)
     if match:
         id_value = int(match.group(1))  # Extract the number after "c_"
@@ -60,7 +62,7 @@ def test_committee_member_name(argument_name: str, current_highest_index: int):
     return False
 
 
-def extract_table_names(db_name: str):
+def extract_table_names(db_name: str) -> List[str]:
     EXTRACT_QUERY = "SELECT name AS table_name\n" \
                     "FROM sqlite_master\n" \
                     "WHERE type='table';"
@@ -71,7 +73,7 @@ def extract_table_names(db_name: str):
     return result['table_name'].tolist()
 
 
-def extract_table_attributes(db_name: str, table_name: str):
+def extract_table_attributes(db_name: str, table_name: str) -> List[str]:
     EXTRACT_QUERY = f"PRAGMA\n" \
                     f"table_info('{table_name}');"
 
@@ -80,8 +82,8 @@ def extract_table_attributes(db_name: str, table_name: str):
     db_engine.__del__()
     return result['name'].tolist()
 
-
-def extract_available_relations_dict(db_name: str):
+@st.cache_resource
+def extract_available_relations_dict(db_name: str) -> Dict[str, List[str]]:
     available_relations = dict()
     tables_list = extract_table_names(db_name)
     for table_name in tables_list:
