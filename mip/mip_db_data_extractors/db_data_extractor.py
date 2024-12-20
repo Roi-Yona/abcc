@@ -64,6 +64,10 @@ class DBDataExtractor:
         i.e. '<'/'>'/'='/'!=' between two (new) column names.
         :return: The resulted df of the join operation, with the new names (such as 'x').
         """
+        # Handle special case of an empty dict.
+        if len(tables_dict.items()) == 0:
+            return pd.DataFrame()
+
         # Link between the new variable name to the new table name.
         # For instance variable_dict['x'] = [('t1', 'original_x_column_name'), ...].
         variables_dict = dict()

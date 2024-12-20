@@ -83,25 +83,34 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         """
         legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start,
                                                    self._constants_start, self._comparison_atoms_start)
-        # Extract the committee members sets out of the resulted join.
         tgd_tuples_list = []
-        for _, row in legal_assignments_start.iterrows():
-            current_row_assigment_constants = row.to_dict()
-            config.debug_print(MODULE_NAME, "The current candidates assignments constants are: " +
-                               str(current_row_assigment_constants))
-            current_element_committee_members = set(row[self._committee_members_list_start])
-
-            # Check if there are common keys between the two dicts.
-            if current_row_assigment_constants.keys() & self._constants_end.keys():
-                raise ValueError("The input tgd_constants_end and the assignment of the committee members at the left "
-                                 "hand side of the TGD (committee_members_list_start) are overlap.")
-            else:
-                union_constants = current_row_assigment_constants | self._constants_end
-            legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end, union_constants,
+        if legal_assignments_start.empty:
+            legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
+                                                     self._constants_end,
                                                      self._comparison_atoms_end)
             current_element_representatives_set = legal_assignments_end[self._committee_members_list_end].values
+            tgd_tuples_list.append((set(), current_element_representatives_set))
+        else:
+            # Extract the committee members sets out of the resulted join.
+            for _, row in legal_assignments_start.iterrows():
+                current_row_assignment_constants = row.to_dict()
+                config.debug_print(MODULE_NAME, "The current candidates assignments constants are: " +
+                                   str(current_row_assignment_constants))
+                current_element_committee_members = set(row[self._committee_members_list_start])
 
-            tgd_tuples_list.append((current_element_committee_members, current_element_representatives_set))
+                # Check if there are common keys between the two dicts.
+                if current_row_assignment_constants.keys() & self._constants_end.keys():
+                    raise ValueError(
+                        "The input tgd_constants_end and the assignment of the committee members at the left "
+                        "hand side of the TGD (committee_members_list_start) are overlap.")
+                else:
+                    union_constants = current_row_assignment_constants | self._constants_end
+                legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
+                                                         union_constants,
+                                                         self._comparison_atoms_end)
+                current_element_representatives_set = legal_assignments_end[self._committee_members_list_end].values
+
+                tgd_tuples_list.append((current_element_committee_members, current_element_representatives_set))
 
         self._tgd_tuples_list = tgd_tuples_list
 
