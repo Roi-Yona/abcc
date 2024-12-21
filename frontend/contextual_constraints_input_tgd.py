@@ -58,9 +58,7 @@ def user_input_one_tgd_side(
 
     with constraint_columns_list[column_list_index]:
         constraint_statement_message = "For All:" if is_left_hand_side else "Exists:"
-        st.markdown("<p style='padding-top:0.01px'></p>", unsafe_allow_html=True)
-        st.markdown(constraint_statement_message)
-        # st.caption('-')
+        st.markdown(f"**{constraint_statement_message}**")
         column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
     if column_list_index == 0:
@@ -166,7 +164,7 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
         # Get the left and right hand of the TGD definition from the user.
         constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2]
 
-        left_constraint_columns_list = st.columns(constraint_columns_ratio)
+        left_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="center")
         column_list_index = 0
         column_list_index, current_committee_member_id, left_hand_side_relations = user_input_one_tgd_side(
             left_hand_side_relations_number,
@@ -178,7 +176,7 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
             column_list_index
         )
 
-        right_constraint_columns_list = st.columns(constraint_columns_ratio)
+        right_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="center")
         column_list_index = 0
         _, _, right_hand_side_relations = user_input_one_tgd_side(
             right_hand_side_relations_number,
