@@ -13,8 +13,9 @@ MODULE_NAME = f'Utils'
 def page_setting():
     # Set page icon and title.
     st.set_page_config(
-        page_icon="✍️", layout="wide", initial_sidebar_state="auto")
+        page_icon="✍️", layout="wide", initial_sidebar_state="auto", )
     st.title("Approval-Based Committee Voting in the Presence of Constraints")
+    set_text_input_style()
 
 
 def check_string_type(input_str: str) -> str:
@@ -90,6 +91,39 @@ def extract_available_relations_dict(db_name: str) -> Dict[str, List[str]]:
         available_relations[table_name] = extract_table_attributes(db_name, table_name)
     available_relations[config.COMMITTEE_RELATION_NAME] = []
     return available_relations
+
+
+
+DEFAULT_TEXT_INPUT_STYLE_NAME = "default_text_input_style"
+COMPARISON_TEXT_INPUT_STYLE_NAME = "comparison_text_input_style"
+def set_text_input_style(
+        background_color: str = "#eafaf1",
+        border_color: str = "#f0f8ff",
+        border_radius: str = "5px",
+        text_color: str = "#333"
+) -> None:
+    """
+
+    :param background_color: string representing the background color of the text input widget. Default is light blue
+    :param border_color: string representing the border color of the text input widget. Default is blue
+    :param border_radius: string representing the border radius (for rounded corners) of the text input widget. Default is 5px
+    :param text_color: string representing the color of the input text. default is light black
+    :return:
+    """
+    st.markdown(
+        f"""
+        <style>
+        .stTextInput input {{
+            background-color: {background_color}; 
+            border: 2px solid {border_color};
+            border-radius: {border_radius};
+            color: {text_color};           /* Text color */
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 
 def extract_table_size(db_name: str, table_name: str, column_name: str):

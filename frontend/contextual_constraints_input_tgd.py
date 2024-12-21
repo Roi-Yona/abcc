@@ -61,12 +61,11 @@ def user_input_one_tgd_side(
         st.markdown(f"**{constraint_statement_message}**")
         column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
-    if column_list_index == 0:
-        constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
-
     for i in range(int(number_of_relational_atoms)):
         current_relation_unique_key = tgd_unique_key + f'_relation_{i}'
         # Create the current relation select box.
+        if column_list_index == 0:
+            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
         with constraint_columns_list[column_list_index]:
             relation_name = st.selectbox(
                 f"Relation {i + 1}",
@@ -77,8 +76,7 @@ def user_input_one_tgd_side(
             )
             # st.caption('-')
             column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
-        if column_list_index == 0:
-            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+
         relation_dict_key = (relation_name, current_relation_unique_key)
 
         # Handle the special committee relation (no user choice for the input).
@@ -86,31 +84,36 @@ def user_input_one_tgd_side(
             candidate_attribute_name = utils.generate_committee_member_attribute_name(committee_member_id)
             committee_member_id += 1
             tgd_committee_members_list.append(candidate_attribute_name)
-            with constraint_columns_list[column_list_index]:
-                st.markdown("<p style='padding-top:0.01px'></p>", unsafe_allow_html=True)
-                st.markdown(candidate_attribute_name)
-                # st.caption('-')
-                column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+
             if column_list_index == 0:
                 constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+            with constraint_columns_list[column_list_index]:
+                # st.markdown("<p style='padding-top:0.01px'></p>", unsafe_allow_html=True)
+                # st.markdown(candidate_attribute_name)
+                st.write(f"{candidate_attribute_name}")
+                # st.caption('-')
+                column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+
             continue
 
         # Otherwise, regular relation.
         for argument in available_relations[relation_name]:
+            style_key = current_relation_unique_key + f"_arg_{argument}"
+            if column_list_index == 0:
+                constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
             with constraint_columns_list[column_list_index]:
-                # TODO: Reduce space between caption and text input.
                 user_current_attribute_input = st.text_input(
-                    label="",
-                    key=current_relation_unique_key + f"_arg_{argument}",
-                    value='',
+                    label=style_key,
+                    key=style_key,
+                    value="",
                     label_visibility="collapsed",
                     placeholder=argument,
                     help=argument,
                 )
-                # st.caption(argument)
+
                 column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
-            if column_list_index == 0:
-                constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+
+
 
             # Check the user input type:
             input_type = utils.check_string_type(user_current_attribute_input)
