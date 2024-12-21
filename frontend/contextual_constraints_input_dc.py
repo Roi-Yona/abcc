@@ -159,8 +159,6 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
     for i in range(int(number_of_dc_comparison_atoms)):
         current_comparison_atom_unique_key = dc_unique_key + f'_comparison_atom_{i}'
 
-        if column_list_index == 0:
-            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT, vertical_alignment="bottom")
         # Input the comparison atom (two arguments and comparison sign between them).
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
