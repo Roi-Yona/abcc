@@ -46,14 +46,16 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
     dc_relational_atoms_unique_key = f"dc_relational_atoms_{dc_constraint_number}"
     dc_comparison_atoms_unique_key = f"dc_comparison_atoms_{dc_constraint_number}"
 
-    constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+    constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2.5]
+
+    constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="center")
     column_list_index = 0
     committee_member_id = 1
     with constraint_columns_list[column_list_index]:
-        st.markdown("<p style='padding-top:0.01px'></p>", unsafe_allow_html=True)
-        st.markdown("Not")
-        st.caption('-')
+        st.markdown(f"**Not**")
         column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+    if column_list_index == 0:
+        constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
     for i in range(int(number_of_dc_relational_atoms)):
         current_relation_unique_key = dc_relational_atoms_unique_key + f'_relational_atom_{i}'
@@ -66,8 +68,9 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                 index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
                 label_visibility="collapsed"
             )
-            st.caption('-')
             column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+        if column_list_index == 0:
+            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
         relation_dict_key = (relation_name, current_relation_unique_key)
 
         # Handle the special committee relation (no user choice for the input).
@@ -79,18 +82,24 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                 st.markdown("<p style='padding-top:0.01px'></p>", unsafe_allow_html=True)
                 st.markdown(candidate_attribute_name)
                 column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
-                st.caption('_')
+            if column_list_index == 0:
+                constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
             continue
 
         # Otherwise, regular relation.
         for argument in available_relations[relation_name]:
             with constraint_columns_list[column_list_index]:
                 # TODO: Reduce space between caption and text input.
-                user_current_attribute_input = st.text_input(f"{argument}",
-                                                             key=current_relation_unique_key + f"_arg_{argument}",
-                                                             value='_', label_visibility="collapsed")
-                st.caption(argument)
+                user_current_attribute_input = st.text_input(
+                    f"{argument}",
+                    key=current_relation_unique_key + f"_arg_{argument}",
+                    value="",
+                    label_visibility="collapsed",
+                    placeholder=argument
+                )
                 column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+            if column_list_index == 0:
+                constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
             # Check the user input type:
             input_type = utils.check_string_type(user_current_attribute_input)
@@ -121,7 +130,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
 
 
 def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique_key: str,
-                                   number_of_committee_members: int, constraint_column_list: list,
+                                   number_of_committee_members: int, constraint_columns_list: list,
                                    column_list_index: int):
     """Get from the user the DC constraint comparison atoms.
 
@@ -129,7 +138,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
     :param dc_unique_key: A unique key for the current DC (and relational atoms input).
     :param number_of_committee_members: The number of committee members that are defined in the constraint (i.e. the
     id's of the constraint committee members are in the range of [1, number_of_committee_members]).
-    :param constraint_column_list: The constraint column list create by the function st.columns.
+    :param constraint_columns_list: The constraint column list create by the function st.columns.
     :param column_list_index: The current column index.
     :return: DC relational atoms constraint definition (as defined by the MIP convertor modules - look at the
     constraints module for more details).
@@ -140,27 +149,30 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
         current_comparison_atom_unique_key = dc_unique_key + f'_comparison_atom_{i}'
 
         # Input the comparison atom (two arguments and comparison sign between them).
-        with constraint_column_list[column_list_index]:
+        with constraint_columns_list[column_list_index]:
             left_side_comparison_arg = st.text_input(f"variable name/value",
                                                      key=current_comparison_atom_unique_key + f"_left_side_comparison_arg",
                                                      label_visibility="collapsed")
-            st.caption('-')
             column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
-        with constraint_column_list[column_list_index]:
+        if column_list_index == 0:
+            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+        with constraint_columns_list[column_list_index]:
             comparison_sign = st.selectbox(
                 f"comparison sign {i + 1}",
                 config.COMPARISON_SINGS,
                 key=current_comparison_atom_unique_key,
                 label_visibility="collapsed"
             )
-            st.caption('-')
             column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
-        with constraint_column_list[column_list_index]:
+        if column_list_index == 0:
+            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+        with constraint_columns_list[column_list_index]:
             right_side_comparison_arg = st.text_input(f"variable name/value",
                                                       key=current_comparison_atom_unique_key + f"_right_side_comparison_arg",
                                                       label_visibility="collapsed")
-            st.caption('-')
             column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+        if column_list_index == 0:
+            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
         left_side_comparison_arg = left_side_comparison_arg.replace("'", '"')
         right_side_comparison_arg = right_side_comparison_arg.replace("'", '"')
