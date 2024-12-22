@@ -88,10 +88,13 @@ def user_input_one_tgd_side(
             if column_list_index == 0:
                 constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
             with constraint_columns_list[column_list_index]:
-                # st.markdown("<p style='padding-top:0.01px'></p>", unsafe_allow_html=True)
-                # st.markdown(candidate_attribute_name)
-                st.write(f"{candidate_attribute_name}")
-                # st.caption('-')
+                st.text_input(
+                    label="",
+                    key=candidate_attribute_name,
+                    value=candidate_attribute_name,
+                    label_visibility="collapsed",
+                    disabled=True,
+                )
                 column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
             continue
@@ -103,10 +106,10 @@ def user_input_one_tgd_side(
                 constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
             with constraint_columns_list[column_list_index]:
                 user_current_attribute_input = st.text_input(
-                    label=style_key,
+                    label="",
                     key=style_key,
                     value="",
-                    label_visibility="collapsed",
+                    label_visibility="visible",
                     placeholder=argument,
                     help=argument,
                 )
@@ -167,20 +170,18 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
         # Get the left and right hand of the TGD definition from the user.
         constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2]
 
-        left_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="center")
-        column_list_index = 0
-        column_list_index, current_committee_member_id, left_hand_side_relations = user_input_one_tgd_side(
+        left_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="bottom")
+        _, current_committee_member_id, left_hand_side_relations = user_input_one_tgd_side(
             left_hand_side_relations_number,
             available_relations,
             f"tgd_left_{tgd_constraint_number}",
             True,
             1,
             left_constraint_columns_list,
-            column_list_index
+            0
         )
 
-        right_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="center")
-        column_list_index = 0
+        right_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="bottom")
         _, _, right_hand_side_relations = user_input_one_tgd_side(
             right_hand_side_relations_number,
             available_relations,
@@ -188,7 +189,7 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
             False,
             current_committee_member_id,
             right_constraint_columns_list,
-            column_list_index
+            0
         )
         tgd_constraints.append((*left_hand_side_relations, *right_hand_side_relations))
 

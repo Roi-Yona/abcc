@@ -48,7 +48,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
 
     constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2.5]
 
-    constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="center")
+    constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="bottom")
     column_list_index = 0
     committee_member_id = 1
     with constraint_columns_list[column_list_index]:
@@ -78,24 +78,28 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
             candidate_attribute_name = utils.generate_committee_member_attribute_name(committee_member_id)
             committee_member_id += 1
             dc_committee_members_list.append(candidate_attribute_name)
-            with constraint_columns_list[column_list_index]:
-                st.markdown("<p style='padding-top:0.01px'></p>", unsafe_allow_html=True)
-                st.markdown(candidate_attribute_name)
-                column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
             if column_list_index == 0:
                 constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+            with constraint_columns_list[column_list_index]:
+                st.text_input(
+                    label="",
+                    value=candidate_attribute_name,
+                    label_visibility="collapsed",
+                    disabled=True,
+                )
+                column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
             continue
 
         # Otherwise, regular relation.
         for argument in available_relations[relation_name]:
             with constraint_columns_list[column_list_index]:
-                # TODO: Reduce space between caption and text input.
                 user_current_attribute_input = st.text_input(
-                    f"{argument}",
+                    "",
                     key=current_relation_unique_key + f"_arg_{argument}",
                     value="",
-                    label_visibility="collapsed",
-                    placeholder=argument
+                    label_visibility="visible",
+                    placeholder=argument,
+                    help=argument,
                 )
                 column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
             if column_list_index == 0:
@@ -148,6 +152,8 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
     for i in range(int(number_of_dc_comparison_atoms)):
         current_comparison_atom_unique_key = dc_unique_key + f'_comparison_atom_{i}'
 
+        if i > 0 and column_list_index == 0:
+            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
         # Input the comparison atom (two arguments and comparison sign between them).
         with constraint_columns_list[column_list_index]:
             left_side_comparison_arg = st.text_input(f"variable name/value",
@@ -164,6 +170,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
                 label_visibility="collapsed"
             )
             column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+
         if column_list_index == 0:
             constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
         with constraint_columns_list[column_list_index]:
@@ -171,8 +178,6 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
                                                       key=current_comparison_atom_unique_key + f"_right_side_comparison_arg",
                                                       label_visibility="collapsed")
             column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
-        if column_list_index == 0:
-            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
         left_side_comparison_arg = left_side_comparison_arg.replace("'", '"')
         right_side_comparison_arg = right_side_comparison_arg.replace("'", '"')
