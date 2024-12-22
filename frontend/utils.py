@@ -94,8 +94,6 @@ def extract_available_relations_dict(db_name: str) -> Dict[str, List[str]]:
 
 
 
-DEFAULT_TEXT_INPUT_STYLE_NAME = "default_text_input_style"
-COMPARISON_TEXT_INPUT_STYLE_NAME = "comparison_text_input_style"
 def set_text_input_style(
         background_color: str = "#eafaf1",
         border_color: str = "#f0f8ff",
@@ -103,12 +101,13 @@ def set_text_input_style(
         text_color: str = "#333"
 ) -> None:
     """
+    set the style for all text inputs in the app.
 
     :param background_color: string representing the background color of the text input widget. Default is light blue
     :param border_color: string representing the border color of the text input widget. Default is blue
     :param border_radius: string representing the border radius (for rounded corners) of the text input widget. Default is 5px
     :param text_color: string representing the color of the input text. default is light black
-    :return:
+    :return: nothing
     """
     st.markdown(
         f"""
@@ -117,7 +116,7 @@ def set_text_input_style(
             background-color: {background_color}; 
             border: 2px solid {border_color};
             border-radius: {border_radius};
-            color: {text_color};           /* Text color */
+            color: {text_color};        
         }}
         </style>
         """,

@@ -29,7 +29,6 @@ def user_input_one_tgd_side(
     is_left_hand_side: bool,
     committee_member_id: int,
     constraint_columns_list: list,
-    column_list_index: int
 ):
     """Get from the user one side of the TGD.
 
@@ -40,7 +39,6 @@ def user_input_one_tgd_side(
     :param is_left_hand_side: a boolean indicating if it's a left or right hand side of the TGD.
     :param committee_member_id: The next committee member id in the constraint so far.
     :param constraint_columns_list: The constraint column list create by the function st.columns.
-    :param column_list_index: The current column index.
     :return: TGD one side constraint definition (as defined by the MIP convertor modules - look at the constraints
     module for more details).
     """
@@ -55,6 +53,7 @@ def user_input_one_tgd_side(
 
     # This is currently not part of the framework and therefore, stays empty.
     tgd_comparison_atoms_list = []
+    column_list_index = 0
 
     with constraint_columns_list[column_list_index]:
         constraint_statement_message = "For All:" if is_left_hand_side else "Exists:"
@@ -155,13 +154,13 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
     # Iterate and get all the TGDs from the user.
     for tgd_constraint_number in range(number_of_tgd_constraints):
         # Get the number of relations in each side of the current TGD.
-        left_col, right_col = st.columns(2)
-        with left_col:
+        for_all_constraints_col, exists_constraints_col = st.columns(2)
+        with for_all_constraints_col:
             left_hand_side_relations_number = st.number_input(
                 "Number of relational atoms on the left hand side", min_value=0, step=1,
                 value=1, key=f"tgd_left_side_number_{tgd_constraint_number}"
             )
-        with right_col:
+        with exists_constraints_col:
             right_hand_side_relations_number = st.number_input(
                 "Number of relational atoms on the right hand side", min_value=1, step=1,
                 value=1, key=f"tgd_right_side_number_{tgd_constraint_number}"
@@ -178,7 +177,6 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
             True,
             1,
             left_constraint_columns_list,
-            0
         )
 
         right_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="bottom")
@@ -189,7 +187,6 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
             False,
             current_committee_member_id,
             right_constraint_columns_list,
-            0
         )
         tgd_constraints.append((*left_hand_side_relations, *right_hand_side_relations))
 
