@@ -1,4 +1,5 @@
 import streamlit as st
+import re
 
 import config
 import frontend.utils as utils
@@ -61,6 +62,7 @@ def user_input_one_tgd_side(number_of_relational_atoms: int, available_relations
                 f"Relation {i + 1}",
                 available_relations.keys(),
                 key=current_relation_unique_key,
+                index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
                 label_visibility="collapsed"
             )
             st.caption('-')
@@ -134,12 +136,12 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
         col1, col2 = st.columns(2)
         with col1:
             left_hand_side_relations_number = st.number_input(
-                "Number of relational atoms on the left hand side", min_value=1, max_value=10, step=1,
+                "Number of relational atoms on the left hand side", min_value=0, step=1,
                 value=1, key=f"tgd_left_side_number_{tgd_constraint_number}"
             )
         with col2:
             right_hand_side_relations_number = st.number_input(
-                "Number of relational atoms on the right hand side", min_value=1, max_value=10, step=1,
+                "Number of relational atoms on the right hand side", min_value=1, step=1,
                 value=1, key=f"tgd_right_side_number_{tgd_constraint_number}"
             )
 

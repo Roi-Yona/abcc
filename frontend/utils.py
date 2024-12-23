@@ -88,3 +88,12 @@ def extract_available_relations_dict(db_name: str):
         available_relations[table_name] = extract_table_attributes(db_name, table_name)
     available_relations[config.COMMITTEE_RELATION_NAME] = []
     return available_relations
+
+
+def extract_table_size(db_name: str, table_name: str, column_name: str):
+    EXTRACT_QUERY = f"SELECT COUNT(DISTINCT {column_name}) AS distinct_value_count\n" \
+                    f"FROM {table_name};"
+    db_engine = database_server_interface.Database(os.path.join(config.SQLITE_DATABASE_FOLDER_PATH, db_name))
+    result = db_engine.run_query(EXTRACT_QUERY)
+    db_engine.__del__()
+    return result['distinct_value_count'][0]

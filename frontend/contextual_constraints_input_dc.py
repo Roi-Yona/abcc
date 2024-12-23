@@ -63,6 +63,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                 f"Relational atom {i + 1}",
                 available_relations.keys(),
                 key=current_relation_unique_key,
+                index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
                 label_visibility="collapsed"
             )
             st.caption('-')
@@ -189,12 +190,12 @@ def user_input_multiple_dc_constraints(available_relations: dict, number_of_dc_c
         col1, col2 = st.columns(2)
         with col1:
             number_of_dc_relational_atoms = st.number_input(
-                "Number of relational atoms", min_value=1, max_value=10, step=1,
+                "Number of relational atoms", min_value=1, step=1,
                 value=1, key=f"dc_relational_atoms_number_{dc_constraint_number}"
             )
         with col2:
             number_of_dc_comparison_atoms = st.number_input(
-                "Number of comparison atoms", min_value=0, max_value=10, step=1,
+                "Number of comparison atoms", min_value=0, step=1,
                 value=0, key=f"dc_comparison_atoms_number_{dc_constraint_number}"
             )
 
