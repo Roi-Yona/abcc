@@ -4,6 +4,16 @@ import config
 import pandas as pd
 import database.database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
+import streamlit as st
+# The next import is for adding the context for threads under streamlit.
+# Note that IT IS NOT a part of the official API, and this currently works for version 1.40.1,
+# See the Github discussion for the history of solution hacks through different versions:
+# https://github.com/streamlit/streamlit/issues/1326
+from streamlit.runtime.scriptrunner import add_script_run_ctx
+
+from threading import Thread
+
+from mip.mip_db_data_extractors.progress_bar_utils import advance_progress_bar
 
 MODULE_NAME = "Database Extractor"
 
@@ -166,7 +176,27 @@ class DBDataExtractor:
 
     def extract_and_convert(self) -> None:
         # Extract problem data from the database.
+        db_extraction_progress_message = "Extracting relevant data from database..."
+        db_extraction_progress_bar = st.progress(0, text=db_extraction_progress_message)
+
+        db_extraction_progress_delay = 3
+        db_bar_advancement_thread = Thread(
+            target=advance_progress_bar,
+            args=(
+                db_extraction_progress_bar,
+                db_extraction_progress_message,
+                db_extraction_progress_delay
+            )
+        )
+        add_script_run_ctx(db_bar_advancement_thread)
+
+        db_bar_advancement_thread.start()
         self.extract_data_from_db()
+        db_bar_advancement_thread.join(timeout=0)
+
+        db_extraction_progress_bar.progress(100, text="Finished DB extraction")
+        time.sleep(3)
+        db_extraction_progress_bar.empty()
 
         # Convert to MIP problem (add the model properties).
         self.convert_to_mip()
