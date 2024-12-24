@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import streamlit as st
 import re
@@ -46,9 +46,18 @@ def check_string_type(input_str: str) -> str:
     return "name"
 
 
-def advance_column_index(index: int, number_of_columns: int) -> int:
+def advance_column_index(
+        index: int,
+        number_of_columns: int,
+        current_column_list: List[st.delta_generator.DeltaGenerator],
+        column_alignment: str = "bottom",
+        disable_new_columns_creation: bool = False
+) -> Tuple[int, List[st.delta_generator.DeltaGenerator]]:
     new_index = (index + 1) % number_of_columns
-    return new_index
+    if new_index == 0 and not disable_new_columns_creation:
+        return new_index, st.columns(number_of_columns, vertical_alignment=column_alignment)
+    else:
+        return new_index, current_column_list
 
 
 def generate_committee_member_attribute_name(current_index: int) -> str:

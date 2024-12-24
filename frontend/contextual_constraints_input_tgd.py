@@ -58,13 +58,15 @@ def user_input_one_tgd_side(
     with constraint_columns_list[column_list_index]:
         constraint_statement_message = "For All:" if is_left_hand_side else "Exists:"
         st.markdown(f"**{constraint_statement_message}**")
-        column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
     for i in range(int(number_of_relational_atoms)):
         current_relation_unique_key = tgd_unique_key + f'_relation_{i}'
         # Create the current relation select box.
-        if column_list_index == 0:
-            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+        column_list_index, constraint_columns_list = utils.advance_column_index(
+            column_list_index,
+            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            constraint_columns_list
+        )
         with constraint_columns_list[column_list_index]:
             relation_name = st.selectbox(
                 f"Relation {i + 1}",
@@ -73,8 +75,6 @@ def user_input_one_tgd_side(
                 index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
                 label_visibility="collapsed"
             )
-            # st.caption('-')
-            column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
         relation_dict_key = (relation_name, current_relation_unique_key)
 
@@ -84,8 +84,11 @@ def user_input_one_tgd_side(
             committee_member_id += 1
             tgd_committee_members_list.append(candidate_attribute_name)
 
-            if column_list_index == 0:
-                constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+            column_list_index, constraint_columns_list = utils.advance_column_index(
+                column_list_index,
+                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                constraint_columns_list
+            )
             with constraint_columns_list[column_list_index]:
                 st.text_input(
                     label="",
@@ -94,15 +97,17 @@ def user_input_one_tgd_side(
                     label_visibility="collapsed",
                     disabled=True,
                 )
-                column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
             continue
 
         # Otherwise, regular relation.
         for argument in available_relations[relation_name]:
             style_key = current_relation_unique_key + f"_arg_{argument}"
-            if column_list_index == 0:
-                constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT)
+            column_list_index, constraint_columns_list = utils.advance_column_index(
+                column_list_index,
+                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                constraint_columns_list
+            )
             with constraint_columns_list[column_list_index]:
                 user_current_attribute_input = st.text_input(
                     label="",
@@ -113,7 +118,6 @@ def user_input_one_tgd_side(
                     help=argument,
                 )
 
-                column_list_index = utils.advance_column_index(column_list_index, NUMBER_OF_COLUMNS_IN_CONSTRAINT)
 
 
 
@@ -157,12 +161,12 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
         for_all_constraints_col, exists_constraints_col = st.columns(2)
         with for_all_constraints_col:
             left_hand_side_relations_number = st.number_input(
-                "Number of relational atoms on the left hand side", min_value=0, step=1,
+                "\# of relational atoms on the left hand side", min_value=0, step=1,
                 value=1, key=f"tgd_left_side_number_{tgd_constraint_number}"
             )
         with exists_constraints_col:
             right_hand_side_relations_number = st.number_input(
-                "Number of relational atoms on the right hand side", min_value=1, step=1,
+                "\# of relational atoms on the right hand side", min_value=1, step=1,
                 value=1, key=f"tgd_right_side_number_{tgd_constraint_number}"
             )
 
