@@ -15,7 +15,7 @@ def main():
     # User input ABC with Context problem settings.
     selected_db, selected_rule, committee_size, tgds, dcs = abc_settings_input.abc_settings_input()
     voters_starting_point, voters_group_size, candidates_starting_point, candidates_group_size, solver_timeout = \
-        abc_settings_input.advanced_abc_settings_input()
+        abc_settings_input.advanced_abc_settings_input(selected_db)
 
     # Display selected options (debug purposes).
     abc_settings_input.present_selected_configuration(selected_db, selected_rule, committee_size, tgds, dcs,
