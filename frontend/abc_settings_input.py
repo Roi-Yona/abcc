@@ -24,9 +24,9 @@ def abc_settings_input():
 
     # Get the number of TGD and DC constraints from the user.
     with column_list[3]:
-        number_of_tgd_constraints = st.number_input("Number of TGD constraints", min_value=0, step=1, value=0)
+        number_of_tgd_constraints = st.number_input("\# of TGD constraints", min_value=0, step=1, value=0)
     with column_list[4]:
-        number_of_dc_constraints = st.number_input("Number of DC constraints", min_value=0, step=1, value=0)
+        number_of_dc_constraints = st.number_input("\# of DC constraints", min_value=0, step=1, value=0)
 
     tgd_constraints = contextual_constraints_input_tgd.user_input_tgd_constraint(available_relations,
                                                                                  number_of_tgd_constraints)
