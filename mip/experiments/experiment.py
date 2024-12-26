@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 import pandas as pd
 
@@ -6,6 +7,7 @@ import config
 from database import database_server_interface as db_interface
 import mip.mip_reduction.mip_convertor as mip_convertor
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
+from mip.mip_db_data_extractors.progress_bar_utils import run_func_with_fake_progress_bar
 
 MODULE_NAME = 'Experiment'
 # The results of an experiment are with a saved to .xlsx located in the experiments db folder (the parent folder of the
@@ -48,7 +50,14 @@ class Experiment:
         print(f"Experiment Name - {self._experiment_name} | Database Name - {self._database_name} start.")
 
         # Solve the MIP problem.
-        self._abc_convertor.solve()
+        mip_solver_progress_bar = run_func_with_fake_progress_bar(
+            delay=3,
+            loading_message="Running MIP Solver...",
+            finish_message="*Solved MIP Problem!*",
+            func_to_run=self._abc_convertor.solve,
+        )
+        time.sleep(2)
+        mip_solver_progress_bar.empty()
 
         # Print the MIP solution.
         config.debug_print(MODULE_NAME, f"The solving time is {str(self._abc_convertor.solving_time)}\n" +
