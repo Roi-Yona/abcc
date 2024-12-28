@@ -66,6 +66,7 @@ MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True
 # --------------------------------------------------------------------------------
 VOTING_TABLE_NAME = 'voting'
 CANDIDATES_TABLE_NAME = 'candidates'
+CANDIDATES_SUMMARY_TABLE_NAME = 'candidates_summary'
 VOTERS_COLUMN_NAME = 'voter_id'
 CANDIDATES_COLUMN_NAME = 'candidate_id'
 APPROVAL_COLUMN_NAME = 'rating'
