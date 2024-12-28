@@ -81,17 +81,24 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         the chosen committee, then 2 and 4 *or* 3 and 5 must be as well.
         Note: The first place in the tuple could be empty (i.e. the TGD should always be enforced).
         """
-        legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start,
-                                                   self._constants_start, self._comparison_atoms_start)
         tgd_tuples_list = []
-        # TODO: Rethink about this if.
-        if legal_assignments_start.empty:
+        # TODO: Validate that at least one of the sides use the relation committee (i.e. it is contextual constraint).
+        # TODO: Validate there are no free variable of committee relation in left side and in the right side.
+        # TODO: Validate that the right side relations are not empty.
+        # TODO: Enable empty committee relation list on the right side (i.e. there is committee members on the left
+        #  side and the right side should indicate true/false).
+
+        # The left side is empty, it is equivalent to true.
+        if len(self._tgd_dict_start.items()) == 0 and len(self._candidates_tables_start) == 0:
             legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
                                                      self._constants_end,
                                                      self._comparison_atoms_end)
             current_element_representatives_set = legal_assignments_end[self._committee_members_list_end].values
             tgd_tuples_list.append((set(), current_element_representatives_set))
         else:
+            legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start,
+                                                       self._constants_start, self._comparison_atoms_start)
+
             # Extract the committee members sets out of the resulted join.
             for _, row in legal_assignments_start.iterrows():
                 current_row_assignment_constants = row.to_dict()
