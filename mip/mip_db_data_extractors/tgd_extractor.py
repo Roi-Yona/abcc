@@ -84,6 +84,7 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start,
                                                    self._constants_start, self._comparison_atoms_start)
         tgd_tuples_list = []
+        # TODO: Rethink about this if.
         if legal_assignments_start.empty:
             legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
                                                      self._constants_end,
