@@ -3,7 +3,6 @@ import re
 
 import config
 import frontend.utils as utils
-from annotated_text import annotated_text
 
 MODULE_NAME = f'Contextual Constraints Input TGD'
 NUMBER_OF_COLUMNS_IN_CONSTRAINT = 11

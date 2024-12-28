@@ -47,7 +47,7 @@ def main():
         experiment_results_row_df = current_experiment.run_experiment()
 
         # Present the results.
-        problem_output.present_solver_results(experiment_results_row_df)
+        problem_output.present_solver_results(current_experiment.get_db_engine(), experiment_results_row_df)
 
 
 if __name__ == "__main__":

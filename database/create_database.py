@@ -131,6 +131,20 @@ def create_trip_advisor_candidates_table(cur, con):
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
+def create_trip_advisor_candidates_summary_table(cur, con):
+    # Create the candidates table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    price FLOAT NOT NULL, 
+    location TEXT NOT NULL,
+    price_range TEXT NOT NULL)''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
+    df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
+
+
 def trip_advisor_create_locations_table(cur, con):
     # Create the voting table.
     cur.execute('''CREATE TABLE IF NOT EXISTS locations (
@@ -193,6 +207,7 @@ def trip_advisor_create_database_main():
     trip_advisor_create_locations_table(cur, con)
     trip_advisor_create_important_locations_table(cur, con)
     trip_advisor_create_price_ranges_table(cur, con)
+    create_trip_advisor_candidates_summary_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -218,7 +233,7 @@ def create_movies_voting_table(cur, con):
 
 
 def create_movies_candidates_table(cur, con):
-    # Create the voting table.
+    # Create the candidates table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
        adult NVARCHAR(50),
        belongs_to_collection NVARCHAR(200),
@@ -251,6 +266,26 @@ def create_movies_candidates_table(cur, con):
         os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_metadata_new.csv"))
 
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
+
+
+def create_movies_candidates_summary_table(cur, con):
+    # Create the candidates summary table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+       {config.CANDIDATES_COLUMN_NAME} int PRIMARY KEY,
+       adult NVARCHAR(50),
+       genres NVARCHAR(550),
+       original_language NVARCHAR(50),
+       title NVARCHAR(1000),
+       release_date date,
+       runtime int
+       )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_metadata_new.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'adult', 'genres', 'original_language', 'title', 'release_date',
+            'runtime']]
+    df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
 
 
 def create_movies_genres_table(cur, con):
@@ -367,6 +402,7 @@ def the_movies_database_create_database_main():
     create_movies_original_language_table(cur, con)
     create_movies_runtime_categories_table(cur, con)
     create_movies_important_genres_table(cur, con)
+    create_movies_candidates_summary_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -402,6 +438,27 @@ def create_glasgow_candidates_table(cur, con):
 
     # Insert data from the DataFrame into the table.
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
+
+
+def create_glasgow_candidates_summary_table(cur, con):
+    # Creating the candidates summary table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    candidate_name TEXT NOT NULL, 
+    district_number INTEGER NOT NULL,
+    district_name TEXT NOT NULL, 
+    party TEXT NOT NULL)''')
+
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
+
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'name', 'district', 'district_name', 'party']]
+    df.rename(columns={"district": "district_number"}, inplace=True)
+    df.rename(columns={"name": "candidate_name"}, inplace=True)
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
 
 
 def create_glasgow_important_parties_db(cur, con):
@@ -473,6 +530,7 @@ def glasgow_create_database_main():
     create_glasgow_candidates_table(cur, con)
     create_glasgow_important_parties_db(cur, con)
     create_glasgow_context_domain_db(cur, con)
+    create_glasgow_candidates_summary_table(cur, con)
 
     # Committing changes.
     con.commit()

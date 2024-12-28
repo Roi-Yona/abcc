@@ -62,5 +62,8 @@ class Experiment:
     def run_experiment(self):
         pass
 
+    def get_db_engine(self):
+        return self._db_engine
+
     def __del__(self):
         self._db_engine.__del__()
