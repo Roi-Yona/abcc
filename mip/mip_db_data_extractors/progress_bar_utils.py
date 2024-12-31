@@ -23,10 +23,6 @@ def advance_progress_bar(
     delta_after_loop = delay_time - (advances_number * advance_delay)
     bar_delta_value = (last_value - starting_value) / advances_number
 
-    print("!!!")
-    print(bar_delta_value)
-    print(delta_after_loop)
-    print(advances_number)
     for i in range(advances_number):
         sleep(advance_delay)
 
