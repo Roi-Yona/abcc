@@ -26,7 +26,6 @@ def main():
     if st.button("Find a winning committee"):
         # TODO: Test here the validity of the contextual constraints user input types.
         st.success("Configuration submitted successfully!")
-        st.success("Searching for a winning committee...")
 
         experiment_name = 'user_interface_experiment'
         # Set the new selected voting rule and solver timeout.
