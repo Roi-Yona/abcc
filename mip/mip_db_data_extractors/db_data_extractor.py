@@ -169,7 +169,7 @@ class DBDataExtractor:
 
     def extract_and_convert(self) -> None:
         db_extraction_progress_bar = run_func_with_fake_progress_bar(
-            delay=3,
+            delay=7,
             loading_message="Extracting relevant data from database...",
             finish_message="*Finished DB Extraction!*",
             func_to_run=self.extract_data_from_db,
