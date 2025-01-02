@@ -168,15 +168,15 @@ class DBDataExtractor:
         self.convert_to_mip_timer = end - start
 
     def extract_and_convert(self) -> None:
-        db_extraction_progress_bar = run_func_with_fake_progress_bar(
-            delay=7,
+        db_extraction_progress_bar, _ = run_func_with_fake_progress_bar(
+            delay=config.DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY,
             loading_message="Extracting relevant data from database...",
             finish_message="*Finished DB Extraction!*",
             func_to_run=self.extract_data_from_db,
         )
 
-        mip_conversion_progress_bar = run_func_with_fake_progress_bar(
-            delay=3,
+        mip_conversion_progress_bar, _ = run_func_with_fake_progress_bar(
+            delay=config.MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY,
             loading_message="Converting problem to MIP...",
             finish_message="*Finished MIP Conversion!*",
             func_to_run=self.convert_to_mip,

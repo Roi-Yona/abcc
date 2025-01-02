@@ -1,6 +1,6 @@
 from threading import Thread
 from time import sleep
-from typing import Callable
+from typing import Callable, Tuple, Any
 
 import streamlit as st
 from matplotlib.pyplot import barbs
@@ -39,7 +39,19 @@ def run_func_with_fake_progress_bar(
         func_to_run: Callable,
         *args,
         **kwargs
-) -> st.delta_generator.DeltaGenerator:
+) -> Tuple[st.delta_generator.DeltaGenerator, Any]:
+    """
+    Runs the given function with a fake streamlit progress bar.
+
+    Currently, the progress bar will wait at least `delay` seconds (does not "jump forward" even if the function finished running)
+    :param delay: the number of seconds to spread the advancement across (will get stuck on "almost done" if the delay was reached but the function is still running)
+    :param loading_message: message to display when the progress bar is partially full
+    :param finish_message: message to display when the progress bar is complete
+    :param func_to_run: the function to run
+    :param args: args for running the function
+    :param kwargs: kwargs for running the function
+    :return: the progress bar object (if you want to remove it then call its "empty" method) and the function result
+    """
     progress_bar = st.progress(0, text=loading_message)
 
     bar_advancement_thread = Thread(
@@ -53,8 +65,8 @@ def run_func_with_fake_progress_bar(
     add_script_run_ctx(bar_advancement_thread)
 
     bar_advancement_thread.start()
-    func_to_run(*args, **kwargs)
+    result = func_to_run(*args, **kwargs)
     bar_advancement_thread.join()
 
     progress_bar.progress(100, text=finish_message)
-    return progress_bar
+    return progress_bar, result
