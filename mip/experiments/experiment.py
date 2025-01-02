@@ -50,8 +50,8 @@ class Experiment:
         print(f"Experiment Name - {self._experiment_name} | Database Name - {self._database_name} start.")
 
         # Solve the MIP problem.
-        # mip_solver_progress_bar = run_func_with_fake_progress_bar(
-        #     delay=3,
+        # mip_solver_progress_bar, _ = run_func_with_fake_progress_bar(
+        #     delay=MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY,
         #     loading_message="Running MIP Solver...",
         #     finish_message="*Solved MIP Problem!*",
         #     func_to_run=self._abc_convertor.solve,

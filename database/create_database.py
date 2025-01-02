@@ -541,5 +541,5 @@ def glasgow_create_database_main():
 if __name__ == '__main__':
     # create_tests_db_main()
     the_movies_database_create_database_main()
-    trip_advisor_create_database_main()
-    glasgow_create_database_main()
+    # trip_advisor_create_database_main()
+    # glasgow_create_database_main()
