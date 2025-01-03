@@ -1,4 +1,3 @@
-import uuid
 from typing import List, Dict, Tuple
 
 import streamlit as st
@@ -142,6 +141,3 @@ def extract_table_size(db_name: str, table_name: str, column_name: str):
     result = db_engine.run_query(EXTRACT_QUERY)
     db_engine.__del__()
     return result['distinct_value_count'][0]
-
-
-
