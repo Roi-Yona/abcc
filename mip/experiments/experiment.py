@@ -50,15 +50,14 @@ class Experiment:
         print(f"Experiment Name - {self._experiment_name} | Database Name - {self._database_name} start.")
 
         # Solve the MIP problem.
-        # mip_solver_progress_bar, _ = run_func_with_fake_progress_bar(
-        #     delay=MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY,
-        #     loading_message="Running MIP Solver...",
-        #     finish_message="*Solved MIP Problem!*",
-        #     func_to_run=self._abc_convertor.solve,
-        # )
-        # time.sleep(2)
-        # mip_solver_progress_bar.empty()
-        self._abc_convertor.solve()
+        mip_solver_progress_bar, _ = run_func_with_fake_progress_bar(
+            delay=config.MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY,
+            loading_message="Running MIP Solver...",
+            finish_message="**Solved MIP Problem!**",
+            func_to_run=self._abc_convertor.solve,
+        )
+        time.sleep(2)
+        mip_solver_progress_bar.empty()
 
         # Print the MIP solution.
         config.debug_print(MODULE_NAME, f"The solving time is {str(self._abc_convertor.solving_time)}\n" +

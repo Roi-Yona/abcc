@@ -67,10 +67,11 @@ def user_input_one_tgd_side(
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
+            current_select_box_key = f"select_box_{current_relation_unique_key}"
             relation_name = st.selectbox(
                 f"Relation {i + 1}",
                 available_relations.keys(),
-                key=current_relation_unique_key,
+                key=current_select_box_key,
                 index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
                 label_visibility="collapsed"
             )
@@ -89,9 +90,10 @@ def user_input_one_tgd_side(
                 constraint_columns_list
             )
             with constraint_columns_list[column_list_index]:
+                current_committee_key = f"committee_member_{current_relation_unique_key}_{candidate_attribute_name}"
                 st.text_input(
                     label="",
-                    key=candidate_attribute_name,
+                    key=current_committee_key,
                     value=candidate_attribute_name,
                     label_visibility="collapsed",
                     disabled=True,
@@ -101,7 +103,7 @@ def user_input_one_tgd_side(
 
         # Otherwise, regular relation.
         for argument in available_relations[relation_name]:
-            style_key = current_relation_unique_key + f"_arg_{argument}"
+            current_arg_style_key = current_relation_unique_key + f"_arg_{argument}"
             column_list_index, constraint_columns_list = utils.advance_column_index(
                 column_list_index,
                 NUMBER_OF_COLUMNS_IN_CONSTRAINT,
@@ -110,7 +112,7 @@ def user_input_one_tgd_side(
             with constraint_columns_list[column_list_index]:
                 user_current_attribute_input = st.text_input(
                     label="",
-                    key=style_key,
+                    key=current_arg_style_key,
                     value="",
                     label_visibility="visible",
                     placeholder=argument,

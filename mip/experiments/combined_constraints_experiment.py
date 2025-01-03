@@ -1,6 +1,11 @@
 import sys
 import os
+import time
+
 import pandas as pd
+
+from mip.mip_db_data_extractors.progress_bar_utils import run_func_with_fake_progress_bar
+
 sys.path.append(os.path.join('..', '..'))
 
 import config
@@ -98,13 +103,23 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             committee_size, voters_starting_point, candidates_starting_point, voters_size_limit, candidates_size_limit,
             config.SCORE_FUNCTION)
 
-    def run_experiment(self):
-        # Extract problem data from the database and convert to MIP.
+    def extract_and_convert_all_constraints(self):
         self._abc_setting_extractor.extract_and_convert()
         for curr_dc_extractor in self._dc_db_extractors:
             curr_dc_extractor.extract_and_convert()
         for curr_tgd_extractor in self._tgd_db_extractors:
             curr_tgd_extractor.extract_and_convert()
+
+    def run_experiment(self):
+        # Extract problem data from the database and convert to MIP.
+        extraction_and_conversion_progress_bar, _ = run_func_with_fake_progress_bar(
+            delay=config.DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY + config.MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY,
+            loading_message="Extracting relevant data from database and converting to MIP...",
+            finish_message="**Finished DB Extraction and Conversion!**",
+            func_to_run=self.extract_and_convert_all_constraints,
+        )
+        time.sleep(2)
+        extraction_and_conversion_progress_bar.empty()
 
         # Run the experiment.
         solved_time = self.run_model()
@@ -175,6 +190,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                       }
 
         return pd.DataFrame([new_result])
+
 
     def __del__(self):
         super().__del__()
