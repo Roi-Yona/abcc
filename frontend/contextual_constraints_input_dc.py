@@ -27,7 +27,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
     :param number_of_dc_comparison_atoms: The number of comparison atoms in the DC constraint (defined by the user).
     :param available_relations: A dict of the available relations in the chosen DB, s.t. the relation name is the key,
     and the value is a list of the relation column names.
-    :param dc_constraint_number: The unique constraint number (do define the constraint key).
+    :param dc_constraint_number: The unique constraint number (to define the constraint key).
     :return: DC constraint definition (as defined by the MIP convertor modules - look at the constraints module for more
     details).
     """
@@ -65,10 +65,11 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
+            select_box_unique_key = f"select_box_{current_relation_unique_key}"
             relation_name = st.selectbox(
                 f"Relational atom {i + 1}",
                 available_relations.keys(),
-                key=current_relation_unique_key,
+                key=select_box_unique_key,
                 index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
                 label_visibility="collapsed"
             )
@@ -86,12 +87,15 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                 NUMBER_OF_COLUMNS_IN_CONSTRAINT,
                 constraint_columns_list
             )
+            current_candidate_widget_unique_key = current_relation_unique_key + f'_comm_{i}'
+
             with constraint_columns_list[column_list_index]:
                 st.text_input(
                     label="",
                     value=candidate_attribute_name,
                     label_visibility="collapsed",
                     disabled=True,
+                    key=current_candidate_widget_unique_key
                 )
             continue
 

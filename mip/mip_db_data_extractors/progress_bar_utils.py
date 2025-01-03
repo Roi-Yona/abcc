@@ -16,7 +16,7 @@ def advance_progress_bar(
         progress_text: str,
         delay_time: int,
         starting_value: int = 0,
-        last_value: int = 99,
+        last_value: int = 95,
         advance_delay: float = 0.1
 ):
     advances_number = int(delay_time // advance_delay)
