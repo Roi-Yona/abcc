@@ -27,7 +27,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
     :param number_of_dc_comparison_atoms: The number of comparison atoms in the DC constraint (defined by the user).
     :param available_relations: A dict of the available relations in the chosen DB, s.t. the relation name is the key,
     and the value is a list of the relation column names.
-    :param dc_constraint_number: The unique constraint number (do define the constraint key).
+    :param dc_constraint_number: The unique constraint number (to define the constraint key).
     :return: DC constraint definition (as defined by the MIP convertor modules - look at the constraints module for more
     details).
     """
@@ -65,10 +65,11 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
+            select_box_unique_key = f"select_box_{current_relation_unique_key}"
             relation_name = st.selectbox(
                 f"Relational atom {i + 1}",
                 available_relations.keys(),
-                key=current_relation_unique_key,
+                key=select_box_unique_key,
                 index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
                 label_visibility="collapsed"
             )
@@ -86,12 +87,15 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                 NUMBER_OF_COLUMNS_IN_CONSTRAINT,
                 constraint_columns_list
             )
+            current_candidate_widget_unique_key = current_relation_unique_key + f'_comm_{i}'
+
             with constraint_columns_list[column_list_index]:
                 st.text_input(
                     label="",
                     value=candidate_attribute_name,
                     label_visibility="collapsed",
                     disabled=True,
+                    key=current_candidate_widget_unique_key
                 )
             continue
 
@@ -159,18 +163,8 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
     for i in range(int(number_of_dc_comparison_atoms)):
         current_comparison_atom_unique_key = dc_unique_key + f'_comparison_atom_{i}'
 
-        if column_list_index == 0:
-            constraint_columns_list = st.columns(NUMBER_OF_COLUMNS_IN_CONSTRAINT, vertical_alignment="bottom")
-        # Input the comparison atom (two arguments and comparison sign between them).
-        column_list_index, constraint_columns_list = utils.advance_column_index(
-            column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
-            constraint_columns_list
-        )
-        with constraint_columns_list[column_list_index]:
-            left_side_comparison_arg = st.text_input(f"variable name/value",
-                                                     key=current_comparison_atom_unique_key + f"_left_side_comparison_arg",
-                                                     label_visibility="collapsed")
+        # Input the comparison atom (the comparison relation and its two arguments).
+
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
             NUMBER_OF_COLUMNS_IN_CONSTRAINT,
@@ -179,9 +173,21 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
         with constraint_columns_list[column_list_index]:
             comparison_sign = st.selectbox(
                 f"comparison sign {i + 1}",
-                config.COMPARISON_SINGS,
+                config.COMPARISON_SIGNS,
                 key=current_comparison_atom_unique_key,
                 label_visibility="collapsed"
+            )
+
+        column_list_index, constraint_columns_list = utils.advance_column_index(
+            column_list_index,
+            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            constraint_columns_list
+        )
+        with constraint_columns_list[column_list_index]:
+            left_side_comparison_arg = st.text_input(f"variable name/value",
+                                                     key=current_comparison_atom_unique_key + f"_left_side_comparison_arg",
+                                                     label_visibility="collapsed",
+                                                     placeholder="a"
             )
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
@@ -191,7 +197,9 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
         with constraint_columns_list[column_list_index]:
             right_side_comparison_arg = st.text_input(f"variable name/value",
                                                       key=current_comparison_atom_unique_key + f"_right_side_comparison_arg",
-                                                      label_visibility="collapsed")
+                                                      label_visibility="collapsed",
+                                                      placeholder="b"
+            )
 
         left_side_comparison_arg = left_side_comparison_arg.replace("'", '"')
         right_side_comparison_arg = right_side_comparison_arg.replace("'", '"')
