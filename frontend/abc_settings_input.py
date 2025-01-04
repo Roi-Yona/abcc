@@ -44,12 +44,28 @@ def advanced_abc_settings_input(selected_db: str):
         candidates_group_max_size = utils.extract_table_size(selected_db, config.CANDIDATES_TABLE_NAME,
                                                              config.CANDIDATES_COLUMN_NAME)
 
-        voters_starting_point = st.number_input("Voters id to start from", min_value=0, step=1)
-        voters_group_size = st.number_input("Voters group size", min_value=1, max_value=voters_group_max_size, step=1,
-                                            value=10)
-        candidates_starting_point = st.number_input("Candidates id to start from", min_value=0, step=1)
-        candidates_group_size = st.number_input("Candidates group size", min_value=1,
-                                                max_value=candidates_group_max_size, step=1, value=10)
+        voters_settings_column = st.columns(2)
+        with voters_settings_column[0]:
+            voters_starting_point = st.number_input("Voters id to start from", min_value=0, step=1)
+        with voters_settings_column[1]:
+            voters_group_size = st.number_input(
+                f"Voters group size (up to {voters_group_max_size})",
+                min_value=1,
+                max_value=voters_group_max_size,
+                step=1,
+                value=10
+            )
+        candidates_settings_column = st.columns(2)
+        with candidates_settings_column[0]:
+            candidates_starting_point = st.number_input("Candidates id to start from", min_value=0, step=1)
+        with candidates_settings_column[1]:
+            candidates_group_size = st.number_input(
+                f"Candidates group size (up to {candidates_group_max_size})",
+                min_value=1,
+                max_value=candidates_group_max_size,
+                step=1,
+                value=10
+            )
 
         # User input - solver settings.
         solver_timeout = st.number_input("Solver time limit (in minutes)", min_value=1, step=1,
