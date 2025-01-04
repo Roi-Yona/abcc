@@ -4,6 +4,7 @@ and should be used after cleaning and parsing the datasets.
 import os
 import sqlite3
 import pandas as pd
+import ast
 
 import config
 
@@ -285,6 +286,12 @@ def create_movies_candidates_summary_table(cur, con):
         os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_metadata_new.csv"))
     df = df[[config.CANDIDATES_COLUMN_NAME, 'adult', 'genres', 'original_language', 'title', 'release_date',
             'runtime']]
+    # Parse the required column as a dict (parsed as a string by default).
+    df['genres'] = df['genres'].apply(ast.literal_eval)
+
+    # Create a new column with the names list as a value.
+    df['genres'] = df['genres'].apply(
+        lambda current_row_dict_list: str([current_dict['name'] for current_dict in current_row_dict_list]))
     df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
 
 

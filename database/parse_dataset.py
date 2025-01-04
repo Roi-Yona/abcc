@@ -27,7 +27,7 @@ def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path:
     valid_rows.rename(columns={'id': config.CANDIDATES_COLUMN_NAME}, inplace=True)
 
     # Remove duplicates.
-    valid_rows = valid_rows[valid_rows.duplicated(subset=['candidate_id'], keep=False) == False]
+    valid_rows = valid_rows[valid_rows.duplicated(subset=['candidate_id'], keep=False) is False]
 
     # Save the cleaned DataFrame back to a CSV file.
     valid_rows.to_csv(new_csv_file_path, index=False)
