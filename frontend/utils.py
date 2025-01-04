@@ -61,7 +61,7 @@ def advance_column_index(
 
 
 def generate_committee_member_attribute_name(current_index: int) -> str:
-    return f"c_{current_index}"
+    return f"c{current_index}"
 
 
 def test_committee_member_name(argument_name: str, current_highest_index: int) -> bool:
