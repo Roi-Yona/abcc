@@ -159,18 +159,54 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
     # Iterate and get all the TGDs from the user.
     for tgd_constraint_number in range(number_of_tgd_constraints):
         # Get the number of relations in each side of the current TGD.
-        for_all_constraints_col, exists_constraints_col = st.columns(2)
-        with for_all_constraints_col:
-            left_hand_side_relations_number = st.number_input(
-                "\# of relational atoms on the left hand side", min_value=0, step=1,
-                value=1, key=f"tgd_left_side_number_{tgd_constraint_number}"
+        add_left_hand_side_atoms_button, remove_left_hand_side_atoms_button, add_right_hand_side_atoms_button, remove_right_hand_side_atoms_button = st.columns(4)
+        with add_left_hand_side_atoms_button:
+            if st.button(
+                label = "Add \"left hand side\" relational atom",
+                key=f"add_left_hand_side_atoms_button_{tgd_constraint_number}",
+                use_container_width=True
+            ):
+                utils.add_constraint_atom(constraint_type="tgd",
+                    constraint_index=tgd_constraint_number,
+                    atom_type="left_hand_side"
+                )
+        with remove_left_hand_side_atoms_button:
+            st.button(
+                label = "Remove last \"left hand side\" relational atom",
+                key=f"remove_left_hand_side_atoms_button_{tgd_constraint_number}",
+                on_click=utils.remove_constraint_atom(
+                    constraint_type="tgd",
+                    constraint_index=tgd_constraint_number,
+                    atom_type="left_hand_side"
+                ),
+                use_container_width=True
             )
-        with exists_constraints_col:
-            right_hand_side_relations_number = st.number_input(
-                "\# of relational atoms on the right hand side", min_value=1, step=1,
-                value=1, key=f"tgd_right_side_number_{tgd_constraint_number}"
+        with add_right_hand_side_atoms_button:
+            st.button(
+                label = "Add \"right hand side\" relational atoms",
+                key=f"add_right_hand_side_atoms_button_{tgd_constraint_number}",
+                on_click=utils.add_constraint_atom(
+                    constraint_type="tgd",
+                    constraint_index=tgd_constraint_number,
+                    atom_type="right_hand_side"
+                ),
+                use_container_width=True
+            )
+        with remove_right_hand_side_atoms_button:
+            st.button(
+                label="Remove last \"right hand side\" relational atoms",
+                key=f"remove_right_hand_side_atoms_button_{tgd_constraint_number}",
+                on_click=utils.remove_constraint_atom(
+                    constraint_type="tgd",
+                    constraint_index=tgd_constraint_number,
+                    atom_type="right_hand_side"
+                ),
+                use_container_width=True
             )
 
+        current_constraints_atoms_counts = st.session_state["tgd_constraints_atoms_count"][tgd_constraint_number]
+        left_hand_side_relations_number, right_hand_side_relations_number = current_constraints_atoms_counts["left_hand_side"], current_constraints_atoms_counts["right_hand_side"]
+        print(f"left_hand_side_relations_number: {left_hand_side_relations_number}, right_hand_side_relations_number: {right_hand_side_relations_number}\n\n")
         # Get the left and right hand of the TGD definition from the user.
         constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2]
 

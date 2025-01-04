@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Literal
 
 import streamlit as st
 import re
@@ -16,6 +16,8 @@ def page_setting():
         page_icon="✍️", layout="wide", initial_sidebar_state="auto", )
     st.title("Approval-Based Committee Voting in the Presence of Constraints")
     set_text_input_style()
+    st.session_state["tgd_constraints_atoms_count"] = []
+    st.session_state["dc_constraints_atoms_count"] = []
 
 
 def check_string_type(input_str: str) -> str:
@@ -141,3 +143,79 @@ def extract_table_size(db_name: str, table_name: str, column_name: str):
     result = db_engine.run_query(EXTRACT_QUERY)
     db_engine.__del__()
     return result['distinct_value_count'][0]
+
+def change_constraint_atoms_count_in_session_state(constraint_type: str, constraint_index: int, atom_type: str, delta: int):
+    print("###########################################################")
+    print(st.session_state["tgd_constraints_atoms_count"])
+    print("###########################################################")
+    if constraint_index < 0:
+        raise ValueError(f"Got invalid constraint index \"{constraint_index}\" (must be >= 0)")
+
+    if constraint_type == "tgd":
+        if constraint_index > len(st.session_state["tgd_constraints_atoms_count"]):
+            raise ValueError(
+                f"Got invalid constraint index \"{constraint_index}\" when trying to change the number of atoms in tgd constraint")
+
+        if atom_type == "left_hand_side":
+            new_tgd_left_hand_side_atoms_number = st.session_state["tgd_constraints_atoms_count"][constraint_index]["left_hand_side"] + delta
+            print(f"new_tgd_left {new_tgd_left_hand_side_atoms_number}")
+            if new_tgd_left_hand_side_atoms_number < 0:
+                negative_atoms_toaster()
+            else:
+                st.session_state["tgd_constraints_atoms_count"][constraint_index]["left_hand_side"] = new_tgd_left_hand_side_atoms_number
+        elif atom_type == "right_hand_side":
+            new_tgd_right_hand_side_atoms_number = st.session_state["tgd_constraints_atoms_count"][constraint_index][
+                                                      "right_hand_side"] + delta
+            if new_tgd_right_hand_side_atoms_number < 1:
+                negative_atoms_toaster(min_atoms_number=1)
+            else:
+                st.session_state["tgd_constraints_atoms_count"][constraint_index][
+                    "right_hand_side"] = new_tgd_right_hand_side_atoms_number
+        else:
+            raise ValueError(f"Non supported atom type \"{atom_type}\" when trying to change the number of atoms in tgd constraint")
+
+    elif constraint_type == "dc":
+        current_number_of_dc_constraints_in_session_state = len(st.session_state["dc_constraints_atoms_count"])
+        if constraint_index == current_number_of_dc_constraints_in_session_state:
+            st.session_state["dc_constraints_atoms_count"].append({"relations": 1, "comparisons": 0})
+        elif constraint_index > current_number_of_dc_constraints_in_session_state:
+            raise ValueError(
+                f"Got invalid constraint index \"{constraint_index}\" when trying to change the number of atoms in dc constraint")
+
+        if atom_type == "relation":
+            new_dc_relations_atoms_number = st.session_state["dc_constraints_atoms_count"][constraint_index][
+                                                      "relations"] + delta
+            if new_dc_relations_atoms_number < 0:
+                negative_atoms_toaster()
+            else:
+                st.session_state["dc_constraints_atoms_count"][constraint_index][
+                    "relations"] = new_dc_relations_atoms_number
+        elif atom_type == "comparison":
+            new_dc_comparisons_atoms_number = st.session_state["dc_constraints_atoms_count"][constraint_index][
+                                                "comparisons"] + delta
+            if new_dc_comparisons_atoms_number < 0:
+                negative_atoms_toaster()
+            else:
+                st.session_state["dc_constraints_atoms_count"][constraint_index][
+                    "comparisons"] = new_dc_comparisons_atoms_number
+
+        else:
+            raise ValueError(
+                f"Non supported atom type \"{atom_type}\" when trying to change the number of atoms in dc constraint")
+
+    else:
+        raise ValueError(f"Non supported constraint type \"{constraint_type}\" when trying to change the number of atoms")
+
+
+def negative_atoms_toaster(min_atoms_number: int = 0):
+    st.toast(
+        body=f"You can't have less than {min_atoms_number} atoms in a constraint!",
+        icon="🚨"
+    )
+
+
+def add_constraint_atom(constraint_type: str, constraint_index: int, atom_type: str):
+    change_constraint_atoms_count_in_session_state(constraint_type, constraint_index, atom_type, 1)
+
+def remove_constraint_atom(constraint_type: str, constraint_index: int, atom_type: str):
+    change_constraint_atoms_count_in_session_state(constraint_type, constraint_index, atom_type, -1)
