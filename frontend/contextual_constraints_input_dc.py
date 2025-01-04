@@ -163,7 +163,21 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
     for i in range(int(number_of_dc_comparison_atoms)):
         current_comparison_atom_unique_key = dc_unique_key + f'_comparison_atom_{i}'
 
-        # Input the comparison atom (two arguments and comparison sign between them).
+        # Input the comparison atom (the comparison relation and its two arguments).
+
+        column_list_index, constraint_columns_list = utils.advance_column_index(
+            column_list_index,
+            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            constraint_columns_list
+        )
+        with constraint_columns_list[column_list_index]:
+            comparison_sign = st.selectbox(
+                f"comparison sign {i + 1}",
+                config.COMPARISON_SIGNS,
+                key=current_comparison_atom_unique_key,
+                label_visibility="collapsed"
+            )
+
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
             NUMBER_OF_COLUMNS_IN_CONSTRAINT,
@@ -173,18 +187,6 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
             left_side_comparison_arg = st.text_input(f"variable name/value",
                                                      key=current_comparison_atom_unique_key + f"_left_side_comparison_arg",
                                                      label_visibility="collapsed")
-        column_list_index, constraint_columns_list = utils.advance_column_index(
-            column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
-            constraint_columns_list
-        )
-        with constraint_columns_list[column_list_index]:
-            comparison_sign = st.selectbox(
-                f"comparison sign {i + 1}",
-                config.COMPARISON_SINGS,
-                key=current_comparison_atom_unique_key,
-                label_visibility="collapsed"
-            )
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
             NUMBER_OF_COLUMNS_IN_CONSTRAINT,
