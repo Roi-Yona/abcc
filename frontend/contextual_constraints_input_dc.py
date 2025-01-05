@@ -130,10 +130,12 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                     dc_dict[relation_dict_key] = [(clean_input, argument)]
             elif input_type == 'value':
                 # If it is a value than it fits the constants' dict.
-                if relation_dict_key in dc_constants_dict:
-                    dc_constants_dict[relation_dict_key].append((clean_input, argument))
+                variable_name = config.generate_unique_key_string()
+                if relation_dict_key in dc_dict:
+                    dc_dict[relation_dict_key].append((variable_name, argument))
                 else:
-                    dc_constants_dict[relation_dict_key] = [(clean_input, argument)]
+                    dc_dict[relation_dict_key] = [(variable_name, argument)]
+                dc_constants_dict[variable_name] = clean_input
 
     _dc_comparison_atoms_list = user_input_comparison_atoms_dc(number_of_dc_comparison_atoms,
                                                                dc_comparison_atoms_unique_key, committee_member_id,

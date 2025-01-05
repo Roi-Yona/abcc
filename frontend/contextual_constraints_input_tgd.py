@@ -135,10 +135,12 @@ def user_input_one_tgd_side(
                     tgd_dict[relation_dict_key] = [(clean_input, argument)]
             elif input_type == 'value':
                 # If it is a value than it fits the constants' dict.
-                if relation_dict_key in tgd_constants_dict:
-                    tgd_constants_dict[relation_dict_key].append((clean_input, argument))
+                variable_name = config.generate_unique_key_string()
+                if relation_dict_key in tgd_dict:
+                    tgd_dict[relation_dict_key].append((variable_name, argument))
                 else:
-                    tgd_constants_dict[relation_dict_key] = [(clean_input, argument)]
+                    tgd_dict[relation_dict_key] = [(variable_name, argument)]
+                tgd_constants_dict[variable_name] = clean_input
 
     return column_list_index, committee_member_id, (
         tgd_dict, tgd_committee_members_list, tgd_candidates_tables_list, tgd_constants_dict, tgd_comparison_atoms_list)
