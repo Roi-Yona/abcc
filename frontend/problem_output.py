@@ -12,6 +12,9 @@ def present_solver_results(db: Database, experiment_results_row_df: pd.DataFrame
     if experiment_results_row_df['solving_status'].iloc[-1] == config.SOLVER_FOUND_OPTIMAL_STATUS:
         st.write("**Winning Committee Summary**:")
         print_candidates_summary_df(db, experiment_results_row_df['resulted_committee'].iloc[-1])
+        # Present additional data about the experiment.
+        with st.expander("Additional Experiment Details", expanded=False):
+            st.dataframe(experiment_results_row_df)
     elif experiment_results_row_df['solving_status'].iloc[-1] == config.SOLVER_PROVEN_INFEASIBLE_STATUS:
         st.write("Model proven infeasible.")
     elif experiment_results_row_df['solving_status'].iloc[-1] == config.SOLVER_PROVEN_UNBOUNDED_STATUS:

@@ -145,9 +145,11 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                       'lifted_voters_group_size': self._abc_convertor.lifted_voters_group_size,
                       'candidates_group_size': self._abc_convertor.candidates_group_size,
                       'committee_size': self._committee_size,
-                      'mip_solving_time(sec)': solved_time,
-                      'number_of_solver_variables': self._solver.NumVariables(),
-                      'number_of_solver_constraints': self._solver.NumConstraints(),
+                      'extract_data_time(sec)': self._abc_setting_extractor.extract_data_timer +
+                                                sum([x.extract_data_timer for x in
+                                                     self._dc_db_extractors]) +
+                                                sum([x.extract_data_timer for x in
+                                                     self._tgd_db_extractors]),
                       'mip_construction_time_abc(sec)': self._abc_setting_extractor.convert_to_mip_timer,
                       'mip_construction_time_dc(sec)': sum([x.convert_to_mip_timer for x in
                                                                            self._dc_db_extractors]),
@@ -158,11 +160,6 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                                self._dc_db_extractors]) +
                                                           sum([x.convert_to_mip_timer for x in
                                                                self._tgd_db_extractors]),
-                      'extract_data_time(sec)': self._abc_setting_extractor.extract_data_timer +
-                                                sum([x.extract_data_timer for x in
-                                                     self._dc_db_extractors]) +
-                                                sum([x.extract_data_timer for x in
-                                                     self._tgd_db_extractors]),
                       'total_construction_and_extraction_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                                      sum([x.extract_data_timer for x in
                                                                           self._dc_db_extractors]) +
@@ -173,6 +170,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                                           self._dc_db_extractors]) +
                                                                      sum([x.convert_to_mip_timer for x in
                                                                           self._tgd_db_extractors]),
+                      'mip_solving_time(sec)': solved_time,
                       'total_solution_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                   sum([x.extract_data_timer for x in
                                                        self._dc_db_extractors]) +
@@ -185,6 +183,8 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                   sum([x.convert_to_mip_timer for x in
                                                        self._tgd_db_extractors]) +
                                                   solved_time,
+                      'number_of_solver_variables': self._solver.NumVariables(),
+                      'number_of_solver_constraints': self._solver.NumConstraints(),
                       'solving_status': self._abc_convertor.solver_status,
                       'resulted_committee': committee_string
                       }
