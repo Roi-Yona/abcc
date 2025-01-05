@@ -190,7 +190,7 @@ TRIP_ADVISOR_DATASET_DC_NO_TWO_MEMBERS_WITH_SAME_LOCATION_AND_PRICE = (_dc_dict,
 
 # TGD - For every location in important locations, there is (at least) one low price committee member representing it.
 _tgd_dict_start = dict()
-_tgd_dict_start['important_locations', 't1'] = [('x', 'location'), ('y', 'price_range')]
+_tgd_dict_start['selected_locations', 't1'] = [('x', 'location')]
 _tgd_committee_members_list_start = []
 _tgd_candidates_tables_start = []
 _tgd_constants_start = dict()
@@ -200,7 +200,7 @@ _tgd_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_CO
                                                      ('y', 'price_range')]
 _tgd_committee_members_list_end = ['c1']
 _tgd_candidates_tables_end = ['t2']
-_tgd_constants_end = dict()
+_tgd_constants_end = {'y': 'low'}
 _tgd_comparison_atoms_end = []
 TRIP_ADVISOR_DATASET_TGD_FOR_EACH_IMPORTANT_LOCATION_AT_LEAST_ONE_LOW_PRICE_REPRESENTATION = \
     (_tgd_dict_start, _tgd_committee_members_list_start, _tgd_candidates_tables_start, _tgd_constants_start,

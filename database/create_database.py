@@ -157,24 +157,22 @@ def trip_advisor_create_locations_table(cur, con):
     df.to_sql('locations', con, if_exists='append', index=False)
 
 
-def trip_advisor_create_important_locations_table(cur, con):
+def trip_advisor_create_selected_locations_table(cur, con):
     # Create the important locations table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_locations (
-                        location TEXT NOT NULL,
-                        price_range TEXT NOT NULL)''')
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_locations (
+                        location TEXT NOT NULL)''')
 
     # Insert multiple rows into the table.
     new_data = [
-        ('Dallas Texas', 'low'),
-        ('Madrid', 'low'),
-        ('Seminyak Bali', 'low'),
-        ('Toronto Ontario', 'low'),
-        ('Singapore', 'low'),
-        ('Seattle Washington', 'low'),
-
+        ('Dallas Texas',),
+        ('Madrid',),
+        ('Seminyak Bali',),
+        ('Toronto Ontario',),
+        ('Singapore',),
+        ('Seattle Washington',),
     ]
 
-    cur.executemany("INSERT INTO important_locations (location, price_range) values (?, ?)", new_data)
+    cur.executemany("INSERT INTO selected_locations (location) values (?)", new_data)
 
 
 def trip_advisor_create_price_ranges_table(cur, con):
@@ -206,7 +204,7 @@ def trip_advisor_create_database_main():
                                      f"voting_table.csv"))
     create_trip_advisor_candidates_table(cur, con)
     trip_advisor_create_locations_table(cur, con)
-    trip_advisor_create_important_locations_table(cur, con)
+    trip_advisor_create_selected_locations_table(cur, con)
     trip_advisor_create_price_ranges_table(cur, con)
     create_trip_advisor_candidates_summary_table(cur, con)
 

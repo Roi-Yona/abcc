@@ -141,7 +141,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         # Save the results.
         new_result = {'candidates_starting_point': self._candidates_starting_point,
                       'voters_starting_point': self._voters_starting_point,
-                      'voters_group_size': self._voters_group_size,
+                      'voters_group_size (non-empty approval profile)': self._voters_group_size,
                       'lifted_voters_group_size': self._abc_convertor.lifted_voters_group_size,
                       'candidates_group_size': self._abc_convertor.candidates_group_size,
                       'committee_size': self._committee_size,
