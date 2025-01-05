@@ -119,9 +119,6 @@ def user_input_one_tgd_side(
                     help=argument,
                 )
 
-
-
-
             # Check the user input type:
             input_type = utils.check_string_type(user_current_attribute_input)
             clean_input = user_current_attribute_input.replace("'", "").replace('"', '')
@@ -195,9 +192,9 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
         )
         tgd_constraints.append((*left_hand_side_relations, *right_hand_side_relations))
 
+    if config.FRONTED_DEBUG:
+        # Present all TGD constraints data visually.
+        with st.expander("TGD Constraints Details", expanded=False):
+            print_tgd_constraints(tgd_constraints)
 
-
-    # Present all TGD constraints data visually.
-    with st.expander("TGD Constraints Details", expanded=False):
-        print_tgd_constraints(tgd_constraints)
     return tgd_constraints

@@ -18,7 +18,7 @@ def abc_settings_input():
 
     with column_list[1]:
         committee_size = st.number_input("Committee Size", min_value=1, max_value=candidates_group_max_size, step=1,
-                                         value=3)
+                                         value=10)
     with column_list[2]:
         selected_rule = st.selectbox("Voting Rule", config.SCORE_RULES.keys())
 
@@ -53,7 +53,7 @@ def advanced_abc_settings_input(selected_db: str):
                 min_value=1,
                 max_value=voters_group_max_size,
                 step=1,
-                value=10
+                value=10000
             )
         candidates_settings_column = st.columns(2)
         with candidates_settings_column[0]:
@@ -64,7 +64,7 @@ def advanced_abc_settings_input(selected_db: str):
                 min_value=1,
                 max_value=candidates_group_max_size,
                 step=1,
-                value=10
+                value=100
             )
 
         # User input - solver settings.

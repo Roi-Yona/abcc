@@ -7,6 +7,7 @@ from mip.mip_reduction import score_functions
 # General:
 # --------------------------------------------------------------------------------
 DEBUG = True
+FRONTED_DEBUG = False
 unique_key_index = 0
 
 # Enable to print big Dataframe without any cutting.
@@ -49,9 +50,9 @@ SOLVER_TIME_LIMIT = int(0.5 * HOUR)
 SOLVER_NAMES = ["SAT", "CP_SAT", "SAT", "GLPK", "GUROBI"]
 SOLVER_NAME = SOLVER_NAMES[0]
 SCORE_RULES = {
+    'CC': score_functions.cc_thiele_function,
     'PAV': score_functions.pav_thiele_function,
     'AV': score_functions.av_thiele_function,
-    'CC': score_functions.cc_thiele_function,
     '2_TRUNCATED_AV': score_functions.k_2_truncated_av_thiele_function,
     'SAV': score_functions.sav_score_rule_function}
 SCORE_RULE_NAME = 'PAV'

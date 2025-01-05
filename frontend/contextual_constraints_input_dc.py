@@ -54,8 +54,6 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
     with constraint_columns_list[column_list_index]:
         st.markdown(f"**Not**")
 
-
-
     for i in range(int(number_of_dc_relational_atoms)):
         current_relation_unique_key = dc_relational_atoms_unique_key + f'_relational_atom_{i}'
         # Create the current relation select box.
@@ -246,7 +244,9 @@ def user_input_multiple_dc_constraints(available_relations: dict, number_of_dc_c
             dc_constraint_number)
         dc_constraints.append(dc_constraint)
 
-    # Present all DC constraints data visually.
-    with st.expander("DC Constraints Details", expanded=False):
-        print_dc_constraints(dc_constraints)
+    if config.FRONTED_DEBUG:
+        # Present all DC constraints data visually.
+        with st.expander("DC Constraints Details", expanded=False):
+            print_dc_constraints(dc_constraints)
+
     return dc_constraints

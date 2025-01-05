@@ -17,10 +17,12 @@ def main():
     voters_starting_point, voters_group_size, candidates_starting_point, candidates_group_size, solver_timeout = \
         abc_settings_input.advanced_abc_settings_input(selected_db)
 
-    # Display selected options (debug purposes).
-    abc_settings_input.present_selected_configuration(selected_db, selected_rule, committee_size, tgds, dcs,
-                                                      voters_starting_point, voters_group_size,
-                                                      candidates_starting_point, candidates_group_size, solver_timeout)
+    if config.FRONTED_DEBUG:
+        # Display selected options (debug purposes).
+        abc_settings_input.present_selected_configuration(selected_db, selected_rule, committee_size, tgds, dcs,
+                                                          voters_starting_point, voters_group_size,
+                                                          candidates_starting_point, candidates_group_size,
+                                                          solver_timeout)
 
     # Submit button
     if st.button("Find a winning committee"):
@@ -42,7 +44,6 @@ def main():
                                                                                            candidates_group_size)
 
         # Run the experiment.
-        # TODO: Present progress bar (of the solver and the stage..)
         experiment_results_row_df = current_experiment.run_experiment()
 
         # Present the results.
