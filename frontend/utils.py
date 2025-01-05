@@ -16,6 +16,13 @@ def page_setting():
         page_icon="✍️", layout="wide", initial_sidebar_state="auto", )
     st.title("Approval-Based Committee Voting in the Presence of Constraints")
     set_text_input_style()
+    # Create a debug toggle using a checkbox
+    debug_mode = st.checkbox("Debug Mode", value=False)
+
+    if debug_mode:
+        config.FRONTED_DEBUG = True
+    else:
+        config.FRONTED_DEBUG = False
 
 
 def check_string_type(input_str: str) -> str:
