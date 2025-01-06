@@ -106,7 +106,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
             )
             with constraint_columns_list[column_list_index]:
                 user_current_attribute_input = st.text_input(
-                    "",
+                    f"dc user input for attribute {argument} in atom {i+1}",
                     key=current_relation_unique_key + f"_arg_{argument}",
                     value="",
                     label_visibility="visible",
