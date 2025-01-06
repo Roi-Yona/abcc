@@ -89,7 +89,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
 
             with constraint_columns_list[column_list_index]:
                 st.text_input(
-                    label="",
+                    label=f"Generated dc committee member \"{candidate_attribute_name}\" in atom {i + 1}",
                     value=candidate_attribute_name,
                     label_visibility="collapsed",
                     disabled=True,

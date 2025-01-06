@@ -92,7 +92,7 @@ def user_input_one_tgd_side(
             with constraint_columns_list[column_list_index]:
                 current_committee_key = f"committee_member_{current_relation_unique_key}_{candidate_attribute_name}"
                 st.text_input(
-                    label="",
+                    label=f"Generated tgd committee member \"{candidate_attribute_name}\" in atom {i + 1}",
                     key=current_committee_key,
                     value=candidate_attribute_name,
                     label_visibility="collapsed",
@@ -111,7 +111,7 @@ def user_input_one_tgd_side(
             )
             with constraint_columns_list[column_list_index]:
                 user_current_attribute_input = st.text_input(
-                    label="",
+                    label=f"tgd user input for attribute {argument} in atom {i+1}",
                     key=current_arg_style_key,
                     value="",
                     label_visibility="visible",
