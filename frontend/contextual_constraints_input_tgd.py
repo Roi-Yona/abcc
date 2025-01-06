@@ -111,7 +111,8 @@ def user_input_one_tgd_side(
             )
             with constraint_columns_list[column_list_index]:
                 user_current_attribute_input = st.text_input(
-                    label=f"tgd user input for attribute {argument} in atom {i+1}",
+                    # Streamlit throws a warning over empty labels, but we need it to have the tooltip
+                    label="",
                     key=current_arg_style_key,
                     value="",
                     label_visibility="visible",
