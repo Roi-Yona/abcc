@@ -112,10 +112,10 @@ def extract_available_relations_dict(db_name: str) -> Dict[str, List[str]]:
 
 
 def set_text_input_style(
-        background_color: str = "#eafaf1",
-        border_color: str = "#f0f8ff",
+        background_color: str = "#fffacd",
+        border_color: str = "#fffacd",
         border_radius: str = "5px",
-        text_color: str = "#333"
+        text_color: str = "#343a40"
 ) -> None:
     """
     set the style for all text inputs in the app.
