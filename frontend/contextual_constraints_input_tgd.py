@@ -68,13 +68,15 @@ def user_input_one_tgd_side(
         )
         with constraint_columns_list[column_list_index]:
             current_select_box_key = f"select_box_{current_relation_unique_key}"
-            relation_name = st.selectbox(
-                f"Relation {i + 1}",
-                available_relations.keys(),
-                key=current_select_box_key,
-                index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
-                label_visibility="collapsed"
-            )
+            select_box_col = utils.create_cols_for_buffer([1, 6], left_buffer="(", alignment="bottom")
+            with select_box_col:
+                relation_name = st.selectbox(
+                    f"Relation {i + 1}",
+                    available_relations.keys(),
+                    key=current_select_box_key,
+                    index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
+                    label_visibility="collapsed"
+                )
 
         relation_dict_key = (relation_name, current_relation_unique_key)
 
@@ -91,13 +93,15 @@ def user_input_one_tgd_side(
             )
             with constraint_columns_list[column_list_index]:
                 current_committee_key = f"committee_member_{current_relation_unique_key}_{candidate_attribute_name}"
-                st.text_input(
-                    label=f"Generated tgd committee member \"{candidate_attribute_name}\" in atom {i + 1}",
-                    key=current_committee_key,
-                    value=candidate_attribute_name,
-                    label_visibility="collapsed",
-                    disabled=True,
-                )
+                disabled_input_text_col = utils.create_cols_for_buffer([10, 1], right_buffer=")", alignment="bottom")
+                with disabled_input_text_col:
+                    st.text_input(
+                        label=f"Generated tgd committee member \"{candidate_attribute_name}\" in atom {i + 1}",
+                        key=current_committee_key,
+                        value=candidate_attribute_name,
+                        label_visibility="collapsed",
+                        disabled=True,
+                    )
 
             continue
 
@@ -110,15 +114,24 @@ def user_input_one_tgd_side(
                 constraint_columns_list
             )
             with constraint_columns_list[column_list_index]:
-                user_current_attribute_input = st.text_input(
-                    # Streamlit throws a warning over empty labels, but we need it to have the tooltip
-                    label="",
-                    key=current_arg_style_key,
-                    value="",
-                    label_visibility="visible",
-                    placeholder=argument,
-                    help=argument,
-                )
+                def _add_input_widget() -> str:
+                    attribute_input = st.text_input(
+                        # Streamlit throws a warning over empty labels, but we need it to have the tooltip
+                        label="",
+                        key=current_arg_style_key,
+                        value="",
+                        label_visibility="visible",
+                        placeholder=argument,
+                        help=argument,
+                    )
+                    return attribute_input
+                # If reached last input, add closing parentheses
+                if argument == available_relations[relation_name][-1]:
+                    last_input_col = utils.create_cols_for_buffer([10, 1], right_buffer=")")
+                    with last_input_col:
+                        user_current_attribute_input = _add_input_widget()
+                else:
+                    user_current_attribute_input = _add_input_widget()
 
             # Check the user input type:
             input_type = utils.check_string_type(user_current_attribute_input)
