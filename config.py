@@ -219,6 +219,14 @@ COMMITTEE_RELATION_NAME = 'Com'
 COMPARISON_SIGNS = ['(a < b)', '(a > b)', '(a = b)']
 
 
+
+# Front End Constants:
+# --------------------------------------------------------------------------------
+NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 11
+NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 11
+
+
+
 # Utility Functions:
 # --------------------------------------------------------------------------------
 def remove_file(file_path: str):

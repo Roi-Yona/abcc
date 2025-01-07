@@ -4,7 +4,6 @@ import config
 import frontend.utils as utils
 
 MODULE_NAME = f'Contextual Constraints Input DC'
-NUMBER_OF_COLUMNS_IN_CONSTRAINT = 12
 
 
 def print_dc_constraints(dc_constraints: list):
@@ -46,7 +45,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
     dc_relational_atoms_unique_key = f"dc_relational_atoms_{dc_constraint_number}"
     dc_comparison_atoms_unique_key = f"dc_comparison_atoms_{dc_constraint_number}"
 
-    constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2.5]
+    constraint_columns_ratio = [1] + (config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT - 1) * [2.5]
 
     constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="bottom")
     column_list_index = 0
@@ -59,7 +58,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
         # Create the current relation select box.
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
@@ -84,13 +83,13 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
 
             column_list_index, constraint_columns_list = utils.advance_column_index(
                 column_list_index,
-                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
                 constraint_columns_list
             )
             current_candidate_widget_unique_key = current_relation_unique_key + f'_comm_{i}'
 
             with constraint_columns_list[column_list_index]:
-                committee_disabled_input_col = utils.create_cols_for_buffer([10, 1], right_buffer=")")
+                committee_disabled_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
                 with committee_disabled_input_col:
                     st.text_input(
                         label=f"Generated dc committee member \"{candidate_attribute_name}\" in atom {i + 1}",
@@ -105,7 +104,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
         for argument in available_relations[relation_name]:
             column_list_index, constraint_columns_list = utils.advance_column_index(
                 column_list_index,
-                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
                 constraint_columns_list
             )
             with constraint_columns_list[column_list_index]:
@@ -122,7 +121,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                     return attribute_input
                 # If reached last input, add closing parentheses
                 if argument == available_relations[relation_name][-1]:
-                    last_input_col = utils.create_cols_for_buffer([10, 1], right_buffer=")")
+                    last_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
                     with last_input_col:
                         user_current_attribute_input = _add_input_widget()
                 else:
@@ -181,7 +180,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
 
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
@@ -196,7 +195,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
 
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
@@ -207,11 +206,11 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
             )
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
-            last_input_col = utils.create_cols_for_buffer([10, 1], right_buffer=")")
+            last_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
             with last_input_col:
                 right_side_comparison_arg = st.text_input(f"variable name/value",
                                                           key=current_comparison_atom_unique_key + f"_right_side_comparison_arg",
