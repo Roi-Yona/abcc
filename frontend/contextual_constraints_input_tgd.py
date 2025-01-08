@@ -174,12 +174,12 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
         for_all_constraints_col, exists_constraints_col = st.columns(2)
         with for_all_constraints_col:
             left_hand_side_relations_number = st.number_input(
-                "\# of relational atoms on the left hand side", min_value=0, step=1,
+                "Add/Remove relational atoms on the left hand side", min_value=0, step=1,
                 value=1, key=f"tgd_left_side_number_{tgd_constraint_number}"
             )
         with exists_constraints_col:
             right_hand_side_relations_number = st.number_input(
-                "\# of relational atoms on the right hand side", min_value=1, step=1,
+                "Add/Remove relational atoms on the right hand side", min_value=1, step=1,
                 value=1, key=f"tgd_right_side_number_{tgd_constraint_number}"
             )
 

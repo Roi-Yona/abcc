@@ -246,12 +246,12 @@ def user_input_multiple_dc_constraints(available_relations: dict, number_of_dc_c
         col1, col2 = st.columns(2)
         with col1:
             number_of_dc_relational_atoms = st.number_input(
-                "\# of relational atoms", min_value=1, step=1,
+                "Add/Remove relational atoms", min_value=1, step=1,
                 value=1, key=f"dc_relational_atoms_number_{dc_constraint_number}"
             )
         with col2:
             number_of_dc_comparison_atoms = st.number_input(
-                "\# of comparison atoms", min_value=0, step=1,
+                "Add/Remove comparison atoms", min_value=0, step=1,
                 value=0, key=f"dc_comparison_atoms_number_{dc_constraint_number}"
             )
 
