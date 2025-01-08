@@ -124,7 +124,7 @@ def user_input_one_tgd_side(
                         help=argument,
                     )
                     return attribute_input
-                # If reached last input, add closing parentheses
+                # If reached last input, add closing parenthesis
                 if argument == available_relations[relation_name][-1]:
                     last_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
                     with last_input_col:
