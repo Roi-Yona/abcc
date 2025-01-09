@@ -125,8 +125,9 @@ class DBDataExtractor:
         # Add the different variable constraint.
         for comparison_atom in comparison_atoms:
             where_phrase = self.sql_concat_and(where_phrase)
-            where_phrase += f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}"
+            where_phrase += f"{comparison_atom[0]}{comparison_atom[1][3]}{comparison_atom[2]}"
 
+        where_phrase = self.sql_remove_and(where_phrase)
         where_phrase += '\n'
 
         # If trim WHERE phrase is empty, remove it.
@@ -156,9 +157,16 @@ class DBDataExtractor:
         pass
 
     @staticmethod
-    def sql_concat_and(input_str) -> str:
+    def sql_concat_and(input_str: str) -> str:
         if input_str != "WHERE " and input_str[-4:] != 'AND ':
             input_str += " AND "
+        return input_str
+
+    @staticmethod
+    def sql_remove_and(input_str: str) -> str:
+        if len(input_str) >= 4:
+            if input_str[-4:] == 'AND ':
+                input_str = input_str[:-4]
         return input_str
 
     def convert_to_mip(self) -> None:
@@ -188,12 +196,6 @@ class DBDataExtractor:
         else:
             self.extract_data_from_db()
             self.convert_to_mip()
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

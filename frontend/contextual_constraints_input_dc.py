@@ -121,7 +121,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
                 # Check if it is of the format of c_<number>, if so then it is a committee member.
                 if utils.test_committee_member_name(clean_input, committee_member_id - 1):
                     dc_candidates_tables_list.append(relation_dict_key[1])
-                elif clean_input == '_':
+                elif clean_input == '':
                     clean_input = config.generate_unique_key_string()
                 # If it is a name than it fits the general dict.
                 if relation_dict_key in dc_dict:
