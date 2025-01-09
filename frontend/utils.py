@@ -115,7 +115,7 @@ def set_text_input_style(
         background_color: str = "#98ff98",
         border_color: str = "#98ff98",
         border_radius: str = "5px",
-        text_color: str = "#343a40"
+        text_color: str = "#000000"
 ) -> None:
     """
     set the style for all text inputs in the app.
