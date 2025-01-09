@@ -218,15 +218,16 @@ def clean_trip_advisor_dat_file(dat_file_path: str, new_csv_file_path: str):
         while line:
             list_line = line.split(',')
 
-            if list_line[2] == '1':
-                # If the price is equal to 1, remove this part of the line.
-                list_line = list_line[:2] + list_line[3:]
-            if list_line[2] == 'nkonwn' or list_line[2] == 'id="hotel_505846">' or list_line[2] == 'id="hotel_579210">' \
-                    or list_line[2] == 'id="hotel_674915">':
-                list_line[2] = '-1'
+            if "Unknown" not in list_line[3]:
+                if list_line[2] == '1':
+                    # If the price is equal to 1, remove this part of the line.
+                    list_line = list_line[:2] + list_line[3:]
+                if list_line[2] == 'nkonwn' or list_line[2] == 'id="hotel_505846">' or list_line[2] == 'id="hotel_579210">' \
+                        or list_line[2] == 'id="hotel_674915">':
+                    list_line[2] = '-1'
 
-            new_line = ','.join(list_line)
-            new_file_content += new_line + '\n'
+                new_line = ','.join(list_line)
+                new_file_content += new_line + '\n'
 
             # Read the next line.
             line = file.readline()
