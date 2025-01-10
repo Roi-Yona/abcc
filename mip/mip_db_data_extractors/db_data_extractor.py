@@ -125,7 +125,7 @@ class DBDataExtractor:
         # Add the different variable constraint.
         for comparison_atom in comparison_atoms:
             where_phrase = self.sql_concat_and(where_phrase)
-            where_phrase += f"{comparison_atom[0]}{comparison_atom[1][3]}{comparison_atom[2]}"
+            where_phrase += f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}"
 
         where_phrase = self.sql_remove_and(where_phrase)
         where_phrase += '\n'
