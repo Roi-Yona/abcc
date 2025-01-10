@@ -202,7 +202,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
             left_side_comparison_arg = st.text_input(f"variable name/value",
                                                      key=current_comparison_atom_unique_key + f"_left_side_comparison_arg",
                                                      label_visibility="collapsed",
-                                                     placeholder="a"
+                                                     placeholder=""
             )
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
@@ -215,7 +215,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
                 right_side_comparison_arg = st.text_input(f"variable name/value",
                                                           key=current_comparison_atom_unique_key + f"_right_side_comparison_arg",
                                                           label_visibility="collapsed",
-                                                          placeholder="b"
+                                                          placeholder=""
                 )
 
         left_side_comparison_arg = left_side_comparison_arg.replace("'", '"')
