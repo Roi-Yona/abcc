@@ -50,14 +50,17 @@ class Experiment:
         print("----------------------------------------------------------------------------")
         print(f"Experiment Name - {self._experiment_name} | Database Name - {self._database_name} start.")
 
+        spinner_col, bar_col = st.columns([1, 30])
         # Solve the MIP problem.
-        with st.spinner(text=""):
-            mip_solver_progress_bar, _ = run_func_with_fake_progress_bar(
-                delay=config.MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY,
-                loading_message="Running MIP Solver...",
-                finish_message="**Solved MIP Problem!**",
-                func_to_run=self._abc_convertor.solve,
-            )
+        with spinner_col:
+            with st.spinner(text=""):
+                with bar_col:
+                    mip_solver_progress_bar, _ = run_func_with_fake_progress_bar(
+                    delay=config.MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY,
+                    loading_message="Running MIP Solver...",
+                    finish_message="**Solved MIP Problem!**",
+                    func_to_run=self._abc_convertor.solve,
+                )
             time.sleep(2)
             mip_solver_progress_bar.empty()
 
