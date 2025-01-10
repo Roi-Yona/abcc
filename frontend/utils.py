@@ -112,8 +112,8 @@ def extract_available_relations_dict(db_name: str) -> Dict[str, List[str]]:
 
 
 def set_text_input_style(
-        background_color: str = "#98ff98",
-        border_color: str = "#98ff98",
+        background_color: str = "#eafaf1",
+        border_color: str = "#eafaf1",
         border_radius: str = "5px",
         text_color: str = "#000000"
 ) -> None:
