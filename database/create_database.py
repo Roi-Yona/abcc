@@ -132,17 +132,43 @@ def create_trip_advisor_candidates_table(cur, con):
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_trip_advisor_candidates_summary_table(cur, con):
-    # Create the candidates table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+def create_trip_advisor_hotel_price_range_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_price_range (
     {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
-    price FLOAT NOT NULL, 
-    location TEXT NOT NULL,
     price_range TEXT NOT NULL)''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
                                   f"candidates_table.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'price_range']]
+    df.to_sql('hotel_price_range', con, if_exists='append', index=False)
+
+
+def create_trip_advisor_hotel_location_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_location (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    location TEXT NOT NULL)''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'location']]
+    df.to_sql('hotel_location', con, if_exists='append', index=False)
+
+
+def create_trip_advisor_candidates_summary_table(cur, con):
+    # Create the candidates table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    location TEXT NOT NULL,
+    price FLOAT NOT NULL, 
+    price_range TEXT NOT NULL
+    )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'price', 'price_range', 'location']]
     df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
 
 
@@ -177,7 +203,7 @@ def trip_advisor_create_selected_locations_table(cur, con):
 
 def trip_advisor_create_price_ranges_table(cur, con):
     # Create the important price ranges table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS hotels_price_ranges (
+    cur.execute('''CREATE TABLE IF NOT EXISTS price_ranges (
                         price_range TEXT NOT NULL PRIMARY KEY)''')
 
     # Insert multiple rows into the table.
@@ -187,7 +213,7 @@ def trip_advisor_create_price_ranges_table(cur, con):
         ('low',),
     ]
 
-    cur.executemany("INSERT INTO hotels_price_ranges (price_range) values (?)", new_data)
+    cur.executemany("INSERT INTO price_ranges (price_range) values (?)", new_data)
 
 
 def trip_advisor_create_database_main():
@@ -199,14 +225,16 @@ def trip_advisor_create_database_main():
     con = sqlite3.connect(config.TRIP_ADVISOR_DB_PATH)
     cur = con.cursor()
 
+    create_trip_advisor_hotel_price_range_table(cur, con)
+    create_trip_advisor_hotel_location_table(cur, con)
+    trip_advisor_create_selected_locations_table(cur, con)
+    create_trip_advisor_candidates_summary_table(cur, con)
+    trip_advisor_create_locations_table(cur, con)
+    trip_advisor_create_price_ranges_table(cur, con)
     create_voting_table(cur, con,
                         os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
                                      f"voting_table.csv"))
     create_trip_advisor_candidates_table(cur, con)
-    trip_advisor_create_locations_table(cur, con)
-    trip_advisor_create_selected_locations_table(cur, con)
-    trip_advisor_create_price_ranges_table(cur, con)
-    create_trip_advisor_candidates_summary_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -271,19 +299,28 @@ def create_movies_candidates_summary_table(cur, con):
     # Create the candidates summary table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
        {config.CANDIDATES_COLUMN_NAME} int PRIMARY KEY,
-       adult NVARCHAR(50),
+       title NVARCHAR(1000),
        genres NVARCHAR(550),
        original_language NVARCHAR(50),
-       title NVARCHAR(1000),
+       runtime NVARCHAR(50),
        release_date date,
-       runtime int
+       adult NVARCHAR(50)
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(
         os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_metadata_new.csv"))
-    df = df[[config.CANDIDATES_COLUMN_NAME, 'adult', 'genres', 'original_language', 'title', 'release_date',
-            'runtime']]
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'title', 'genres', 'original_language', 'runtime', 'release_date',
+            'adult']]
+
+    # Merge df1 with df2, replacing the 'value' column based on matching 'id'
+
+    df2 = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movie_runtime.csv"))
+    df = df.merge(df2, on=config.CANDIDATES_COLUMN_NAME, how='left', suffixes=('', '_new'))
+    df['runtime'] = df['runtime_new'].combine_first(df['runtime'])
+    df = df.drop(columns=['runtime_new'])
+
     # Parse the required column as a dict (parsed as a string by default).
     df['genres'] = df['genres'].apply(ast.literal_eval)
 
@@ -293,59 +330,56 @@ def create_movies_candidates_summary_table(cur, con):
     df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_movies_genres_table(cur, con):
+def create_movie_genre_table(cur, con):
     # Create the genres table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_genres (
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_genre (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        genre TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(
-        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_genres.csv"))
-    df.to_sql("movies_genres", con, if_exists='append', index=False)
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movie_genre.csv"))
+    df.to_sql("movie_genre", con, if_exists='append', index=False)
 
 
-def create_movies_spoken_languages_table(cur, con):
-    # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_spoken_languages (
+def create_movie_spoken_languages_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_spoken_languages (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        spoken_language TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
-                                  "movies_spoken_languages.csv"))
-    df.to_sql("movies_spoken_languages", con, if_exists='append', index=False)
+                                  "movie_spoken_languages.csv"))
+    df.to_sql("movie_spoken_languages", con, if_exists='append', index=False)
 
 
-def create_movies_original_language_table(cur, con):
-    # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_original_language (
+def create_movie_original_language_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_original_language (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        original_language TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
-                                  "movies_original_language.csv"))
-    df.to_sql("movies_original_language", con, if_exists='append', index=False)
+                                  "movie_original_language.csv"))
+    df.to_sql("movie_original_language", con, if_exists='append', index=False)
 
 
-def create_movies_runtime_table(cur, con):
-    # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_runtime (
+def create_movie_runtime_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_runtime (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        runtime TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(
-        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_runtime.csv"))
-    df.to_sql("movies_runtime", con, if_exists='append', index=False)
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movie_runtime.csv"))
+    df.to_sql("movie_runtime", con, if_exists='append', index=False)
 
 
-def create_movies_runtime_categories_table(cur, con):
+def create_runtime_categories_table(cur, con):
     # Create the important price ranges table.
     cur.execute('''CREATE TABLE IF NOT EXISTS runtime_categories (
                         runtime TEXT NOT NULL PRIMARY KEY)''')
@@ -359,9 +393,9 @@ def create_movies_runtime_categories_table(cur, con):
     cur.executemany("INSERT INTO runtime_categories (runtime) values (?)", new_data)
 
 
-def create_movies_important_genres_table(cur, con):
+def create_selected_genres_table(cur, con):
     # Create the important price ranges table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_genres (
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_genres (
                         genre TEXT NOT NULL PRIMARY KEY)''')
 
     # Insert multiple rows into the table.
@@ -371,22 +405,22 @@ def create_movies_important_genres_table(cur, con):
         ('Drama',),
     ]
 
-    cur.executemany("INSERT INTO important_genres (genre) values (?)", new_data)
+    cur.executemany("INSERT INTO selected_genres (genre) values (?)", new_data)
 
 
-def create_movies_important_languages_table(cur, con):
+def create_selected_languages_table(cur, con):
     # Create the important locations table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_languages (
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_languages (
                         original_language TEXT NOT NULL)''')
 
     # Insert multiple rows into the table.
     new_data = [
-        ('en',),
-        ('fr',),
-        ('es',),
+        ('English',),
+        ('French',),
+        ('Spanish',),
     ]
 
-    cur.executemany("INSERT INTO important_languages (original_language) values (?)", new_data)
+    cur.executemany("INSERT INTO selected_languages (original_language) values (?)", new_data)
 
 
 def the_movies_database_create_database_main():
@@ -398,16 +432,16 @@ def the_movies_database_create_database_main():
     con = sqlite3.connect(config.MOVIES_DB_PATH)
     cur = con.cursor()
 
+    create_movie_genre_table(cur, con)
+    create_movie_original_language_table(cur, con)
+    create_movie_runtime_table(cur, con)
+    create_movie_spoken_languages_table(cur, con)
+    create_selected_genres_table(cur, con)
+    create_selected_languages_table(cur, con)
+    create_runtime_categories_table(cur, con)
+    create_movies_candidates_summary_table(cur, con)
     create_movies_voting_table(cur, con)
     create_movies_candidates_table(cur, con)
-    create_movies_genres_table(cur, con)
-    create_movies_spoken_languages_table(cur, con)
-    create_movies_runtime_table(cur, con)
-    create_movies_important_languages_table(cur, con)
-    create_movies_original_language_table(cur, con)
-    create_movies_runtime_categories_table(cur, con)
-    create_movies_important_genres_table(cur, con)
-    create_movies_candidates_summary_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -547,4 +581,4 @@ if __name__ == '__main__':
     # create_tests_db_main()
     the_movies_database_create_database_main()
     trip_advisor_create_database_main()
-    glasgow_create_database_main()
+    # glasgow_create_database_main()

@@ -93,9 +93,9 @@ GLASGOW_DATASET_TGD_FOR_EACH_DISTRICT_AT_LEAST_THREE_REPRESENTATION = \
 # ----------------------------------Movies Dataset Constraints---------------------------------
 # DC - There are no three committee members (i.e. movies) with the same genre.
 _dc_dict = dict()
-_dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-_dc_dict[('movies_genres', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-_dc_dict[('movies_genres', 't3')] = [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+_dc_dict[('movie_genre', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+_dc_dict[('movie_genre', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+_dc_dict[('movie_genre', 't3')] = [('c3', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
 _dc_committee_members_list = ['c1', 'c2', 'c3']
 _dc_candidates_tables = ['t1', 't2', 't3']
 _dc_comparison_atoms = [('c1', '<', 'c2'), ('c2', '<', 'c3')]
@@ -105,8 +105,8 @@ MOVIES_DATASET_DC_NO_THREE_MEMBERS_WITH_SAME_GENRE = (_dc_dict, _dc_committee_me
 
 # DC - There are no three committee members (i.e. movies) with the same genre.
 _dc_dict = dict()
-_dc_dict[('movies_genres', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
-_dc_dict[('movies_genres', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+_dc_dict[('movie_genre', 't1')] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+_dc_dict[('movie_genre', 't2')] = [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
 _dc_committee_members_list = ['c1', 'c2']
 _dc_candidates_tables = ['t1', 't2']
 _dc_comparison_atoms = [('c1', '<', 'c2')]
@@ -117,13 +117,13 @@ MOVIES_DATASET_DC_NO_TWO_MEMBERS_WITH_SAME_GENRE = (_dc_dict, _dc_committee_memb
 # TGD - For each original language from the important original languages table, there is (at least) one committee member
 # representing it.
 _tgd_dict_start = dict()
-_tgd_dict_start['important_languages', 't1'] = [('x', 'original_language')]
+_tgd_dict_start['selected_languages', 't1'] = [('x', 'original_language')]
 _tgd_committee_members_list_start = []
 _tgd_candidates_tables_start = []
 _tgd_constants_start = dict()
 _tgd_comparison_atoms_start = []
 _tgd_dict_end = dict()
-_tgd_dict_end['movies_original_language', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'original_language')]
+_tgd_dict_end['movie_original_language', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'original_language')]
 _tgd_committee_members_list_end = ['c1']
 _tgd_candidates_tables_end = ['t2']
 _tgd_constants_end = dict()
@@ -142,7 +142,7 @@ _tgd_candidates_tables_start = []
 _tgd_constants_start = dict()
 _tgd_comparison_atoms_start = []
 _tgd_dict_end = dict()
-_tgd_dict_end['movies_runtime', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'runtime')]
+_tgd_dict_end['movie_runtime', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'runtime')]
 _tgd_committee_members_list_end = ['c1']
 _tgd_candidates_tables_end = ['t2']
 _tgd_constants_end = dict()
@@ -155,13 +155,13 @@ MOVIES_DATASET_TGD_FOR_EACH_RUNTIME_LENGTH_AT_LEAST_ONE_REPRESENTATION = \
 
 # TGD - For every genre in important genres table there is (at least) one committee member representing it.
 _tgd_dict_start = dict()
-_tgd_dict_start['important_genres', 't1'] = [('x', 'genre')]
+_tgd_dict_start['selected_genres', 't1'] = [('x', 'genre')]
 _tgd_committee_members_list_start = []
 _tgd_candidates_tables_start = []
 _tgd_constants_start = dict()
 _tgd_comparison_atoms_start = []
 _tgd_dict_end = dict()
-_tgd_dict_end['movies_genres', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
+_tgd_dict_end['movie_genre', 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'genre')]
 _tgd_committee_members_list_end = ['c1']
 _tgd_candidates_tables_end = ['t2']
 _tgd_constants_end = dict()

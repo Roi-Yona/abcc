@@ -6,10 +6,20 @@ import os
 import numpy as np
 import pandas as pd
 import ast
+import pycountry
 
 import config
 
 MODULE_NAME = "Parse Dataset"
+
+
+def code_to_language_name(code):
+    # Function to convert ISO 639-1 codes to English language names.
+    try:
+        language = pycountry.languages.get(alpha_2=(str(code)).lower())
+        return language.name if language else f"Unknown code: {code}"
+    except KeyError:
+        return f"Unknown code: {code}"
 
 
 def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path: str):
@@ -27,7 +37,10 @@ def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path:
     valid_rows.rename(columns={'id': config.CANDIDATES_COLUMN_NAME}, inplace=True)
 
     # Remove duplicates.
-    valid_rows = valid_rows[valid_rows.duplicated(subset=['candidate_id'], keep=False) is False]
+    valid_rows = valid_rows[valid_rows.duplicated(subset=[config.CANDIDATES_COLUMN_NAME], keep=False) == False]
+
+    # Convert the original language to english names.
+    valid_rows['original_language'] = valid_rows['original_language'].apply(code_to_language_name)
 
     # Save the cleaned DataFrame back to a CSV file.
     valid_rows.to_csv(new_csv_file_path, index=False)
@@ -390,17 +403,17 @@ def the_movies_dataset_main():
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'ratings_new.csv'))
     create_movie_genre_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
-        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_genres.csv'))
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movie_genre.csv'))
     create_movie_spoken_languages_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
-        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_spoken_languages.csv'))
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movie_spoken_languages.csv'))
     create_movie_runtime_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
-        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_runtime.csv'))
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movie_runtime.csv'))
     create_movie_original_language_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
-                     f'movies_original_language.csv'))
+                     f'movie_original_language.csv'))
 
 
 def glasgow_dataset_main():
