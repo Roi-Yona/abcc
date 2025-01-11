@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Lock
 from time import sleep
 from typing import Callable, Tuple, Any
 
@@ -9,6 +9,8 @@ from matplotlib.pyplot import barbs
 # See the Github discussion for the history of solution hacks through different versions:
 # https://github.com/streamlit/streamlit/issues/1326
 from streamlit.runtime.scriptrunner import add_script_run_ctx
+
+progress_thread_lock = Lock()
 
 
 def advance_progress_bar(
@@ -24,6 +26,10 @@ def advance_progress_bar(
     bar_delta_value = (last_value - starting_value) / advances_number
 
     for i in range(advances_number):
+        with progress_thread_lock:
+            if st.session_state.get("finish_progress_bar"):
+                progress_bar.progress(100, progress_text)
+                return
         sleep(advance_delay)
 
         new_bar_value = starting_value + int(i * bar_delta_value)
@@ -63,10 +69,16 @@ def run_func_with_fake_progress_bar(
         )
     )
     add_script_run_ctx(bar_advancement_thread)
-
+    with progress_thread_lock:
+        st.session_state["finish_progress_bar"] = False
     bar_advancement_thread.start()
+
     result = func_to_run(*args, **kwargs)
+    with progress_thread_lock:
+        st.session_state["finish_progress_bar"] = True
     bar_advancement_thread.join()
 
+    with progress_thread_lock:
+        st.session_state["finish_progress_bar"] = False
     progress_bar.progress(100, text=finish_message)
     return progress_bar, result
