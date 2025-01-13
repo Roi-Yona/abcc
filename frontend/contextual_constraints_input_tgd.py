@@ -5,7 +5,6 @@ import config
 import frontend.utils as utils
 
 MODULE_NAME = f'Contextual Constraints Input TGD'
-NUMBER_OF_COLUMNS_IN_CONSTRAINT = 11
 
 
 def print_tgd_constraints(tgd_constraints: list):
@@ -63,18 +62,20 @@ def user_input_one_tgd_side(
         # Create the current relation select box.
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
             current_select_box_key = f"select_box_{current_relation_unique_key}"
-            relation_name = st.selectbox(
-                f"Relation {i + 1}",
-                available_relations.keys(),
-                key=current_select_box_key,
-                index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
-                label_visibility="collapsed"
-            )
+            select_box_col = utils.create_cols_for_buffer([1, 6], left_buffer="(", alignment="bottom")
+            with select_box_col:
+                relation_name = st.selectbox(
+                    f"Relation {i + 1}",
+                    available_relations.keys(),
+                    key=current_select_box_key,
+                    index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
+                    label_visibility="collapsed"
+                )
 
         relation_dict_key = (relation_name, current_relation_unique_key)
 
@@ -86,18 +87,20 @@ def user_input_one_tgd_side(
 
             column_list_index, constraint_columns_list = utils.advance_column_index(
                 column_list_index,
-                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                config.NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT,
                 constraint_columns_list
             )
             with constraint_columns_list[column_list_index]:
                 current_committee_key = f"committee_member_{current_relation_unique_key}_{candidate_attribute_name}"
-                st.text_input(
-                    label="",
-                    key=current_committee_key,
-                    value=candidate_attribute_name,
-                    label_visibility="collapsed",
-                    disabled=True,
-                )
+                disabled_input_text_col = utils.create_cols_for_buffer([100, 1], right_buffer=")", alignment="bottom")
+                with disabled_input_text_col:
+                    st.text_input(
+                        label=f"Generated tgd committee member \"{candidate_attribute_name}\" in atom {i + 1}",
+                        key=current_committee_key,
+                        value=candidate_attribute_name,
+                        label_visibility="collapsed",
+                        disabled=True,
+                    )
 
             continue
 
@@ -106,18 +109,28 @@ def user_input_one_tgd_side(
             current_arg_style_key = current_relation_unique_key + f"_arg_{argument}"
             column_list_index, constraint_columns_list = utils.advance_column_index(
                 column_list_index,
-                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                config.NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT,
                 constraint_columns_list
             )
             with constraint_columns_list[column_list_index]:
-                user_current_attribute_input = st.text_input(
-                    label="",
-                    key=current_arg_style_key,
-                    value="",
-                    label_visibility="visible",
-                    placeholder=argument,
-                    help=argument,
-                )
+                def _add_input_widget() -> str:
+                    attribute_input = st.text_input(
+                        # Streamlit throws a warning over empty labels, but we need it to have the tooltip
+                        label="",
+                        key=current_arg_style_key,
+                        value="",
+                        label_visibility="visible",
+                        placeholder=argument,
+                        help=argument,
+                    )
+                    return attribute_input
+                # If reached last input, add closing parenthesis
+                if argument == available_relations[relation_name][-1]:
+                    last_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
+                    with last_input_col:
+                        user_current_attribute_input = _add_input_widget()
+                else:
+                    user_current_attribute_input = _add_input_widget()
 
             # Check the user input type:
             input_type = utils.check_string_type(user_current_attribute_input)
@@ -161,17 +174,17 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
         for_all_constraints_col, exists_constraints_col = st.columns(2)
         with for_all_constraints_col:
             left_hand_side_relations_number = st.number_input(
-                "\# of relational atoms on the left hand side", min_value=0, step=1,
+                "Add/Remove relational atoms on the left hand side", min_value=0, step=1,
                 value=1, key=f"tgd_left_side_number_{tgd_constraint_number}"
             )
         with exists_constraints_col:
             right_hand_side_relations_number = st.number_input(
-                "\# of relational atoms on the right hand side", min_value=1, step=1,
+                "Add/Remove relational atoms on the right hand side", min_value=1, step=1,
                 value=1, key=f"tgd_right_side_number_{tgd_constraint_number}"
             )
 
         # Get the left and right hand of the TGD definition from the user.
-        constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2]
+        constraint_columns_ratio = [1] + (config.NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT - 1) * [2]
 
         left_constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="bottom")
         _, current_committee_member_id, left_hand_side_relations = user_input_one_tgd_side(

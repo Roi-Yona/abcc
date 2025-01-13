@@ -1,4 +1,5 @@
-from typing import List, Dict, Tuple
+from numbers import Number
+from typing import List, Dict, Tuple, Optional
 
 import streamlit as st
 import re
@@ -112,9 +113,9 @@ def extract_available_relations_dict(db_name: str) -> Dict[str, List[str]]:
 
 def set_text_input_style(
         background_color: str = "#eafaf1",
-        border_color: str = "#f0f8ff",
+        border_color: str = "#eafaf1",
         border_radius: str = "5px",
-        text_color: str = "#333"
+        text_color: str = "#000000"
 ) -> None:
     """
     set the style for all text inputs in the app.
@@ -148,3 +149,30 @@ def extract_table_size(db_name: str, table_name: str, column_name: str):
     result = db_engine.run_query(EXTRACT_QUERY)
     db_engine.__del__()
     return result['distinct_value_count'][0]
+
+
+def create_cols_for_buffer(cols_relation: list, left_buffer: Optional[str] = None, right_buffer: Optional[str] = None, alignment: str = "bottom") -> st.delta_generator.DeltaGenerator:
+    if left_buffer is None and right_buffer is None:
+        raise ValueError("You must set at least one buffer when calling 'create_cols_for_buffer'")
+
+    md_buffer_format = """
+                <style>
+                .custom-text {{
+                    font-size: 26px;
+                    font-family: 'Courier New', monospace;
+                }}
+                </style>
+                <p class="custom-text">{buffer}</p>
+                """
+    cols = st.columns(cols_relation, vertical_alignment=alignment)
+    if left_buffer is not None:
+        with cols[0]:
+            # st.text(left_buffer)
+            st.markdown(md_buffer_format.format(buffer=left_buffer), unsafe_allow_html=True)
+    if right_buffer is not None:
+        with cols[-1]:
+            # st.text(right_buffer)
+            st.markdown(md_buffer_format.format(buffer=right_buffer), unsafe_allow_html=True)
+
+    main_widget_col = cols[1] if left_buffer is not None else cols[0]
+    return main_widget_col

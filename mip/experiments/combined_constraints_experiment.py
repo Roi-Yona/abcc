@@ -3,7 +3,7 @@ import os
 import time
 
 import pandas as pd
-
+import streamlit as st
 from mip.mip_db_data_extractors.progress_bar_utils import run_func_with_fake_progress_bar
 
 sys.path.append(os.path.join('..', '..'))
@@ -111,15 +111,19 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             curr_tgd_extractor.extract_and_convert()
 
     def run_experiment(self):
-        # Extract problem data from the database and convert to MIP.
-        extraction_and_conversion_progress_bar, _ = run_func_with_fake_progress_bar(
-            delay=config.DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY + config.MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY,
-            loading_message="Extracting relevant data from database and converting to MIP...",
-            finish_message="**Finished DB Extraction and Conversion!**",
-            func_to_run=self.extract_and_convert_all_constraints,
-        )
-        time.sleep(2)
-        extraction_and_conversion_progress_bar.empty()
+        spinner_col, bar_col = st.columns([1, 30])
+        with spinner_col:
+            with st.spinner(text=""):
+                with bar_col:
+                    # Extract problem data from the database and convert to MIP.
+                    extraction_and_conversion_progress_bar, _ = run_func_with_fake_progress_bar(
+                        delay=config.DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY + config.MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY,
+                        loading_message="Extracting relevant data from database and converting to MIP...",
+                        finish_message="**Finished DB Extraction and Conversion!**",
+                        func_to_run=self.extract_and_convert_all_constraints,
+                    )
+                    time.sleep(1)
+                    extraction_and_conversion_progress_bar.empty()
 
         # Run the experiment.
         solved_time = self.run_model()

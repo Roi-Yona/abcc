@@ -50,12 +50,12 @@ SOLVER_TIME_LIMIT = int(0.5 * HOUR)
 SOLVER_NAMES = ["SAT", "CP_SAT", "SAT", "GLPK", "GUROBI"]
 SOLVER_NAME = SOLVER_NAMES[0]
 SCORE_RULES = {
-    'CC': score_functions.cc_thiele_function,
-    'PAV': score_functions.pav_thiele_function,
-    'AV': score_functions.av_thiele_function,
-    '2_TRUNCATED_AV': score_functions.k_2_truncated_av_thiele_function,
-    'SAV': score_functions.sav_score_rule_function}
-SCORE_RULE_NAME = 'PAV'
+    'Chamberlin-Courant': score_functions.cc_thiele_function,
+    'Proportional Approval Voting': score_functions.pav_thiele_function,
+    'Approval Voting': score_functions.av_thiele_function,
+    '2-Truncated Approval Voting': score_functions.k_2_truncated_av_thiele_function,
+    'Satisfaction Approval Voting': score_functions.sav_score_rule_function}
+SCORE_RULE_NAME = 'Proportional Approval Voting'
 SCORE_FUNCTION = SCORE_RULES[SCORE_RULE_NAME]
 
 LIFTED_INFERENCE = True
@@ -211,12 +211,20 @@ MOVIES_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH
 
 DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY = 7
 MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY = 3
-MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY = 3
+MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY = 20
 
 # --------------------------------------------------------------------------------
 DB_NAME_LIST = [MOVIES_DB_NAME, GLASGOW_ELECTIONS_DB_NAME, TRIP_ADVISOR_DB_NAME]
 COMMITTEE_RELATION_NAME = 'Com'
-COMPARISON_SIGNS = ['(a < b)', '(a > b)', '(a = b)']
+COMPARISON_SIGNS = ['<', '>', '=']
+
+
+
+# Front End Constants:
+# --------------------------------------------------------------------------------
+NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 11
+NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 11
+
 
 
 # Utility Functions:

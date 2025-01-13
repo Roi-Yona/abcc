@@ -4,7 +4,6 @@ import config
 import frontend.utils as utils
 
 MODULE_NAME = f'Contextual Constraints Input DC'
-NUMBER_OF_COLUMNS_IN_CONSTRAINT = 12
 
 
 def print_dc_constraints(dc_constraints: list):
@@ -46,7 +45,7 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
     dc_relational_atoms_unique_key = f"dc_relational_atoms_{dc_constraint_number}"
     dc_comparison_atoms_unique_key = f"dc_comparison_atoms_{dc_constraint_number}"
 
-    constraint_columns_ratio = [1] + (NUMBER_OF_COLUMNS_IN_CONSTRAINT - 1) * [2.5]
+    constraint_columns_ratio = [1] + (config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT - 1) * [2.5]
 
     constraint_columns_list = st.columns(constraint_columns_ratio, vertical_alignment="bottom")
     column_list_index = 0
@@ -59,18 +58,20 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
         # Create the current relation select box.
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
-            select_box_unique_key = f"select_box_{current_relation_unique_key}"
-            relation_name = st.selectbox(
-                f"Relational atom {i + 1}",
-                available_relations.keys(),
-                key=select_box_unique_key,
-                index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
-                label_visibility="collapsed"
-            )
+            select_box_col = utils.create_cols_for_buffer([1,6], left_buffer="(")
+            with select_box_col:
+                select_box_unique_key = f"select_box_{current_relation_unique_key}"
+                relation_name = st.selectbox(
+                    f"Relational atom {i + 1}",
+                    available_relations.keys(),
+                    key=select_box_unique_key,
+                    index=list(available_relations.keys()).index(config.COMMITTEE_RELATION_NAME),
+                    label_visibility="collapsed"
+                )
 
         relation_dict_key = (relation_name, current_relation_unique_key)
 
@@ -82,37 +83,49 @@ def user_input_single_dc_constraint(number_of_dc_relational_atoms: int,
 
             column_list_index, constraint_columns_list = utils.advance_column_index(
                 column_list_index,
-                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
                 constraint_columns_list
             )
             current_candidate_widget_unique_key = current_relation_unique_key + f'_comm_{i}'
 
             with constraint_columns_list[column_list_index]:
-                st.text_input(
-                    label="",
-                    value=candidate_attribute_name,
-                    label_visibility="collapsed",
-                    disabled=True,
-                    key=current_candidate_widget_unique_key
-                )
+                committee_disabled_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
+                with committee_disabled_input_col:
+                    st.text_input(
+                        label=f"Generated dc committee member \"{candidate_attribute_name}\" in atom {i + 1}",
+                        value=candidate_attribute_name,
+                        label_visibility="collapsed",
+                        disabled=True,
+                        key=current_candidate_widget_unique_key
+                    )
             continue
 
         # Otherwise, regular relation.
         for argument in available_relations[relation_name]:
             column_list_index, constraint_columns_list = utils.advance_column_index(
                 column_list_index,
-                NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+                config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
                 constraint_columns_list
             )
             with constraint_columns_list[column_list_index]:
-                user_current_attribute_input = st.text_input(
-                    "",
-                    key=current_relation_unique_key + f"_arg_{argument}",
-                    value="",
-                    label_visibility="visible",
-                    placeholder=argument,
-                    help=argument,
-                )
+                def _add_input_widget() -> str:
+                    attribute_input = st.text_input(
+                        # Streamlit throws a warning over empty labels, but we need it to have the tooltip
+                        label="",
+                        key=current_relation_unique_key + f"_arg_{argument}",
+                        value="",
+                        label_visibility="visible",
+                        placeholder=argument,
+                        help=argument,
+                    )
+                    return attribute_input
+                # If reached last input, add closing parenthesis
+                if argument == available_relations[relation_name][-1]:
+                    last_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
+                    with last_input_col:
+                        user_current_attribute_input = _add_input_widget()
+                else:
+                    user_current_attribute_input = _add_input_widget()
 
             # Check the user input type:
             input_type = utils.check_string_type(user_current_attribute_input)
@@ -167,39 +180,43 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
 
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
-            comparison_sign = st.selectbox(
-                f"comparison sign {i + 1}",
-                config.COMPARISON_SIGNS,
-                key=current_comparison_atom_unique_key,
-                label_visibility="collapsed"
-            )
+            select_box_col = utils.create_cols_for_buffer([1,6], left_buffer="(", alignment="bottom")
+            with select_box_col:
+                comparison_sign = st.selectbox(
+                    f"comparison sign {i + 1}",
+                    config.COMPARISON_SIGNS,
+                    key=current_comparison_atom_unique_key,
+                    label_visibility="collapsed"
+                )
 
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
             left_side_comparison_arg = st.text_input(f"variable name/value",
                                                      key=current_comparison_atom_unique_key + f"_left_side_comparison_arg",
                                                      label_visibility="collapsed",
-                                                     placeholder="a"
+                                                     placeholder=""
             )
         column_list_index, constraint_columns_list = utils.advance_column_index(
             column_list_index,
-            NUMBER_OF_COLUMNS_IN_CONSTRAINT,
+            config.NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT,
             constraint_columns_list
         )
         with constraint_columns_list[column_list_index]:
-            right_side_comparison_arg = st.text_input(f"variable name/value",
-                                                      key=current_comparison_atom_unique_key + f"_right_side_comparison_arg",
-                                                      label_visibility="collapsed",
-                                                      placeholder="b"
-            )
+            last_input_col = utils.create_cols_for_buffer([100, 1], right_buffer=")")
+            with last_input_col:
+                right_side_comparison_arg = st.text_input(f"variable name/value",
+                                                          key=current_comparison_atom_unique_key + f"_right_side_comparison_arg",
+                                                          label_visibility="collapsed",
+                                                          placeholder=""
+                )
 
         left_side_comparison_arg = left_side_comparison_arg.replace("'", '"')
         right_side_comparison_arg = right_side_comparison_arg.replace("'", '"')
@@ -229,12 +246,12 @@ def user_input_multiple_dc_constraints(available_relations: dict, number_of_dc_c
         col1, col2 = st.columns(2)
         with col1:
             number_of_dc_relational_atoms = st.number_input(
-                "\# of relational atoms", min_value=1, step=1,
+                "Add/Remove relational atoms", min_value=1, step=1,
                 value=1, key=f"dc_relational_atoms_number_{dc_constraint_number}"
             )
         with col2:
             number_of_dc_comparison_atoms = st.number_input(
-                "\# of comparison atoms", min_value=0, step=1,
+                "Add/Remove comparison atoms", min_value=0, step=1,
                 value=0, key=f"dc_comparison_atoms_number_{dc_constraint_number}"
             )
 
