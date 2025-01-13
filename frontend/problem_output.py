@@ -41,7 +41,7 @@ def print_candidates_summary_df(db: Database, committee_members_ids_list: str):
 
 
 def print_candidates_summary_movies_dataset_df(db: Database, committee_members_ids_list: str):
-    candidates_summary_df, movies_genres = st.columns(2)
+    candidates_summary_df, movie_genre = st.columns(2)
     # Remove redundant comma from the ids list str.
     if committee_members_ids_list[-2:] == ', ':
         committee_members_ids_list = committee_members_ids_list[:-2]
@@ -49,9 +49,9 @@ def print_candidates_summary_movies_dataset_df(db: Database, committee_members_i
     with candidates_summary_df:
         print_candidates_summary_df(db, committee_members_ids_list)
 
-    with movies_genres:
+    with movie_genre:
         # Run a query for the movies genres table.
-        query = f"SELECT DISTINCT * FROM movies_genres WHERE {config.CANDIDATES_COLUMN_NAME} " \
+        query = f"SELECT DISTINCT * FROM movie_genre WHERE {config.CANDIDATES_COLUMN_NAME} " \
                 f"IN ({committee_members_ids_list})"
         df = db.run_query(query)
         df.reset_index(drop=True, inplace=True)
