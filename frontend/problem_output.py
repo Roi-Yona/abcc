@@ -56,7 +56,9 @@ def present_solver_results(db: Database, experiment_results_row_df: pd.DataFrame
         experiment_display_row = row.row([2,2,1], vertical_align="center")
         print_candidates_summary_df(experiment_display_row, db, experiment_results_row_df['resulted_committee'].iloc[-1])
         present_experiment_summary(experiment_display_row, experiment_results_row_df, selected_db, voting_rule, committee_size)
-
+        # Present additional data about the experiment.
+        with st.expander("Additional Experiment Details", expanded=False):
+            st.dataframe(experiment_results_row_df)
     elif experiment_results_row_df['solving_status'].iloc[-1] == config.SOLVER_PROVEN_INFEASIBLE_STATUS:
         st.write("Model proven infeasible.")
     elif experiment_results_row_df['solving_status'].iloc[-1] == config.SOLVER_PROVEN_UNBOUNDED_STATUS:
