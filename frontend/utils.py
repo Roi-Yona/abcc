@@ -15,7 +15,9 @@ def page_setting():
     # Set page icon and title.
     st.set_page_config(
         page_icon="✍️", layout="wide", initial_sidebar_state="auto", )
-    st.title("DVote: Constraining Committee Voting with Database Dependencies")
+    with st.columns([1, 2, 1])[1]:
+        st.image("frontend/DVote_logo.png")
+    # st.title("DVote: Constraining Committee Voting with Database Dependencies")
     set_text_input_style()
     # Create a debug toggle using a checkbox
     debug_mode = st.checkbox("Debug Mode", value=False)
