@@ -48,7 +48,7 @@ def main():
 
         # Present the results.
         problem_output.present_solver_results(current_experiment.get_db_engine(), experiment_results_row_df,
-                                              selected_db)
+                                              selected_db, selected_rule, committee_size)
 
 
 if __name__ == "__main__":
