@@ -177,9 +177,9 @@ MOVIES_DATASET_TGD_FOR_EACH_IMPORTANT_GENRE_AT_LEAST_ONE_REPRESENTATION = \
 # DC - There are no two committee members (i.e. hotels) with both the same location and the same price.
 _dc_dict = dict()
 _dc_dict[(config.CANDIDATES_TABLE_NAME, 't1')] = \
-    [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
+    [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range_extended')]
 _dc_dict[(config.CANDIDATES_TABLE_NAME, 't2')] = \
-    [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range')]
+    [('c2', config.CANDIDATES_COLUMN_NAME), ('x', 'location'), ('y', 'price_range_extended')]
 _dc_committee_members_list = ['c1', 'c2']
 _dc_candidates_tables = ['t1', 't2']
 _dc_comparison_atoms = [('c1', '<', 'c2')]
@@ -197,7 +197,7 @@ _tgd_constants_start = dict()
 _tgd_comparison_atoms_start = []
 _tgd_dict_end = dict()
 _tgd_dict_end[config.CANDIDATES_TABLE_NAME, 't2'] = [('c1', config.CANDIDATES_COLUMN_NAME), ('x', 'location'),
-                                                     ('y', 'price_range')]
+                                                     ('y', 'price_range_extended')]
 _tgd_committee_members_list_end = ['c1']
 _tgd_candidates_tables_end = ['t2']
 _tgd_constants_end = {'y': 'low'}

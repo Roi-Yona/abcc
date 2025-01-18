@@ -164,7 +164,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                                self._dc_db_extractors]) +
                                                           sum([x.convert_to_mip_timer for x in
                                                                self._tgd_db_extractors]),
-                      'total_construction_and_extraction_time(sec)': self._abc_setting_extractor.extract_data_timer +
+                      'total_extraction_and_construction_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                                      sum([x.extract_data_timer for x in
                                                                           self._dc_db_extractors]) +
                                                                      sum([x.extract_data_timer for x in

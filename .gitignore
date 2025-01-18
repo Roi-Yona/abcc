@@ -47,3 +47,4 @@ Thumbs.db
 #####################
 .idea
 *__pycache__*
+abcc-venv*

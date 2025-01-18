@@ -141,7 +141,7 @@ def create_movie_runtime_metadata(original_csv_file_path: str, new_csv_file_path
         else:
             return 'long'
 
-    # Add 'price_range' column based on quantiles.
+    # convert 'runtime' column to category.
     df['runtime'] = df['runtime'].apply(lambda x: categorize_value(x, median_value))
 
     # Write data to the CSV file
@@ -293,15 +293,17 @@ def trip_advisor_dat_to_csv_candidates(dat_file_path: str, new_csv_file_path: st
     # Drop duplicate rows
     df = df.drop_duplicates()
 
-    # Find the one-third and two-third values
-    one_third_value = df['price'].quantile(0.333)
-    two_third_value = df['price'].quantile(0.667)
+    # Find the one-third, median and two-third values
+    one_third_price = df['price'].quantile(0.333)
+    median_price = df['price'].quantile(0.5)
+    two_third_price = df['price'].quantile(0.667)
 
-    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - one-third price value: {one_third_value}")
-    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - two-third price value: {two_third_value}")
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - one-third price value: {one_third_price}")
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - median price value: {median_price}")
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - two-third price value: {two_third_price}")
 
-    # Create a function to categorize values based on quantiles.
-    def categorize_value(value, one_third, two_third):
+    # Create a functions to categorize values based on quantiles.
+    def categorize_value_to_thirds(value, one_third, two_third):
         if value <= one_third:
             return 'low'
         elif value <= two_third:
@@ -309,8 +311,15 @@ def trip_advisor_dat_to_csv_candidates(dat_file_path: str, new_csv_file_path: st
         else:
             return 'high'
 
-    # Add 'price_range' column based on quantiles.
-    df['price_range'] = df['price'].apply(lambda x: categorize_value(x, one_third_value, two_third_value))
+    def categorize_value_to_halves(value, median_value):
+        if value <= median_value:
+            return 'low'
+        else:
+            return 'high'
+
+    # Add 'price_range' and 'price_range_extended' columns based on quantiles.
+    df['price_range'] = df['price'].apply(lambda x: categorize_value_to_halves(x, median_price))
+    df['price_range_extended'] = df['price'].apply(lambda x: categorize_value_to_thirds(x, one_third_price, two_third_price))
 
     # Write data to the CSV file
     df.to_csv(new_csv_file_path, index=False)
