@@ -44,7 +44,7 @@ GLASGOW_DATASET_TGD_FOR_EACH_DISTRICT_AT_LEAST_ONE_REPRESENTATION = \
 # TGD - For all parties in important parties table there is (at least) one committee member representing it.
 # Note that any valid committee should be at least from size 4 up, because there are 4 important parties.
 _tgd_dict_start = dict()
-_tgd_dict_start['important_parties', 't1'] = [('x', 'party')]
+_tgd_dict_start['selected_parties', 't1'] = [('x', 'party')]
 _tgd_committee_members_list_start = []
 _tgd_candidates_tables_start = []
 _tgd_constants_start = dict()

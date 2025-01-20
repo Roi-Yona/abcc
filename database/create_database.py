@@ -506,6 +506,72 @@ def create_glasgow_candidates_table(cur, con):
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
+def create_glasgow_candidate_district_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS candidate_district (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    district_number INTEGER NOT NULL)''')
+
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
+
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'district']]
+    df.rename(columns={"district": "district_number"}, inplace=True)
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql('candidate_district', con, if_exists='append', index=False)
+
+
+def create_glasgow_candidate_party_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS candidate_party (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    party TEXT NOT NULL)''')
+
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
+
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'party']]
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql("candidate_party", con, if_exists='append', index=False)
+
+
+def create_glasgow_parties_db(cur, con):
+    # Create the selected parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS parties (
+                        party TEXT PRIMARY KEY)''')
+
+    # Insert multiple rows into the table.
+    new_data = [
+        ('Scottish Green',),
+        ('Conservative',),
+        ('Labour',),
+        ('Independent',),
+        ('Solidarity',),
+        ('Liberal Democrats',),
+        ('SNP',),
+        ('Scottish Socialist',),
+        ('Scottish Unionist',),
+        ('Scottish Christian',),
+        ('CPA',),
+        ('BNP',),
+    ]
+
+    cur.executemany("INSERT INTO parties (party) values (?)", new_data)
+
+
+def create_glasgow_districts_db(cur, con):
+    # Create the selected parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS districts (
+                        district_number INTEGER PRIMARY KEY)''')
+
+    # Insert multiple rows into the table.
+    new_data = [(i,) for i in range(1, 22)]
+
+    cur.executemany("INSERT INTO districts (district_number) values (?)", new_data)
+
+
 def create_glasgow_candidates_summary_table(cur, con):
     # Creating the candidates summary table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
@@ -527,13 +593,12 @@ def create_glasgow_candidates_summary_table(cur, con):
     df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_glasgow_important_parties_db(cur, con):
-    # Create the important parties table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_parties (
+def create_glasgow_selected_parties_db(cur, con):
+    # Create the selected parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_parties (
                         party TEXT PRIMARY KEY)''')
 
     # Insert multiple rows into the table.
-    # The parties that left out: Solidarity, Liberal Democrats, Scottish Socialist, Scottish Unionist
     new_data = [
         ('Scottish Green',),
         ('SNP',),
@@ -541,7 +606,7 @@ def create_glasgow_important_parties_db(cur, con):
         ('Conservative',)
     ]
 
-    cur.executemany("INSERT INTO important_parties (party) values (?)", new_data)
+    cur.executemany("INSERT INTO selected_parties (party) values (?)", new_data)
 
 
 def create_glasgow_context_degree_db(cur, con):
@@ -591,12 +656,16 @@ def glasgow_create_database_main():
     con = sqlite3.connect(config.GLASGOW_ELECTIONS_DB_PATH)
     cur = con.cursor()
 
+    create_glasgow_candidate_party_table(cur, con)
+    create_glasgow_candidate_district_table(cur, con)
+    create_glasgow_parties_db(cur, con)
+    create_glasgow_districts_db(cur, con)
+    create_glasgow_selected_parties_db(cur, con)
+    create_glasgow_candidates_summary_table(cur, con)
+    # create_glasgow_context_domain_db(cur, con)
+    create_glasgow_candidates_table(cur, con)
     for i in range(1, 22):
         create_glasgow_voting_table(cur, con, i)
-    create_glasgow_candidates_table(cur, con)
-    create_glasgow_important_parties_db(cur, con)
-    create_glasgow_context_domain_db(cur, con)
-    create_glasgow_candidates_summary_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -608,4 +677,4 @@ if __name__ == '__main__':
     # create_tests_db_main()
     the_movies_database_create_database_main()
     trip_advisor_create_database_main()
-    # glasgow_create_database_main()
+    glasgow_create_database_main()
