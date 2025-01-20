@@ -222,8 +222,8 @@ COMPARISON_SIGNS = ['<', '>', '=']
 
 # Front End Constants:
 # --------------------------------------------------------------------------------
-NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 8
-NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 8
+NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 9
+NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 9
 
 
 

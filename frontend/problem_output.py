@@ -56,7 +56,26 @@ def present_solver_results(db: Database, experiment_results_row_df: pd.DataFrame
     if experiment_results_row_df['solving_status'].iloc[-1] == config.SOLVER_FOUND_OPTIMAL_STATUS:
         candidates_summary_df = get_candidates_summary_df(experiment_results_row_df['resulted_committee'].iloc[-1],
                                                           db)
-        present_all_experiment_results(committee_size, candidates_summary_df, experiment_results_row_df, selected_db, voting_rule)
+        present_experiment_results_and_summary(committee_size, candidates_summary_df, experiment_results_row_df, selected_db, voting_rule)
+        if "last_experiment" in st.session_state:
+            with st.expander("Previous Experiment Results", expanded=False):
+                present_experiment_results_and_summary(
+                    committee_size=st.session_state["last_experiment"]["committee_size"],
+                    candidates_summary_df=st.session_state["last_experiment"]["candidates_summary_df"],
+                    experiment_results_row_df=st.session_state["last_experiment"]["experiment_results_row_df"],
+                    selected_db=st.session_state["last_experiment"]["selected_db"],
+                    voting_rule=st.session_state["last_experiment"]["voting_rule"],
+                )
+        st.session_state["last_experiment"] = {
+            "committee_size": committee_size,
+            "candidates_summary_df": candidates_summary_df,
+            "experiment_results_row_df": experiment_results_row_df,
+            "selected_db": selected_db,
+            "voting_rule": voting_rule
+        }
+        if config.FRONTED_DEBUG:
+            with st.expander("Additional Experiment Details", expanded=False):
+                st.dataframe(experiment_results_row_df)
 
     elif experiment_results_row_df['solving_status'].iloc[-1] == config.SOLVER_PROVEN_INFEASIBLE_STATUS:
         st.write("Model proven infeasible.")
@@ -68,47 +87,19 @@ def present_solver_results(db: Database, experiment_results_row_df: pd.DataFrame
         st.write("No winning committee found - an unknown error in the solving phase occurred.")
 
 
-def present_all_experiment_results(
+def present_experiment_results_and_summary(
         committee_size: int,
         candidates_summary_df: pd.DataFrame,
         experiment_results_row_df: pd.DataFrame,
         selected_db: str,
         voting_rule: str,
-        is_current_experiment: bool = True
 ):
     st.write("**Winning Committee Summary**:")
     experiment_display_row = row.row([4, 4, 1], vertical_align="top")
-    print_candidates_summary_df(experiment_display_row, candidates_summary_df)
+    experiment_display_row.dataframe(candidates_summary_df)
     present_experiment_summary(experiment_display_row, experiment_results_row_df, selected_db, voting_rule,
                                committee_size)
 
-    if is_current_experiment:
-        if "last_experiment" in st.session_state:
-            with st.expander("Previous Experiment Results", expanded=False):
-                present_all_experiment_results(
-                    committee_size=st.session_state["last_experiment"]["committee_size"],
-                    candidates_summary_df=st.session_state["last_experiment"]["candidates_summary_df"],
-                    experiment_results_row_df=st.session_state["last_experiment"]["experiment_results_row_df"],
-                    selected_db=st.session_state["last_experiment"]["selected_db"],
-                    voting_rule=st.session_state["last_experiment"]["voting_rule"],
-                    is_current_experiment=False
-                )
-
-        with st.expander("Additional Experiment Details", expanded=False):
-            st.dataframe(experiment_results_row_df)
-
-    st.session_state["last_experiment"] = {
-        "committee_size": committee_size,
-        "candidates_summary_df": candidates_summary_df,
-        "experiment_results_row_df": experiment_results_row_df,
-        "selected_db": selected_db,
-        "voting_rule": voting_rule
-    }
-
-
-def print_candidates_summary_df(st_row, candidates_summary_df: pd.DataFrame):
-    # Present the results on streamlit.
-    st_row.dataframe(candidates_summary_df)
 
 
 def get_candidates_summary_df(committee_members_ids_list, db):
@@ -122,22 +113,3 @@ def get_candidates_summary_df(committee_members_ids_list, db):
     df.reset_index(drop=True, inplace=True)
     return df
 
-
-def print_candidates_summary_movies_dataset_df(db: Database, committee_members_ids_list: str):
-    candidates_summary_df, movie_genre = st.columns(2)
-    # Remove redundant comma from the ids list str.
-    if committee_members_ids_list[-2:] == ', ':
-        committee_members_ids_list = committee_members_ids_list[:-2]
-
-    with candidates_summary_df:
-        print_candidates_summary_df(db, committee_members_ids_list)
-
-    with movie_genre:
-        # Run a query for the movies genres table.
-        query = f"SELECT DISTINCT * FROM movie_genre WHERE {config.CANDIDATES_COLUMN_NAME} " \
-                f"IN ({committee_members_ids_list})"
-        df = db.run_query(query)
-        df.reset_index(drop=True, inplace=True)
-
-        # Present the results on streamlit.
-        st.dataframe(df)

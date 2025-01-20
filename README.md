@@ -25,7 +25,7 @@ collected from the internet.
 ## Running the Front End (Experiments Sandbox GUI)
 
 We've implemented a GUI using Streamlit, for a convenient experiment running framework.
-In order to run the application, you simply need to create the project's environment (or install all package requirements), and run the following command in the root path of this repository:
+In order to run the application, you simply need to create the project's environment (with all package requirements), and run the following command in the root path of this repository:
 
 ```shell
   streamlit run streamlit_main.py
@@ -47,6 +47,12 @@ All ```.db``` sqlite databases should be located under:
 The ```<new_dataset_folder>``` and the ```<database_name>```, along with further specific configuration constants, 
 should be defined in the ```config.py``` file 
 (the preexisting ones are already defined, and can be viewed for reference). 
+
+Notice that in order for the code to run on your new database, it must satisfy the following requirements:
+
+1. Have a relation called "candidates", containing information about the committee candidates, with a column called "candidate_id"
+2. Have a relation called "voters", containing information about all votes regarding the committee, containing the columns "voter_id", "candidate_id" and "rating", which represent the voter, that candidate he rated, and the rating he gave him (on a scale of 1-5), respectively.
+3. Have a relation called "candidates_summary", containing all information you want to be present when viewing your selected committee (must contain a "candidate_id" column of course)
 
 Finally, in order to enable adding new datasets in the main script, you must add the new db flag to the argument-parser in ```parse_dataset_and_create_db.py```, 
 and add proper parsing and creation functions to the ```parse_dataset.py``` and ```create_database.py``` files, respectively.

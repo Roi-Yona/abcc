@@ -7,6 +7,7 @@ import pandas as pd
 import ast
 
 import config
+from config import trip_advisor_create_experiment_name
 
 
 # Helper Functions:
@@ -133,7 +134,7 @@ def create_trip_advisor_candidates_table(cur, con):
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_trip_advisor_hotel_price_range_table(cur, con):
+def trip_advisor_create_hotel_price_range_table(cur, con):
     cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_price_range (
     {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
     price_range TEXT NOT NULL)''')
@@ -145,7 +146,7 @@ def create_trip_advisor_hotel_price_range_table(cur, con):
     df.to_sql('hotel_price_range', con, if_exists='append', index=False)
 
 
-def create_trip_advisor_hotel_price_range_extended_table(cur, con):
+def trip_advisor_create_hotel_price_range_extended_table(cur, con):
     cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_price_range_extended (
     {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
     price_range_extended TEXT NOT NULL)''')
@@ -157,7 +158,7 @@ def create_trip_advisor_hotel_price_range_extended_table(cur, con):
     df.to_sql('hotel_price_range_extended', con, if_exists='append', index=False)
 
 
-def create_trip_advisor_hotel_location_table(cur, con):
+def trip_advisor_create_hotel_location_table(cur, con):
     cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_location (
     {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
     location TEXT NOT NULL)''')
@@ -169,7 +170,7 @@ def create_trip_advisor_hotel_location_table(cur, con):
     df.to_sql('hotel_location', con, if_exists='append', index=False)
 
 
-def create_trip_advisor_candidates_summary_table(cur, con):
+def trip_advisor_create_candidates_summary_table(cur, con):
     # Create the candidates table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
     {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
@@ -248,13 +249,13 @@ def trip_advisor_create_database_main():
     con = sqlite3.connect(config.TRIP_ADVISOR_DB_PATH)
     cur = con.cursor()
 
-    create_trip_advisor_hotel_price_range_table(cur, con)
-    create_trip_advisor_hotel_location_table(cur, con)
+    trip_advisor_create_hotel_price_range_table(cur, con)
+    trip_advisor_create_hotel_location_table(cur, con)
     trip_advisor_create_selected_locations_table(cur, con)
-    create_trip_advisor_candidates_summary_table(cur, con)
+    trip_advisor_create_candidates_summary_table(cur, con)
     trip_advisor_create_locations_table(cur, con)
     trip_advisor_create_price_ranges_tables(cur, con)
-    create_trip_advisor_hotel_price_range_extended_table(cur, con)
+    trip_advisor_create_hotel_price_range_extended_table(cur, con)
 
 
     create_voting_table(cur, con,
