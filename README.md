@@ -22,25 +22,51 @@ The used datasets are:
 Furthermore, for the Glasgow Elections dataset, we have our own additional csv ('00008-00000000_candidates') containing 
 the combined candidates list from all district with context (such as the candidate party association) that we have
 collected from the internet.
+## Running the Front End (Experiments Sandbox GUI)
 
+We've implemented a GUI using Streamlit, for a convenient experiment running framework.
+In order to run the application, you simply need to create the project's environment (with all package requirements), and run the following command in the root path of this repository:
 
-### How to add new database?
+```shell
+  streamlit run streamlit_main.py
+```
 
-All datasets should locate under:
+You can find an instructional video on using this system here **insert link to demo video**
+
+## Extending the Repo
+Below we describe how you can add your own data and run your own experiments, using this codebase.
+
+### How to add a new database?
+
+All datasets should be located under:
 ```database/data/datasets/<new_dataset_folder>/original_data```
-All ```.db``` sqlite databases should locate under:
+
+All ```.db``` sqlite databases should be located under:
 ```database/databases/sqlite_databases/<database_name>```
-The ```<new_dataset_folder>``` and the ```<database_name>``` should also be defined in the ```config.py``` file 
-(and the current ones are already defined). 
 
-After adding the datasets to the project properly, you should run ```parse_dataset_and_create_db``` python script.
-Parsing, cleaning and creating for the three datasets describe above is already implemented.
-Any new datasets should have a proper parsing implementation.
+The ```<new_dataset_folder>``` and the ```<database_name>```, along with further specific configuration constants, 
+should be defined in the ```config.py``` file 
+(the preexisting ones are already defined, and can be viewed for reference). 
 
-In our work, we show several examples of handling soi, dat, and csv datasets cleaning and preparation, and exports a
+Notice that in order for the code to run on your new database, it must satisfy the following requirements:
+
+1. Have a relation called "candidates", containing information about the committee candidates, with a column called "candidate_id"
+2. Have a relation called "voters", containing information about all votes regarding the committee, containing the columns "voter_id", "candidate_id" and "rating", which represent the voter, that candidate he rated, and the rating he gave him (on a scale of 1-5), respectively.
+3. Have a relation called "candidates_summary", containing all information you want to be present when viewing your selected committee (must contain a "candidate_id" column of course)
+
+Finally, in order to enable adding new datasets in the main script, you must add the new db flag to the argument-parser in ```parse_dataset_and_create_db.py```, 
+and add proper parsing and creation functions to the ```parse_dataset.py``` and ```create_database.py``` files, respectively.
+It is well recommended to go over the existing DB parsing and creation methods and make sure that your new methods follow the same logic (with the
+specific needed adjustments for your new tables and relations, of course).
+
+After adding the datasets to the project properly, you should run the ```parse_dataset_and_create_db``` python script.
+As previously mentioned - parsing, cleaning and transformation of the three datasets described above is already implemented.
+Any new dataset should have its own parsing and creation implementation.
+
+In our work, we show several examples of handling ```.soi```, ```.dat```, and ```.csv``` datasets cleaning and preparation, and export a
 general functionality to handle similar cases.
 
-### How to run an experiment?
+### How to run an experiment (with a script)?
 
 This project requires python3, sqlite3, ortools (and any additional solver you want to define for the ortools wrapper,
 we found Gurobi to work well on this problem, the default solver defined in ```config.py``` is SAT).
@@ -49,7 +75,7 @@ The experiments are located under:
 To run an experiment can simply run the python file.
 
 Note that ```config.py``` holds important settings for your experiment, such as DEBUG mode.
-Note they when running the experiment, a copy from the database directory of the ```.db``` file will be created in your 
+Note that when running the experiment, a copy from the database directory of the ```.db``` file will be created in your 
 experiment directory, in order to enable parallel running.
 The result of this experiments can be found under ```mip/experiments/<dataset_name>/results```.
 
