@@ -72,13 +72,10 @@ VOTERS_COLUMN_NAME = 'voter_id'
 CANDIDATES_COLUMN_NAME = 'candidate_id'
 APPROVAL_COLUMN_NAME = 'rating'
 
-# In the rating table in the database each user rates the candidate 1-5.
+# In the voting table in the database each user rates the candidate 1-5 (rating column).
 # Every candidate rated > approval_threshold consider as approved by the voter.
 APPROVAL_THRESHOLD = 4
 
-# The first of 'number_of_approved_candidate' in the ranked-choice ballot will consider as approved
-# candidates of the voter.
-NUMBER_OF_APPROVED_CANDIDATE = 3
 # --------------------------------------------------------------------------------
 
 # The Movies Dataset Consts:
@@ -102,6 +99,10 @@ MOVIES_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, MOVIES_DB_NAME)
 
 # Glasgow Dataset Consts:
 # --------------------------------------------------------------------------------
+# The first of 'number_of_approved_candidate' in the ranked-choice ballot will consider as approved candidates of the
+# voter.
+GLASGOW_NUMBER_OF_APPROVED_CANDIDATE = 3
+
 GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES = {1: 9, 2: 11, 3: 10, 4: 11, 5: 10, 6: 10, 7: 13, 8: 10, 9: 11, 10: 9, 11: 10,
                                           12: 8,
                                           13: 11, 14: 8, 15: 9, 16: 10, 17: 9, 18: 9, 19: 11, 20: 9, 21: 10}
