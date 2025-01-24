@@ -75,7 +75,7 @@ def generate_committee_member_attribute_name(current_index: int) -> str:
 
 
 def test_committee_member_name(argument_name: str, current_highest_index: int) -> bool:
-    match = re.match(r'c_(\d+)', argument_name)
+    match = re.match(r'c(\d+)', argument_name)
     if match:
         id_value = int(match.group(1))  # Extract the number after "c_"
         return 1 <= id_value <= current_highest_index
