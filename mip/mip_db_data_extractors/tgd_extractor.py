@@ -5,6 +5,8 @@ from database import database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 import mip.mip_db_data_extractors.db_data_extractor as db_data_extractor
 
+import pandas as pd
+
 MODULE_NAME = "TGD DB Data Extractor"
 
 
@@ -81,15 +83,40 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         the chosen committee, then 2 and 4 *or* 3 and 5 must be as well.
         Note: The first place in the tuple could be empty (i.e. the TGD should always be enforced).
         """
+        # Handle free Com variables on the left hand side, since they can appear on the right hand side.
+        # TODO: Do it only for *free* left hand side variables.
+        # self._tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't_candidates_table'] = []
+        # for candidate_var_name in self._committee_members_list_start:
+        #     self._tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't_candidates_table'].append((candidate_var_name,
+        #                                                                                      config.CANDIDATES_COLUMN_NAME))
+
         legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start,
                                                    self._constants_start, self._comparison_atoms_start)
+        config.debug_print(MODULE_NAME, f"The legal assignments in the left hand side are: {legal_assignments_start}")
+
         tgd_tuples_list = []
-        if legal_assignments_start.empty:
+        current_element_committee_members = None
+        # If both sides do not contain Com than we skip this constraint (it is not contextual).
+        if (len(self._committee_members_list_end) == 0) and (len(self._committee_members_list_start) == 0):
+            config.debug_print(MODULE_NAME, "Note: The TGD is not contextual and therefore does not enforced.")
+            self._tgd_tuples_list = tgd_tuples_list
+            return
+        # If the right hand side constraint only Com (or nothing) i.e. tgd_dict_end is empty, then there is no
+        # constraint on the committee (same as writing 'true' on the right hand side).
+        if len(self._tgd_dict_end) == 0:
+            config.debug_print(MODULE_NAME, "Note: The TGD enforce nothing on the right hand side, therefore, "
+                                            "there is no actual constraint on the committee.")
+            self._tgd_tuples_list = tgd_tuples_list
+            return
+        # If the left hand side is empty completely (both from relations and Com relation) than we treat it as 'true'.
+        if (len(self._committee_members_list_start) == 0) and (len(self._tgd_dict_start) == 0):
+            config.debug_print(MODULE_NAME, "Note: The TGD left hand side is empty, treat as if it is 'true'.")
             legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
                                                      self._constants_end,
                                                      self._comparison_atoms_end)
-            current_element_representatives_set = legal_assignments_end[self._committee_members_list_end].values
-            tgd_tuples_list.append((set(), current_element_representatives_set))
+            current_element_committee_members = set()
+            tgd_tuples_list = self._extract_data_from_db_aux(legal_assignments_end, tgd_tuples_list,
+                                                             current_element_committee_members)
         else:
             # Extract the committee members sets out of the resulted join.
             for _, row in legal_assignments_start.iterrows():
@@ -108,18 +135,30 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
                 legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
                                                          union_constants,
                                                          self._comparison_atoms_end)
-                current_element_representatives_set = legal_assignments_end[self._committee_members_list_end].values
+                tgd_tuples_list = self._extract_data_from_db_aux(legal_assignments_end, tgd_tuples_list,
+                                                                 current_element_committee_members)
 
-                tgd_tuples_list.append((current_element_committee_members, current_element_representatives_set))
-
+        config.debug_print(MODULE_NAME, f"The tgd tuples list is {tgd_tuples_list}")
         self._tgd_tuples_list = tgd_tuples_list
-
-        # This is commented because it might be time-consuming.
-        # config.debug_print(MODULE_NAME,
-        #                    f"The TGD representatives set: {self._representatives_sets}.")
 
     def _convert_to_mip(self) -> None:
         self._abc_convertor.define_tgd(self._tgd_tuples_list)
+
+    def _extract_data_from_db_aux(self, legal_assignments_end, tgd_tuples_list, current_element_committee_members):
+        if (len(self._committee_members_list_end) == 0) and (len(legal_assignments_end) > 0):
+            # The Com relation does not appear on the right hand side, but there is representatives (in this case there
+            # is no constraint on the committee).
+            pass
+        elif (len(self._committee_members_list_end) == 0) and (len(legal_assignments_end) == 0):
+            # The Com relation does not appear on the right hand side, and there are no representatives (this will cause
+            # the model to be infeasible).
+            current_element_representatives_set = set()
+            tgd_tuples_list.append((current_element_committee_members, current_element_representatives_set))
+        else:
+            # Standard case.
+            current_element_representatives_set = legal_assignments_end[self._committee_members_list_end].values
+            tgd_tuples_list.append((current_element_committee_members, current_element_representatives_set))
+        return tgd_tuples_list
 
 
 if __name__ == '__main__':
