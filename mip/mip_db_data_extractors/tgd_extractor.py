@@ -1,5 +1,7 @@
 """A class for extracting the db data of an ABC contextual constraint - TGD to a MIP constraint.
 """
+import copy
+
 import config
 from database import database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
