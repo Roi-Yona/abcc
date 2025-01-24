@@ -217,7 +217,7 @@ MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY = 20
 # --------------------------------------------------------------------------------
 DB_NAME_LIST = [MOVIES_DB_NAME, GLASGOW_ELECTIONS_DB_NAME, TRIP_ADVISOR_DB_NAME]
 COMMITTEE_RELATION_NAME = 'Com'
-COMPARISON_SIGNS = ['<', '>', '=', '\\neq']
+COMPARISON_SIGNS = ['<', '>', '=', '≠']
 
 
 

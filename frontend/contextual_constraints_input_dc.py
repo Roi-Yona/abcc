@@ -192,7 +192,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
                     key=current_comparison_atom_unique_key,
                     label_visibility="collapsed"
                 )
-                if comparison_sign == "\\neq":
+                if comparison_sign == "≠":
                     comparison_sign = "<"
 
         column_list_index, constraint_columns_list = utils.advance_column_index(
