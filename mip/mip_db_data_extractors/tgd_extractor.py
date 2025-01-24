@@ -104,7 +104,7 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
                         "The input tgd_constants_end and the assignment of the committee members at the left "
                         "hand side of the TGD (committee_members_list_start) are overlap.")
                 else:
-                    union_constants = current_row_assignment_constants | self._constants_end
+                    union_constants = {**current_row_assignment_constants, **self._constants_end}
                 legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
                                                          union_constants,
                                                          self._comparison_atoms_end)
