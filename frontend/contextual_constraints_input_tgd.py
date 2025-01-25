@@ -119,7 +119,7 @@ def user_input_one_tgd_side(
                         label="",
                         key=current_arg_style_key,
                         value="",
-                        label_visibility="collapsed", #"visible",
+                        label_visibility="visible",
                         placeholder=argument,
                         help=argument,
                     )
