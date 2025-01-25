@@ -95,7 +95,7 @@ def present_experiment_results_and_summary(
         voting_rule: str,
 ):
     st.write("**Winning Committee Summary**:")
-    experiment_display_row = row.row([4, 4, 1], vertical_align="top")
+    experiment_display_row = row.row([8, 4, 1], vertical_align="top")
     experiment_display_row.dataframe(candidates_summary_df)
     present_experiment_summary(experiment_display_row, experiment_results_row_df, selected_db, voting_rule,
                                committee_size)
