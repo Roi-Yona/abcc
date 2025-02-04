@@ -10,6 +10,26 @@ import pandas as pd
 MODULE_NAME = "TGD DB Data Extractor"
 
 
+# Define a custom exception for convertion fail.
+class TGDConstraintConvertFailed(Exception):
+    pass
+
+
+# Define a custom exception for the case where there is a free variable of committee member in the TGD constraint.
+class TGDFreeCommitteeMemberVariableError(TGDConstraintConvertFailed):
+    def __init__(self, message="There is a free committee variable (in one of the TGD sides), please find a use for it,"
+                               " or remove it."):
+        super().__init__(message)
+
+
+# Define a custom exception for the case where there is no valid usage of the relation of committee in the TGD
+# constraint.
+class TGDNoCommitteeMemberRelationUsageError(TGDConstraintConvertFailed):
+    def __init__(self, message=f"There is no usage in the special committee relation {config.COMMITTEE_RELATION_NAME}, "
+                               f"or there is a usage only in the left hand side."):
+        super().__init__(message)
+
+
 class TGDExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: abc_to_mip_convertor.ABCToMIPConvertor,
@@ -83,12 +103,11 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         the chosen committee, then 2 and 4 *or* 3 and 5 must be as well.
         Note: The first place in the tuple could be empty (i.e. the TGD should always be enforced).
         """
-        # Handle free Com variables on the left hand side, since they can appear on the right hand side.
-        # TODO: Do it only for *free* left hand side variables.
-        # self._tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't_candidates_table'] = []
-        # for candidate_var_name in self._committee_members_list_start:
-        #     self._tgd_dict_start[config.CANDIDATES_TABLE_NAME, 't_candidates_table'].append((candidate_var_name,
-        #                                                                                      config.CANDIDATES_COLUMN_NAME))
+        if config.check_for_free_com_variables(self._committee_members_list_start, self._tgd_dict_start) or \
+                config.check_for_free_com_variables(self._committee_members_list_end, self._tgd_dict_end):
+            config.debug_print(MODULE_NAME, "Note: There is a free committee member variable in the TGD.")
+            self._tgd_tuples_list = []
+            raise TGDFreeCommitteeMemberVariableError
 
         legal_assignments_start = self.join_tables(self._candidates_tables_start, self._tgd_dict_start,
                                                    self._constants_start, self._comparison_atoms_start)
@@ -99,15 +118,16 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
         # If both sides do not contain Com than we skip this constraint (it is not contextual).
         if (len(self._committee_members_list_end) == 0) and (len(self._committee_members_list_start) == 0):
             config.debug_print(MODULE_NAME, "Note: The TGD is not contextual and therefore does not enforced.")
-            self._tgd_tuples_list = tgd_tuples_list
-            return
+            self._tgd_tuples_list = []
+            raise TGDNoCommitteeMemberRelationUsageError
+
         # If the right hand side constraint only Com (or nothing) i.e. tgd_dict_end is empty, then there is no
         # constraint on the committee (same as writing 'true' on the right hand side).
         if len(self._tgd_dict_end) == 0:
             config.debug_print(MODULE_NAME, "Note: The TGD enforce nothing on the right hand side, therefore, "
                                             "there is no actual constraint on the committee.")
-            self._tgd_tuples_list = tgd_tuples_list
-            return
+            self._tgd_tuples_list = []
+            raise TGDNoCommitteeMemberRelationUsageError
         # If the left hand side is empty completely (both from relations and Com relation) than we treat it as 'true'.
         if (len(self._committee_members_list_start) == 0) and (len(self._tgd_dict_start) == 0):
             config.debug_print(MODULE_NAME, "Note: The TGD left hand side is empty, treat as if it is 'true'.")
