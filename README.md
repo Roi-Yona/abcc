@@ -12,8 +12,8 @@ datasets, and refer to the next chapter to see how to add it to the project and 
 The used datasets are:
 
 * The Glasgow City Council Election Dataset. This dataset is taken from Preflib at
-  https://preflib.simonrey.fr/dataset/00008 and donated by Jeffery O’Neill. Open STV. www.OpenSTV.org, 2013.
-* The Trip Advisor Dataset. This dataset is taken from Preflib at https://preflib.simonrey.fr/dataset/00040 and was
+  https://preflib.github.io/PrefLib-Jekyll/dataset/00008 and donated by Jeffery O’Neill. Open STV. www.OpenSTV.org, 2013.
+* The Trip Advisor Dataset. This dataset is taken from Preflib at https://preflib.github.io/PrefLib-Jekyll/dataset/00040 and was
   scraped and denoted by Hongning Wang, first introduced in (Wang, Lu, and Zhai 2010).
 * The Movies Dataset. This dataset is taken from Kaggle
   at https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset/data, the dataset is an ensemble of data
