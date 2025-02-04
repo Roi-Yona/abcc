@@ -8,6 +8,23 @@ import mip.mip_db_data_extractors.db_data_extractor as db_data_extractor
 MODULE_NAME = "DC DB Data Extractor"
 
 
+# Define a custom exception for convertion fail.
+class DCConstraintConvertFailed(Exception):
+    pass
+
+
+# Define a custom exception for the case where there is a free variable of committee member in the DC constraint.
+class DCFreeCommitteeMemberVariableError(DCConstraintConvertFailed):
+    def __init__(self, message="There is a free committee variable, please find a use for it, or remove it."):
+        super().__init__(message)
+
+
+# Define a custom exception for the case where there is no usage in the relation of committee in the DC constraint.
+class DCNoCommitteeMemberRelationUsageError(DCConstraintConvertFailed):
+    def __init__(self, message=f"There is no usage in the special committee relation {config.COMMITTEE_RELATION_NAME}."):
+        super().__init__(message)
+
+
 class DCExtractor(db_data_extractor.DBDataExtractor):
     def __init__(self,
                  abc_convertor: abc_to_mip_convertor.ABCToMIPConvertor,
@@ -50,6 +67,13 @@ class DCExtractor(db_data_extractor.DBDataExtractor):
         The data is a list (numpy array) containing lists (numpy arrays) of the DC candidates groups, i.e. each list is
         a combination of candidates ids that cannot be in the committee together.
         """""
+        if config.check_for_free_com_variables(self._committee_members_list, self._dc_dict):
+            raise DCFreeCommitteeMemberVariableError()
+
+        # Handle the case when the constraints do not incorporate the special committee relation.
+        if len(self._committee_members_list) == 0:
+            raise DCNoCommitteeMemberRelationUsageError()
+
         legal_assignments = self.join_tables(self._candidates_tables, self._dc_dict, self._constants,
                                              self._comparison_atoms)
 
