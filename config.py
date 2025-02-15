@@ -48,7 +48,7 @@ SOLVER_MODEL_NOT_SOLVED_ERROR_STATUS = 6
 
 SOLVER_TIME_LIMIT = int(0.5 * HOUR)
 SOLVER_NAMES = ["SAT", "CP_SAT", "SAT", "GLPK", "GUROBI"]
-SOLVER_NAME = SOLVER_NAMES[4]
+SOLVER_NAME = SOLVER_NAMES[0]
 SCORE_RULES = {
     'Chamberlin-Courant': score_functions.cc_thiele_function,
     'Proportional Approval Voting': score_functions.pav_thiele_function,

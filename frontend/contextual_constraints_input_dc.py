@@ -192,6 +192,7 @@ def user_input_comparison_atoms_dc(number_of_dc_comparison_atoms: int, dc_unique
                     key=current_comparison_atom_unique_key,
                     label_visibility="collapsed"
                 )
+                # the "≠" sign is for the frontend display, the backend knows only how to work with "=", "<", or ">"
                 if comparison_sign == "≠":
                     comparison_sign = "<"
 
