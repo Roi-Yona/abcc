@@ -217,14 +217,14 @@ MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY = 20
 # --------------------------------------------------------------------------------
 DB_NAME_LIST = [MOVIES_DB_NAME, GLASGOW_ELECTIONS_DB_NAME, TRIP_ADVISOR_DB_NAME]
 COMMITTEE_RELATION_NAME = 'Com'
-COMPARISON_SIGNS = ['<', '>', '=']
+COMPARISON_SIGNS = ['<', '>', '=', '≠']
 
 
 
 # Front End Constants:
 # --------------------------------------------------------------------------------
-NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 9
-NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 9
+NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 7
+NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 7
 
 
 
