@@ -217,11 +217,14 @@ class ABCToMIPConvertor(mip_convertor.MIPConvertor):
         For example - the list [{1,2}, {3,1}] denotes that candidates 1 and 2 cannot be together in the committee (and
         the same applies for candidates 3 and 1).
         """
+        # Remove duplicates by converting to a set and back to a list
+        dc_candidates_sets = list(set(map(frozenset, dc_candidates_sets)))
+
         # This implementation is described in the section:
         # Mixed Integer Programming Implementation - Incorporating DC.
         # And the optimization is described in the section:
         # Optimizations - Contracting DC constraints via hypercliques.
-        if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS:
+        if config.MINIMIZE_DC_CONSTRAINTS_EQUATIONS and len(dc_candidates_sets) > 0 and len(dc_candidates_sets[0]) > 1:
             # Create an empty graph.
             dc_pairs_graph = nx.Graph()
 

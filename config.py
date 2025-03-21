@@ -219,14 +219,10 @@ DB_NAME_LIST = [MOVIES_DB_NAME, GLASGOW_ELECTIONS_DB_NAME, TRIP_ADVISOR_DB_NAME]
 COMMITTEE_RELATION_NAME = 'Com'
 COMPARISON_SIGNS = ['<', '>', '=', '≠']
 
-
-
 # Front End Constants:
 # --------------------------------------------------------------------------------
 NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 7
 NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 7
-
-
 
 # Utility Functions:
 # --------------------------------------------------------------------------------
@@ -330,4 +326,26 @@ def generate_unique_key_string() -> str:
     key = f"name_{unique_key_index}"
     unique_key_index += 1
     return key
+
+
+def check_for_free_com_variables(committee_members_list: list, tables_dict: dict) -> bool:
+    """Test for free committee members variables (i.e. there is use of the relation Com(c_i) but
+    no use to its variable c_i in any relation afterwords).
+
+    :param committee_members_list: A list of committee members [c_1,...]
+    :param tables_dict: A dict of tgd/dc relations.
+    :return: True if there is a free committee member variable, false otherwise.
+    """
+    for committee_member_var in committee_members_list:
+        in_use = False
+        for t in tables_dict.values():
+            for attribute_tuple_new_name_old_name in t:
+                if attribute_tuple_new_name_old_name[0] == committee_member_var:
+                    in_use = True
+                    break
+            if in_use:
+                break
+        if not in_use:
+            return True
+    return False
 # --------------------------------------------------------------------------------

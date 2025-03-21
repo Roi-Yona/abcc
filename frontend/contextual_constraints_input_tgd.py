@@ -213,3 +213,34 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
             print_tgd_constraints(tgd_constraints)
 
     return tgd_constraints
+
+
+def validate_tgd_constraint(tgds: list) -> (bool, str):
+    for tgd in tgds:
+        # The indices 0, 5 represent the tgd start and end tgd relations dicts.
+        for tgd_dict in [tgd[0], tgd[5]]:
+            for attribute_new_name_old_name_tuple_list in tgd_dict.values():
+                for attribute_new_name_old_name_tuple in attribute_new_name_old_name_tuple_list:
+                    new_attribute_name = attribute_new_name_old_name_tuple[0]
+                    print(new_attribute_name)
+                    new_attribute_name_type = utils.check_string_type(new_attribute_name)
+                    if new_attribute_name_type == 'value':
+                        return False, "Variable name cannot be a value."
+                    elif new_attribute_name_type == 'invalid':
+                        return False, "The name input is invalid"
+        # The indices 1, 6 represent the tgd start and end committee members lists.
+        for tgd_committee_members in [tgd[1], tgd[6]]:
+            for committee_member_name in tgd_committee_members:
+                match = re.match(r'c_(\d+)', committee_member_name)
+                if not match:
+                    return False
+        for tgd_constants_dict in [tgd[3], tgd[8]]:
+            for constant_name_value_tuple_list in tgd_constants_dict.values():
+                for constant_name_value_tuple in constant_name_value_tuple_list:
+                    constant_value = constant_name_value_tuple[1]
+                    new_attribute_value_type = utils.check_string_type(constant_value)
+                    if new_attribute_value_type == 'value':
+                        return False, "Constant cannot be a name."
+                    elif new_attribute_value_type == 'invalid':
+                        return False, "The constant input is invalid"
+    return True, ""

@@ -26,7 +26,8 @@ def main():
 
     # Submit button
     if st.button("Find a winning committee"):
-        # TODO: Test here the validity of the contextual constraints user input types.
+        # POC for validate before extracting stage.
+        # is_valid, message = contextual_constraints_input_tgd.validate_tgd_constraint(tgds)
         st.success("Configuration submitted successfully!")
 
         experiment_name = 'user_interface_experiment'
@@ -43,12 +44,16 @@ def main():
                                                                                            voters_group_size,
                                                                                            candidates_group_size)
 
-        # Run the experiment.
-        experiment_results_row_df = current_experiment.run_experiment()
+        try:
+            # Run the experiment.
+            experiment_results_row_df = current_experiment.run_experiment()
 
-        # Present the results.
-        problem_output.present_solver_results(current_experiment.get_db_engine(), experiment_results_row_df,
-                                              selected_db, selected_rule, committee_size)
+            # Present the results.
+            problem_output.present_solver_results(current_experiment.get_db_engine(), experiment_results_row_df,
+                                                  selected_db, selected_rule, committee_size)
+
+        except Exception as e:
+            st.error(e.__str__())
 
 
 if __name__ == "__main__":
