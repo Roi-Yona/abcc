@@ -9,7 +9,7 @@ import frontend.utils as utils
 MODULE_NAME = "DC DB Data Extractor"
 
 
-# Define a custom exception for convertion fail.
+# Define a custom exception for conversion fail.
 class DCConstraintConvertFailed(Exception):
     pass
 
@@ -75,22 +75,17 @@ class DCExtractor(db_data_extractor.DBDataExtractor):
         """Test the validity of a the comparison atoms.
         """""
         for comparison_atom in self._comparison_atoms:
-            input_type = utils.check_string_type(comparison_atom[0])
-            if input_type == 'name' and not self._test_variable_name(comparison_atom[0]):
-                return False
-            input_type = utils.check_string_type(comparison_atom[2])
-            if input_type == 'name' and not self._test_variable_name(comparison_atom[2]):
-                return False
+            for atom_variable in [comparison_atom[0], comparison_atom[2]]:
+                input_type = utils.check_string_type(atom_variable)
+                if input_type == 'name' and not self._test_variable_name(atom_variable):
+                    return False
+
         return True
 
     def _test_variable_name(self, var_name: str) -> bool:
         """Given a variable name, test that it is defined in the dc dict.
         """""
-        for ls in self._dc_dict.values():
-            for tp in ls:
-                if tp[0] == var_name:
-                    return True
-        return False
+        return any(tp[0] == var_name for ls in self._dc_dict.values() for tp in ls)
 
     def _extract_data_from_db(self) -> None:
         """Extracts the DC data from the DB, save the result within the class. 

@@ -217,6 +217,7 @@ def user_input_tgd_constraint(available_relations: dict, number_of_tgd_constrain
 
 def validate_tgd_constraint(tgds: list) -> (bool, str):
     for tgd in tgds:
+        # The indices 0, 5 represent the tgd start and end tgd relations dicts.
         for tgd_dict in [tgd[0], tgd[5]]:
             for attribute_new_name_old_name_tuple_list in tgd_dict.values():
                 for attribute_new_name_old_name_tuple in attribute_new_name_old_name_tuple_list:
@@ -227,6 +228,7 @@ def validate_tgd_constraint(tgds: list) -> (bool, str):
                         return False, "Variable name cannot be a value."
                     elif new_attribute_name_type == 'invalid':
                         return False, "The name input is invalid"
+        # The indices 1, 6 represent the tgd start and end committee members lists.
         for tgd_committee_members in [tgd[1], tgd[6]]:
             for committee_member_name in tgd_committee_members:
                 match = re.match(r'c_(\d+)', committee_member_name)

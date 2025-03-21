@@ -10,7 +10,7 @@ import pandas as pd
 MODULE_NAME = "TGD DB Data Extractor"
 
 
-# Define a custom exception for convertion fail.
+# Define a custom exception for conversion fail.
 class TGDConstraintConvertFailed(Exception):
     pass
 
@@ -169,6 +169,8 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
             # The Com relation does not appear on the right hand side, but there is representatives (in this case there
             # is no constraint on the committee).
             pass
+        # FIXME: In the following two cases, if len(legal_assignments_end) == 0 than the model will prove infeasible.
+        # FIXME: Therefore, we can optimize by deciding here, before finish extracting and sending to MIP solver.
         elif (len(self._committee_members_list_end) == 0) and (len(legal_assignments_end) == 0):
             # The Com relation does not appear on the right hand side, and there are no representatives (this will cause
             # the model to be infeasible).

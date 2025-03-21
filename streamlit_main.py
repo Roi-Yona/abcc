@@ -26,7 +26,7 @@ def main():
 
     # Submit button
     if st.button("Find a winning committee"):
-        # TODO: Validate that all DC comparison atoms are valid variables.
+        # POC for validate before extracting stage.
         # is_valid, message = contextual_constraints_input_tgd.validate_tgd_constraint(tgds)
         st.success("Configuration submitted successfully!")
 
