@@ -5,6 +5,16 @@ In this work we study approval-based committee voting in the presence of externa
 dependencies over a relational database with information about the candidates.
 In order to solve this new problem we build an appropriate MIP program.
 
+## Setting Up the Python Environment
+For your convenience, we've created a `requirements.txt` file, so you can use it to set a virtual environment for running all scripts in this project.
+
+You can just simply enter in your terminal (under the project's root directory): 
+```shell
+python -m venv ABCV-venv
+ABCV-venv\Scripts\activate
+pip install -r requirements.txt
+```
+
 ### Datasets
 
 In our existing experiments we use datasets of three different domains, and in order to use them you should download the
