@@ -6,12 +6,32 @@ dependencies over a relational database with information about the candidates.
 In order to solve this new problem we build an appropriate MIP program.
 
 ## Setting Up the Python Environment
-For your convenience, we've created a `requirements.txt` file, so you can use it to set a virtual environment for running all scripts in this project.
+This project is built using python 3.8. If trying to run on a newer version, consider that some dependencies here may need to be changed.
+For your convenience, we've created a `requirements.txt` file, so you can use it to set a virtual environment for running the UI and all scripts in this project.
 
-You can just simply enter in your terminal (under the project's root directory): 
+First, find out your python's path using the terminal:
+
+Linux/macOS:
 ```shell
-python -m venv ABCV-venv
+which python3.8
+```
+Windows:
+```shell
+where python3.8
+```
+Then, you can just simply enter in your terminal (under the project's root directory): 
+Linux/macOS:
+```shell
+C:\path\to\python3.8 -m venv ABCV-venv
+source ABCV-venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+Windows:
+```shell
+C:\path\to\python3.8 -m venv ABCV-venv
 ABCV-venv\Scripts\activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -29,9 +49,11 @@ The used datasets are:
   at https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset/data, the dataset is an ensemble of data
   collected from TMDB and GroupLens.
 
-Furthermore, for the Glasgow Elections dataset, we have our own additional csv ('00008-00000000_candidates') containing 
+Furthermore, for the Glasgow Elections dataset, we have our own additional csv (already in this repo - '00008-00000000_candidates') containing 
 the combined candidates list from all district with context (such as the candidate party association) that we have
 collected from the internet.
+
+After downloading the relevant db files, you should place them in the appropriate directory (check for the folder path constants in ```config.py```) and run the ```parse_dataset_and_create_db.py``` script - for detailed instructions please read [our instructions on how to add new databases](#How-to-add-a-new-database)
 ## Running the Front End (Experiments Sandbox GUI)
 
 We've implemented a GUI using Streamlit, for a convenient experiment running framework.
@@ -58,7 +80,7 @@ The ```<new_dataset_folder>``` and the ```<database_name>```, along with further
 should be defined in the ```config.py``` file 
 (the preexisting ones are already defined, and can be viewed for reference). 
 
-Notice that in order for the code to run on your new database, it must satisfy the following requirements:
+Notice that in order for the code to run on your new database, it must satisfy the following requirements (all datasets described earlier already satisfy these):
 
 1. Have a relation called "candidates", containing information about the committee candidates, with a column called "candidate_id"
 2. Have a relation called "voters", containing information about all votes regarding the committee, containing the columns "voter_id", "candidate_id" and "rating", which represent the voter, that candidate he rated, and the rating he gave him (on a scale of 1-5), respectively.
