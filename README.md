@@ -63,7 +63,7 @@ In order to run the application, you simply need to create the project's environ
   streamlit run streamlit_main.py
 ```
 
-You can find an instructional video on using this system here **insert link to demo video**
+You can find an instructional video on using this system here https://www.youtube.com/watch?v=pgQBm8xRQuU
 
 ## Extending the Repo
 Below we describe how you can add your own data and run your own experiments, using this codebase.
