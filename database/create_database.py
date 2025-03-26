@@ -3,6 +3,8 @@ and should be used after cleaning and parsing the datasets.
 """
 import os
 import sqlite3
+import warnings
+
 import pandas as pd
 import ast
 
@@ -610,6 +612,11 @@ def create_glasgow_selected_parties_db(cur, con):
 
 
 def create_glasgow_context_degree_db(cur, con):
+    warnings.warn(
+        "This method is deprecated as it uses columns that are no longer used",
+        category=DeprecationWarning,
+        stacklevel=2
+    )
     # Create the candidates degrees table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_degree (
                         candidate_id INTEGER NOT NULL,
@@ -629,6 +636,11 @@ def create_glasgow_context_degree_db(cur, con):
 
 
 def create_glasgow_context_domain_db(cur, con):
+    warnings.warn(
+        "This method is deprecated as it uses columns that are no longer used",
+        category=DeprecationWarning,
+        stacklevel=2
+    )
     # Create the candidates domain table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_domain (
                         candidate_id INTEGER NOT NULL,
