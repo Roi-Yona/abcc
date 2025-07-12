@@ -3,9 +3,13 @@ and should be used after cleaning and parsing the datasets.
 """
 import os
 import sqlite3
+import warnings
+
 import pandas as pd
+import ast
 
 import config
+from config import trip_advisor_create_experiment_name
 
 
 # Helper Functions:
@@ -123,12 +127,65 @@ def create_trip_advisor_candidates_table(cur, con):
     {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
     price FLOAT NOT NULL, 
     location TEXT NOT NULL,
-    price_range TEXT NOT NULL)''')
+    price_range TEXT NOT NULL,
+    price_range_extended TEXT NOT NULL)''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
                                   f"candidates_table.csv"))
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
+
+
+def trip_advisor_create_hotel_price_range_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_price_range (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    price_range TEXT NOT NULL)''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'price_range']]
+    df.to_sql('hotel_price_range', con, if_exists='append', index=False)
+
+
+def trip_advisor_create_hotel_price_range_extended_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_price_range_extended (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    price_range_extended TEXT NOT NULL)''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'price_range_extended']]
+    df.to_sql('hotel_price_range_extended', con, if_exists='append', index=False)
+
+
+def trip_advisor_create_hotel_location_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS hotel_location (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    location TEXT NOT NULL)''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'location']]
+    df.to_sql('hotel_location', con, if_exists='append', index=False)
+
+
+def trip_advisor_create_candidates_summary_table(cur, con):
+    # Create the candidates table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    location TEXT NOT NULL,
+    price FLOAT NOT NULL, 
+    price_range TEXT NOT NULL
+    )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"candidates_table.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'price', 'price_range', 'location']]
+    df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
 
 
 def trip_advisor_create_locations_table(cur, con):
@@ -142,39 +199,47 @@ def trip_advisor_create_locations_table(cur, con):
     df.to_sql('locations', con, if_exists='append', index=False)
 
 
-def trip_advisor_create_important_locations_table(cur, con):
+def trip_advisor_create_selected_locations_table(cur, con):
     # Create the important locations table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_locations (
-                        location TEXT NOT NULL,
-                        price_range TEXT NOT NULL)''')
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_locations (
+                        location TEXT NOT NULL)''')
 
     # Insert multiple rows into the table.
     new_data = [
-        ('Dallas Texas', 'low'),
-        ('Madrid', 'low'),
-        ('Seminyak Bali', 'low'),
-        ('Toronto Ontario', 'low'),
-        ('Singapore', 'low'),
-        ('Seattle Washington', 'low'),
-
+        ('Dallas Texas',),
+        ('Madrid',),
+        ('Seminyak Bali',),
+        ('Toronto Ontario',),
+        ('Singapore',),
+        ('Seattle Washington',),
     ]
 
-    cur.executemany("INSERT INTO important_locations (location, price_range) values (?, ?)", new_data)
+    cur.executemany("INSERT INTO selected_locations (location) values (?)", new_data)
 
 
-def trip_advisor_create_price_ranges_table(cur, con):
+def trip_advisor_create_price_ranges_tables(cur, con):
     # Create the important price ranges table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS hotels_price_ranges (
-                        price_range TEXT NOT NULL PRIMARY KEY)''')
+    cur.execute('''CREATE TABLE IF NOT EXISTS price_ranges (
+                        price_range TEXT NOT NULL PRIMARY KEY
+                    )''')
+
+    cur.execute('''CREATE TABLE IF NOT EXISTS price_ranges_extended (
+                        price_range_extended TEXT NOT NULL PRIMARY KEY
+                    )''')
 
     # Insert multiple rows into the table.
-    new_data = [
+    ranges_data = [
+        ('high',),
+        ('low',),
+    ]
+    ranges_extended_data = [
         ('high',),
         ('medium',),
         ('low',),
     ]
 
-    cur.executemany("INSERT INTO hotels_price_ranges (price_range) values (?)", new_data)
+    cur.executemany("INSERT INTO price_ranges (price_range) values (?)", ranges_data)
+    cur.executemany("INSERT INTO price_ranges_extended (price_range_extended) values (?)", ranges_extended_data)
 
 
 def trip_advisor_create_database_main():
@@ -186,13 +251,19 @@ def trip_advisor_create_database_main():
     con = sqlite3.connect(config.TRIP_ADVISOR_DB_PATH)
     cur = con.cursor()
 
+    trip_advisor_create_hotel_price_range_table(cur, con)
+    trip_advisor_create_hotel_location_table(cur, con)
+    trip_advisor_create_selected_locations_table(cur, con)
+    trip_advisor_create_candidates_summary_table(cur, con)
+    trip_advisor_create_locations_table(cur, con)
+    trip_advisor_create_price_ranges_tables(cur, con)
+    trip_advisor_create_hotel_price_range_extended_table(cur, con)
+
+
     create_voting_table(cur, con,
                         os.path.join(f"{config.TRIP_ADVISOR_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
                                      f"voting_table.csv"))
     create_trip_advisor_candidates_table(cur, con)
-    trip_advisor_create_locations_table(cur, con)
-    trip_advisor_create_important_locations_table(cur, con)
-    trip_advisor_create_price_ranges_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -218,7 +289,7 @@ def create_movies_voting_table(cur, con):
 
 
 def create_movies_candidates_table(cur, con):
-    # Create the voting table.
+    # Create the candidates table.
     cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_TABLE_NAME} (
        adult NVARCHAR(50),
        belongs_to_collection NVARCHAR(200),
@@ -253,59 +324,91 @@ def create_movies_candidates_table(cur, con):
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_movies_genres_table(cur, con):
+def create_movies_candidates_summary_table(cur, con):
+    # Create the candidates summary table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+       {config.CANDIDATES_COLUMN_NAME} int PRIMARY KEY,
+       title NVARCHAR(1000),
+       genres NVARCHAR(550),
+       original_language NVARCHAR(50),
+       runtime NVARCHAR(50),
+       release_date date,
+       adult NVARCHAR(50)
+       )''')
+
+    # Insert data from the DataFrame into the table.
+    df = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_metadata_new.csv"))
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'title', 'genres', 'original_language', 'runtime', 'release_date',
+            'adult']]
+
+    # Merge df1 with df2, replacing the 'value' column based on matching 'id'
+
+    df2 = pd.read_csv(
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movie_runtime.csv"))
+    df = df.merge(df2, on=config.CANDIDATES_COLUMN_NAME, how='left', suffixes=('', '_new'))
+    df['runtime'] = df['runtime_new'].combine_first(df['runtime'])
+    df = df.drop(columns=['runtime_new'])
+
+    # Parse the required column as a dict (parsed as a string by default).
+    df['genres'] = df['genres'].apply(ast.literal_eval)
+
+    # Create a new column with the names list as a value.
+    df['genres'] = df['genres'].apply(
+        lambda current_row_dict_list: str([current_dict['name'] for current_dict in current_row_dict_list]))
+    df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
+
+
+def create_movie_genre_table(cur, con):
     # Create the genres table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_genres (
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_genre (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        genre TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(
-        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_genres.csv"))
-    df.to_sql("movies_genres", con, if_exists='append', index=False)
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movie_genre.csv"))
+    df.to_sql("movie_genre", con, if_exists='append', index=False)
 
 
-def create_movies_spoken_languages_table(cur, con):
-    # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_spoken_languages (
+def create_movie_spoken_languages_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_spoken_languages (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        spoken_language TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
-                                  "movies_spoken_languages.csv"))
-    df.to_sql("movies_spoken_languages", con, if_exists='append', index=False)
+                                  "movie_spoken_languages.csv"))
+    df.to_sql("movie_spoken_languages", con, if_exists='append', index=False)
 
 
-def create_movies_original_language_table(cur, con):
-    # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_original_language (
+def create_movie_original_language_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_original_language (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        original_language TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
-                                  "movies_original_language.csv"))
-    df.to_sql("movies_original_language", con, if_exists='append', index=False)
+                                  "movie_original_language.csv"))
+    df.to_sql("movie_original_language", con, if_exists='append', index=False)
 
 
-def create_movies_runtime_table(cur, con):
-    # Create the voting table.
-    cur.execute(f'''CREATE TABLE IF NOT EXISTS movies_runtime (
+def create_movie_runtime_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS movie_runtime (
        {config.CANDIDATES_COLUMN_NAME} INTEGER NOT NULL,
        runtime TEXT NOT NULL
        )''')
 
     # Insert data from the DataFrame into the table.
     df = pd.read_csv(
-        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movies_runtime.csv"))
-    df.to_sql("movies_runtime", con, if_exists='append', index=False)
+        os.path.join(f"{config.MOVIES_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME, "movie_runtime.csv"))
+    df.to_sql("movie_runtime", con, if_exists='append', index=False)
 
 
-def create_movies_runtime_categories_table(cur, con):
+def create_runtime_categories_table(cur, con):
     # Create the important price ranges table.
     cur.execute('''CREATE TABLE IF NOT EXISTS runtime_categories (
                         runtime TEXT NOT NULL PRIMARY KEY)''')
@@ -319,9 +422,9 @@ def create_movies_runtime_categories_table(cur, con):
     cur.executemany("INSERT INTO runtime_categories (runtime) values (?)", new_data)
 
 
-def create_movies_important_genres_table(cur, con):
+def create_selected_genres_table(cur, con):
     # Create the important price ranges table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_genres (
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_genres (
                         genre TEXT NOT NULL PRIMARY KEY)''')
 
     # Insert multiple rows into the table.
@@ -331,22 +434,22 @@ def create_movies_important_genres_table(cur, con):
         ('Drama',),
     ]
 
-    cur.executemany("INSERT INTO important_genres (genre) values (?)", new_data)
+    cur.executemany("INSERT INTO selected_genres (genre) values (?)", new_data)
 
 
-def create_movies_important_languages_table(cur, con):
+def create_selected_languages_table(cur, con):
     # Create the important locations table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_languages (
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_languages (
                         original_language TEXT NOT NULL)''')
 
     # Insert multiple rows into the table.
     new_data = [
-        ('en',),
-        ('fr',),
-        ('es',),
+        ('English',),
+        ('French',),
+        ('Spanish',),
     ]
 
-    cur.executemany("INSERT INTO important_languages (original_language) values (?)", new_data)
+    cur.executemany("INSERT INTO selected_languages (original_language) values (?)", new_data)
 
 
 def the_movies_database_create_database_main():
@@ -358,15 +461,16 @@ def the_movies_database_create_database_main():
     con = sqlite3.connect(config.MOVIES_DB_PATH)
     cur = con.cursor()
 
+    create_movie_genre_table(cur, con)
+    create_movie_original_language_table(cur, con)
+    create_movie_runtime_table(cur, con)
+    create_movie_spoken_languages_table(cur, con)
+    create_selected_genres_table(cur, con)
+    create_selected_languages_table(cur, con)
+    create_runtime_categories_table(cur, con)
+    create_movies_candidates_summary_table(cur, con)
     create_movies_voting_table(cur, con)
     create_movies_candidates_table(cur, con)
-    create_movies_genres_table(cur, con)
-    create_movies_spoken_languages_table(cur, con)
-    create_movies_runtime_table(cur, con)
-    create_movies_important_languages_table(cur, con)
-    create_movies_original_language_table(cur, con)
-    create_movies_runtime_categories_table(cur, con)
-    create_movies_important_genres_table(cur, con)
 
     # Committing changes.
     con.commit()
@@ -404,13 +508,99 @@ def create_glasgow_candidates_table(cur, con):
     df.to_sql(config.CANDIDATES_TABLE_NAME, con, if_exists='append', index=False)
 
 
-def create_glasgow_important_parties_db(cur, con):
-    # Create the important parties table.
-    cur.execute('''CREATE TABLE IF NOT EXISTS important_parties (
+def create_glasgow_candidate_district_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS candidate_district (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    district_number INTEGER NOT NULL)''')
+
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
+
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'district']]
+    df.rename(columns={"district": "district_number"}, inplace=True)
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql('candidate_district', con, if_exists='append', index=False)
+
+
+def create_glasgow_candidate_party_table(cur, con):
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS candidate_party (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    party TEXT NOT NULL)''')
+
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
+
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'party']]
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql("candidate_party", con, if_exists='append', index=False)
+
+
+def create_glasgow_parties_db(cur, con):
+    # Create the selected parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS parties (
                         party TEXT PRIMARY KEY)''')
 
     # Insert multiple rows into the table.
-    # The parties that left out: Solidarity, Liberal Democrats, Scottish Socialist, Scottish Unionist
+    new_data = [
+        ('Scottish Green',),
+        ('Conservative',),
+        ('Labour',),
+        ('Independent',),
+        ('Solidarity',),
+        ('Liberal Democrats',),
+        ('SNP',),
+        ('Scottish Socialist',),
+        ('Scottish Unionist',),
+        ('Scottish Christian',),
+        ('CPA',),
+        ('BNP',),
+    ]
+
+    cur.executemany("INSERT INTO parties (party) values (?)", new_data)
+
+
+def create_glasgow_districts_db(cur, con):
+    # Create the selected parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS districts (
+                        district_number INTEGER PRIMARY KEY)''')
+
+    # Insert multiple rows into the table.
+    new_data = [(i,) for i in range(1, 22)]
+
+    cur.executemany("INSERT INTO districts (district_number) values (?)", new_data)
+
+
+def create_glasgow_candidates_summary_table(cur, con):
+    # Creating the candidates summary table.
+    cur.execute(f'''CREATE TABLE IF NOT EXISTS {config.CANDIDATES_SUMMARY_TABLE_NAME} (
+    {config.CANDIDATES_COLUMN_NAME} INTEGER PRIMARY KEY,
+    candidate_name TEXT NOT NULL, 
+    district_number INTEGER NOT NULL,
+    district_name TEXT NOT NULL, 
+    party TEXT NOT NULL)''')
+
+    df = pd.read_csv(os.path.join(f"{config.GLASGOW_ELECTIONS_DATASET_FOLDER_PATH}", config.PARSED_DATA_FOLDER_NAME,
+                                  f"00008-00000000_candidates.csv"))
+
+    # Filter the relevant columns.
+    df = df[[config.CANDIDATES_COLUMN_NAME, 'name', 'district', 'district_name', 'party']]
+    df.rename(columns={"district": "district_number"}, inplace=True)
+    df.rename(columns={"name": "candidate_name"}, inplace=True)
+
+    # Insert data from the DataFrame into the table.
+    df.to_sql(config.CANDIDATES_SUMMARY_TABLE_NAME, con, if_exists='append', index=False)
+
+
+def create_glasgow_selected_parties_db(cur, con):
+    # Create the selected parties table.
+    cur.execute('''CREATE TABLE IF NOT EXISTS selected_parties (
+                        party TEXT PRIMARY KEY)''')
+
+    # Insert multiple rows into the table.
     new_data = [
         ('Scottish Green',),
         ('SNP',),
@@ -418,10 +608,15 @@ def create_glasgow_important_parties_db(cur, con):
         ('Conservative',)
     ]
 
-    cur.executemany("INSERT INTO important_parties (party) values (?)", new_data)
+    cur.executemany("INSERT INTO selected_parties (party) values (?)", new_data)
 
 
 def create_glasgow_context_degree_db(cur, con):
+    warnings.warn(
+        "This method is deprecated as it uses columns that are no longer used",
+        category=DeprecationWarning,
+        stacklevel=2
+    )
     # Create the candidates degrees table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_degree (
                         candidate_id INTEGER NOT NULL,
@@ -441,6 +636,11 @@ def create_glasgow_context_degree_db(cur, con):
 
 
 def create_glasgow_context_domain_db(cur, con):
+    warnings.warn(
+        "This method is deprecated as it uses columns that are no longer used",
+        category=DeprecationWarning,
+        stacklevel=2
+    )
     # Create the candidates domain table.
     cur.execute('''CREATE TABLE IF NOT EXISTS context_domain (
                         candidate_id INTEGER NOT NULL,
@@ -468,11 +668,16 @@ def glasgow_create_database_main():
     con = sqlite3.connect(config.GLASGOW_ELECTIONS_DB_PATH)
     cur = con.cursor()
 
+    create_glasgow_candidate_party_table(cur, con)
+    create_glasgow_candidate_district_table(cur, con)
+    create_glasgow_parties_db(cur, con)
+    create_glasgow_districts_db(cur, con)
+    create_glasgow_selected_parties_db(cur, con)
+    create_glasgow_candidates_summary_table(cur, con)
+    # create_glasgow_context_domain_db(cur, con)
+    create_glasgow_candidates_table(cur, con)
     for i in range(1, 22):
         create_glasgow_voting_table(cur, con, i)
-    create_glasgow_candidates_table(cur, con)
-    create_glasgow_important_parties_db(cur, con)
-    create_glasgow_context_domain_db(cur, con)
 
     # Committing changes.
     con.commit()

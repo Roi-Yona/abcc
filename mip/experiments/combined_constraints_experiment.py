@@ -1,6 +1,11 @@
 import sys
 import os
+import time
+
 import pandas as pd
+import streamlit as st
+from mip.mip_db_data_extractors.progress_bar_utils import run_func_with_fake_progress_bar
+
 sys.path.append(os.path.join('..', '..'))
 
 import config
@@ -98,13 +103,27 @@ class CombinedConstraintsExperiment(experiment.Experiment):
             committee_size, voters_starting_point, candidates_starting_point, voters_size_limit, candidates_size_limit,
             config.SCORE_FUNCTION)
 
-    def run_experiment(self):
-        # Extract problem data from the database and convert to MIP.
+    def extract_and_convert_all_constraints(self):
         self._abc_setting_extractor.extract_and_convert()
         for curr_dc_extractor in self._dc_db_extractors:
             curr_dc_extractor.extract_and_convert()
         for curr_tgd_extractor in self._tgd_db_extractors:
             curr_tgd_extractor.extract_and_convert()
+
+    def run_experiment(self):
+        spinner_col, bar_col = st.columns([1, 30])
+        with spinner_col:
+            with st.spinner(text=""):
+                with bar_col:
+                    # Extract problem data from the database and convert to MIP.
+                    extraction_and_conversion_progress_bar, _ = run_func_with_fake_progress_bar(
+                        delay=config.DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY + config.MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY,
+                        loading_message="Extracting relevant data from database and converting to MIP...",
+                        finish_message="**Finished DB Extraction and Conversion!**",
+                        func_to_run=self.extract_and_convert_all_constraints,
+                    )
+                    time.sleep(1)
+                    extraction_and_conversion_progress_bar.empty()
 
         # Run the experiment.
         solved_time = self.run_model()
@@ -126,13 +145,15 @@ class CombinedConstraintsExperiment(experiment.Experiment):
         # Save the results.
         new_result = {'candidates_starting_point': self._candidates_starting_point,
                       'voters_starting_point': self._voters_starting_point,
-                      'voters_group_size': self._voters_group_size,
+                      'voters_group_size (non-empty approval profile)': self._voters_group_size,
                       'lifted_voters_group_size': self._abc_convertor.lifted_voters_group_size,
                       'candidates_group_size': self._abc_convertor.candidates_group_size,
                       'committee_size': self._committee_size,
-                      'mip_solving_time(sec)': solved_time,
-                      'number_of_solver_variables': self._solver.NumVariables(),
-                      'number_of_solver_constraints': self._solver.NumConstraints(),
+                      'extract_data_time(sec)': self._abc_setting_extractor.extract_data_timer +
+                                                sum([x.extract_data_timer for x in
+                                                     self._dc_db_extractors]) +
+                                                sum([x.extract_data_timer for x in
+                                                     self._tgd_db_extractors]),
                       'mip_construction_time_abc(sec)': self._abc_setting_extractor.convert_to_mip_timer,
                       'mip_construction_time_dc(sec)': sum([x.convert_to_mip_timer for x in
                                                                            self._dc_db_extractors]),
@@ -143,12 +164,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                                self._dc_db_extractors]) +
                                                           sum([x.convert_to_mip_timer for x in
                                                                self._tgd_db_extractors]),
-                      'extract_data_time(sec)': self._abc_setting_extractor.extract_data_timer +
-                                                sum([x.extract_data_timer for x in
-                                                     self._dc_db_extractors]) +
-                                                sum([x.extract_data_timer for x in
-                                                     self._tgd_db_extractors]),
-                      'total_construction_and_extraction_time(sec)': self._abc_setting_extractor.extract_data_timer +
+                      'total_extraction_and_construction_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                                      sum([x.extract_data_timer for x in
                                                                           self._dc_db_extractors]) +
                                                                      sum([x.extract_data_timer for x in
@@ -158,6 +174,7 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                                           self._dc_db_extractors]) +
                                                                      sum([x.convert_to_mip_timer for x in
                                                                           self._tgd_db_extractors]),
+                      'mip_solving_time(sec)': solved_time,
                       'total_solution_time(sec)': self._abc_setting_extractor.extract_data_timer +
                                                   sum([x.extract_data_timer for x in
                                                        self._dc_db_extractors]) +
@@ -170,11 +187,14 @@ class CombinedConstraintsExperiment(experiment.Experiment):
                                                   sum([x.convert_to_mip_timer for x in
                                                        self._tgd_db_extractors]) +
                                                   solved_time,
+                      'number_of_solver_variables': self._solver.NumVariables(),
+                      'number_of_solver_constraints': self._solver.NumConstraints(),
                       'solving_status': self._abc_convertor.solver_status,
                       'resulted_committee': committee_string
                       }
 
         return pd.DataFrame([new_result])
+
 
     def __del__(self):
         super().__del__()

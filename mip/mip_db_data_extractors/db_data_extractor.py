@@ -4,6 +4,9 @@ import config
 import pandas as pd
 import database.database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
+import streamlit as st
+
+from mip.mip_db_data_extractors.progress_bar_utils import run_func_with_fake_progress_bar
 
 MODULE_NAME = "Database Extractor"
 
@@ -64,6 +67,10 @@ class DBDataExtractor:
         i.e. '<'/'>'/'='/'!=' between two (new) column names.
         :return: The resulted df of the join operation, with the new names (such as 'x').
         """
+        # Handle special case of an empty dict.
+        if len(tables_dict.items()) == 0:
+            return pd.DataFrame()
+
         # Link between the new variable name to the new table name.
         # For instance variable_dict['x'] = [('t1', 'original_x_column_name'), ...].
         variables_dict = dict()
@@ -120,6 +127,7 @@ class DBDataExtractor:
             where_phrase = self.sql_concat_and(where_phrase)
             where_phrase += f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}"
 
+        where_phrase = self.sql_remove_and(where_phrase)
         where_phrase += '\n'
 
         # If trim WHERE phrase is empty, remove it.
@@ -149,9 +157,16 @@ class DBDataExtractor:
         pass
 
     @staticmethod
-    def sql_concat_and(input_str) -> str:
+    def sql_concat_and(input_str: str) -> str:
         if input_str != "WHERE " and input_str[-4:] != 'AND ':
             input_str += " AND "
+        return input_str
+
+    @staticmethod
+    def sql_remove_and(input_str: str) -> str:
+        if len(input_str) >= 4:
+            if input_str[-4:] == 'AND ':
+                input_str = input_str[:-4]
         return input_str
 
     def convert_to_mip(self) -> None:
@@ -160,12 +175,27 @@ class DBDataExtractor:
         end = time.time()
         self.convert_to_mip_timer = end - start
 
-    def extract_and_convert(self) -> None:
-        # Extract problem data from the database.
-        self.extract_data_from_db()
+    def extract_and_convert(self, run_with_progress_bar: bool = False) -> None:
+        if run_with_progress_bar:
+            db_extraction_progress_bar, _ = run_func_with_fake_progress_bar(
+                delay=config.DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY,
+                loading_message="Extracting relevant data from database...",
+                finish_message="*Finished DB Extraction!*",
+                func_to_run=self.extract_data_from_db,
+            )
 
-        # Convert to MIP problem (add the model properties).
-        self.convert_to_mip()
+            mip_conversion_progress_bar, _ = run_func_with_fake_progress_bar(
+                delay=config.MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY,
+                loading_message="Converting problem to MIP...",
+                finish_message="*Finished MIP Conversion!*",
+                func_to_run=self.convert_to_mip,
+            )
+            time.sleep(2)
+            db_extraction_progress_bar.empty()
+            mip_conversion_progress_bar.empty()
+        else:
+            self.extract_data_from_db()
+            self.convert_to_mip()
 
 
 if __name__ == '__main__':

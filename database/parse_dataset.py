@@ -6,10 +6,20 @@ import os
 import numpy as np
 import pandas as pd
 import ast
+import pycountry
 
 import config
 
 MODULE_NAME = "Parse Dataset"
+
+
+def code_to_language_name(code):
+    # Function to convert ISO 639-1 codes to English language names.
+    try:
+        language = pycountry.languages.get(alpha_2=(str(code)).lower())
+        return language.name if language else f"Unknown code: {code}"
+    except KeyError:
+        return f"Unknown code: {code}"
 
 
 def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path: str):
@@ -27,7 +37,10 @@ def clean_movie_dataset_metadata(original_csv_file_path: str, new_csv_file_path:
     valid_rows.rename(columns={'id': config.CANDIDATES_COLUMN_NAME}, inplace=True)
 
     # Remove duplicates.
-    valid_rows = valid_rows[valid_rows.duplicated(subset=['candidate_id'], keep=False) == False]
+    valid_rows = valid_rows[valid_rows.duplicated(subset=[config.CANDIDATES_COLUMN_NAME], keep=False) == False]
+
+    # Convert the original language to english names.
+    valid_rows['original_language'] = valid_rows['original_language'].apply(code_to_language_name)
 
     # Save the cleaned DataFrame back to a CSV file.
     valid_rows.to_csv(new_csv_file_path, index=False)
@@ -128,7 +141,7 @@ def create_movie_runtime_metadata(original_csv_file_path: str, new_csv_file_path
         else:
             return 'long'
 
-    # Add 'price_range' column based on quantiles.
+    # convert 'runtime' column to category.
     df['runtime'] = df['runtime'].apply(lambda x: categorize_value(x, median_value))
 
     # Write data to the CSV file
@@ -166,7 +179,7 @@ def soi_to_csv_voting(soi_file_path: str, new_csv_file_path: str, candidate_star
                 # In the original elections the election setting was STV, where there is a  ranked-choice ballot.
                 # Because we convert the problem to an ABC, we need to convert the ranked ballot to an approval
                 # profile, we do so by taking only the first NUMBER_OF_APPROVED_CANDIDATE candidates in the ballot.
-                for candidate_id in candidate_ids[:config.NUMBER_OF_APPROVED_CANDIDATE]:
+                for candidate_id in candidate_ids[:config.GLASGOW_NUMBER_OF_APPROVED_CANDIDATE]:
                     current_row = [current_voter_id,
                                    int(candidate_id) + candidate_starting_index,
                                    approval_rate]
@@ -205,15 +218,16 @@ def clean_trip_advisor_dat_file(dat_file_path: str, new_csv_file_path: str):
         while line:
             list_line = line.split(',')
 
-            if list_line[2] == '1':
-                # If the price is equal to 1, remove this part of the line.
-                list_line = list_line[:2] + list_line[3:]
-            if list_line[2] == 'nkonwn' or list_line[2] == 'id="hotel_505846">' or list_line[2] == 'id="hotel_579210">' \
-                    or list_line[2] == 'id="hotel_674915">':
-                list_line[2] = '-1'
+            if "Unknown" not in list_line[3]:
+                if list_line[2] == '1':
+                    # If the price is equal to 1, remove this part of the line.
+                    list_line = list_line[:2] + list_line[3:]
+                if list_line[2] == 'nkonwn' or list_line[2] == 'id="hotel_505846">' or list_line[2] == 'id="hotel_579210">' \
+                        or list_line[2] == 'id="hotel_674915">':
+                    list_line[2] = '-1'
 
-            new_line = ','.join(list_line)
-            new_file_content += new_line + '\n'
+                new_line = ','.join(list_line)
+                new_file_content += new_line + '\n'
 
             # Read the next line.
             line = file.readline()
@@ -279,15 +293,17 @@ def trip_advisor_dat_to_csv_candidates(dat_file_path: str, new_csv_file_path: st
     # Drop duplicate rows
     df = df.drop_duplicates()
 
-    # Find the one-third and two-third values
-    one_third_value = df['price'].quantile(0.333)
-    two_third_value = df['price'].quantile(0.667)
+    # Find the one-third, median and two-third values
+    one_third_price = df['price'].quantile(0.333)
+    median_price = df['price'].quantile(0.5)
+    two_third_price = df['price'].quantile(0.667)
 
-    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - one-third price value: {one_third_value}")
-    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - two-third price value: {two_third_value}")
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - one-third price value: {one_third_price}")
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - median price value: {median_price}")
+    config.debug_print(MODULE_NAME, f"Trip Advisor dataset - two-third price value: {two_third_price}")
 
-    # Create a function to categorize values based on quantiles.
-    def categorize_value(value, one_third, two_third):
+    # Create a functions to categorize values based on quantiles.
+    def categorize_value_to_thirds(value, one_third, two_third):
         if value <= one_third:
             return 'low'
         elif value <= two_third:
@@ -295,8 +311,15 @@ def trip_advisor_dat_to_csv_candidates(dat_file_path: str, new_csv_file_path: st
         else:
             return 'high'
 
-    # Add 'price_range' column based on quantiles.
-    df['price_range'] = df['price'].apply(lambda x: categorize_value(x, one_third_value, two_third_value))
+    def categorize_value_to_halves(value, median_value):
+        if value <= median_value:
+            return 'low'
+        else:
+            return 'high'
+
+    # Add 'price_range' and 'price_range_extended' columns based on quantiles.
+    df['price_range'] = df['price'].apply(lambda x: categorize_value_to_halves(x, median_price))
+    df['price_range_extended'] = df['price'].apply(lambda x: categorize_value_to_thirds(x, one_third_price, two_third_price))
 
     # Write data to the CSV file
     df.to_csv(new_csv_file_path, index=False)
@@ -390,17 +413,17 @@ def the_movies_dataset_main():
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'ratings_new.csv'))
     create_movie_genre_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
-        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_genres.csv'))
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movie_genre.csv'))
     create_movie_spoken_languages_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
-        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_spoken_languages.csv'))
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movie_spoken_languages.csv'))
     create_movie_runtime_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
-        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_runtime.csv'))
+        os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movie_runtime.csv'))
     create_movie_original_language_metadata(
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME, f'movies_metadata_new.csv'),
         os.path.join(config.MOVIES_DATASET_FOLDER_PATH, config.PARSED_DATA_FOLDER_NAME,
-                     f'movies_original_language.csv'))
+                     f'movie_original_language.csv'))
 
 
 def glasgow_dataset_main():

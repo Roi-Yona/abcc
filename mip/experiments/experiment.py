@@ -1,11 +1,14 @@
 import os
+import time
 from datetime import datetime
 import pandas as pd
+import streamlit as st
 
 import config
 from database import database_server_interface as db_interface
 import mip.mip_reduction.mip_convertor as mip_convertor
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
+from mip.mip_db_data_extractors.progress_bar_utils import run_func_with_fake_progress_bar
 
 MODULE_NAME = 'Experiment'
 # The results of an experiment are with a saved to .xlsx located in the experiments db folder (the parent folder of the
@@ -47,8 +50,19 @@ class Experiment:
         print("----------------------------------------------------------------------------")
         print(f"Experiment Name - {self._experiment_name} | Database Name - {self._database_name} start.")
 
+        spinner_col, bar_col = st.columns([1, 30])
         # Solve the MIP problem.
-        self._abc_convertor.solve()
+        with spinner_col:
+            with st.spinner(text=""):
+                with bar_col:
+                    mip_solver_progress_bar, _ = run_func_with_fake_progress_bar(
+                    delay=config.MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY,
+                    loading_message="Running MIP Solver...",
+                    finish_message="**Solved MIP Problem!**",
+                    func_to_run=self._abc_convertor.solve,
+                )
+            time.sleep(2)
+            mip_solver_progress_bar.empty()
 
         # Print the MIP solution.
         config.debug_print(MODULE_NAME, f"The solving time is {str(self._abc_convertor.solving_time)}\n" +
@@ -61,6 +75,9 @@ class Experiment:
 
     def run_experiment(self):
         pass
+
+    def get_db_engine(self):
+        return self._db_engine
 
     def __del__(self):
         self._db_engine.__del__()

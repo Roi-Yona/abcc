@@ -18,7 +18,7 @@ def parse_arguments():
     # Add arguments.
     parser.add_argument("--kaggle_movies_dataset", "-m", action="store_true",
                         help="Parse Kaggle Movies dataset, and create a proper DB.")
-    parser.add_argument("--glasgow_elections_dataset", "-g", action="store_true",
+    parser.add_argument("--glasgow_city_council_elections_2007_dataset", "-g", action="store_true",
                         help="Parse Glasgow Elections (2007) dataset, and create a proper DB")
     parser.add_argument("--trip_advisor_dataset", "-t", action="store_true",
                         help="Parse Trip Advisor dataset, and create a proper DB")
@@ -47,7 +47,7 @@ def main():
                 parse_dataset.the_movies_dataset_main()
             print("Creating Kaggle Movies dataset DB.")
             create_database.the_movies_database_create_database_main()
-        if args.glasgow_elections_dataset:
+        if args.glasgow_city_council_elections_2007_dataset:
             if not args.no_parse_dataset:
                 print("Parsing Glasgow Elections dataset.")
                 parse_dataset.glasgow_dataset_main()

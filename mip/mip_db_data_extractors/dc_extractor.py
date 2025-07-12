@@ -4,8 +4,34 @@ import config
 from database import database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 import mip.mip_db_data_extractors.db_data_extractor as db_data_extractor
+import frontend.utils as utils
 
 MODULE_NAME = "DC DB Data Extractor"
+
+
+# Define a custom exception for conversion fail.
+class DCConstraintConvertFailed(Exception):
+    pass
+
+
+# Define a custom exception for the case where there is a free variable of committee member in the DC constraint.
+class DCFreeCommitteeMemberVariableError(DCConstraintConvertFailed):
+    def __init__(self, message="There is a free committee variable, please find a use for it, or remove it."):
+        super().__init__(message)
+
+
+# Define a custom exception for the case where there is an invalid comparison atom variable name in the DC constraint.
+class DCInvalidComparisonAtomError(DCConstraintConvertFailed):
+    def __init__(self, message="There is an invalid comparison atom variable name, please define this variable in the "
+                               "relations variable names, or remove it."):
+        super().__init__(message)
+
+
+# Define a custom exception for the case where there is no usage in the relation of committee in the DC constraint.
+class DCNoCommitteeMemberRelationUsageError(DCConstraintConvertFailed):
+    def __init__(self,
+                 message=f"There is no usage in the special committee relation {config.COMMITTEE_RELATION_NAME}."):
+        super().__init__(message)
 
 
 class DCExtractor(db_data_extractor.DBDataExtractor):
@@ -45,11 +71,37 @@ class DCExtractor(db_data_extractor.DBDataExtractor):
         self._candidates_tables = candidates_tables
         self._dc_candidates_sets = None
 
+    def _test_comparison_atoms(self) -> bool:
+        """Test the validity of a the comparison atoms.
+        """""
+        for comparison_atom in self._comparison_atoms:
+            for atom_variable in [comparison_atom[0], comparison_atom[2]]:
+                input_type = utils.check_string_type(atom_variable)
+                if input_type == 'name' and not self._test_variable_name(atom_variable):
+                    return False
+
+        return True
+
+    def _test_variable_name(self, var_name: str) -> bool:
+        """Given a variable name, test that it is defined in the dc dict.
+        """""
+        return any(tp[0] == var_name for ls in self._dc_dict.values() for tp in ls)
+
     def _extract_data_from_db(self) -> None:
         """Extracts the DC data from the DB, save the result within the class. 
         The data is a list (numpy array) containing lists (numpy arrays) of the DC candidates groups, i.e. each list is
         a combination of candidates ids that cannot be in the committee together.
         """""
+        if config.check_for_free_com_variables(self._committee_members_list, self._dc_dict):
+            raise DCFreeCommitteeMemberVariableError()
+
+        if not self._test_comparison_atoms():
+            raise DCInvalidComparisonAtomError()
+
+        # Handle the case when the constraints do not incorporate the special committee relation.
+        if len(self._committee_members_list) == 0:
+            raise DCNoCommitteeMemberRelationUsageError()
+
         legal_assignments = self.join_tables(self._candidates_tables, self._dc_dict, self._constants,
                                              self._comparison_atoms)
 

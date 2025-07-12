@@ -15,18 +15,20 @@ def main():
     # User input ABC with Context problem settings.
     selected_db, selected_rule, committee_size, tgds, dcs = abc_settings_input.abc_settings_input()
     voters_starting_point, voters_group_size, candidates_starting_point, candidates_group_size, solver_timeout = \
-        abc_settings_input.advanced_abc_settings_input()
+        abc_settings_input.advanced_abc_settings_input(selected_db)
 
-    # Display selected options (debug purposes).
-    abc_settings_input.present_selected_configuration(selected_db, selected_rule, committee_size, tgds, dcs,
-                                                      voters_starting_point, voters_group_size,
-                                                      candidates_starting_point, candidates_group_size, solver_timeout)
+    if config.FRONTED_DEBUG:
+        # Display selected options (debug purposes).
+        abc_settings_input.present_selected_configuration(selected_db, selected_rule, committee_size, tgds, dcs,
+                                                          voters_starting_point, voters_group_size,
+                                                          candidates_starting_point, candidates_group_size,
+                                                          solver_timeout)
 
     # Submit button
     if st.button("Find a winning committee"):
-        # TODO: Test here the validity of the contextual constraints user input types.
+        # POC for validate before extracting stage.
+        # is_valid, message = contextual_constraints_input_tgd.validate_tgd_constraint(tgds)
         st.success("Configuration submitted successfully!")
-        st.success("Searching for a winning committee...")
 
         experiment_name = 'user_interface_experiment'
         # Set the new selected voting rule and solver timeout.
@@ -42,12 +44,16 @@ def main():
                                                                                            voters_group_size,
                                                                                            candidates_group_size)
 
-        # Run the experiment.
-        # TODO: Present progress bar (of the solver and the stage..)
-        experiment_results_row_df = current_experiment.run_experiment()
+        try:
+            # Run the experiment.
+            experiment_results_row_df = current_experiment.run_experiment()
 
-        # Present the results.
-        problem_output.present_solver_results(experiment_results_row_df)
+            # Present the results.
+            problem_output.present_solver_results(current_experiment.get_db_engine(), experiment_results_row_df,
+                                                  selected_db, selected_rule, committee_size)
+
+        except Exception as e:
+            st.error(e.__str__())
 
 
 if __name__ == "__main__":

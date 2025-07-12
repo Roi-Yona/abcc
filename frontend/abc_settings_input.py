@@ -9,23 +9,24 @@ MODULE_NAME = f'ABC Settings Input'
 
 
 def abc_settings_input():
-    # TODO: Print some database characteristics (or enable access to it).
     column_list = st.columns(5)
     with column_list[0]:
         selected_db = st.selectbox("Database", config.DB_NAME_LIST)
     available_relations = utils.extract_available_relations_dict(selected_db)
+    candidates_group_max_size = utils.extract_table_size(selected_db, config.CANDIDATES_TABLE_NAME,
+                                                         config.CANDIDATES_COLUMN_NAME)
 
     with column_list[1]:
-        # TODO: Based on the DB selection dont allow the committee size be greater than the candidate group size.
-        committee_size = st.number_input("Committee Size", min_value=1, step=1, value=3)
+        committee_size = st.number_input("Committee Size", min_value=1, max_value=candidates_group_max_size, step=1,
+                                         value=10)
     with column_list[2]:
         selected_rule = st.selectbox("Voting Rule", config.SCORE_RULES.keys())
 
     # Get the number of TGD and DC constraints from the user.
     with column_list[3]:
-        number_of_tgd_constraints = st.number_input("Number of TGD constraints", min_value=0, step=1, value=0)
+        number_of_tgd_constraints = st.number_input("Add/Remove TGD constraints", min_value=0, step=1, value=0)
     with column_list[4]:
-        number_of_dc_constraints = st.number_input("Number of DC constraints", min_value=0, step=1, value=0)
+        number_of_dc_constraints = st.number_input("Add/Remove DC constraints", min_value=0, step=1, value=0)
 
     tgd_constraints = contextual_constraints_input_tgd.user_input_tgd_constraint(available_relations,
                                                                                  number_of_tgd_constraints)
@@ -34,15 +35,37 @@ def abc_settings_input():
     return selected_db, selected_rule, committee_size, tgd_constraints, dc_constraints
 
 
-def advanced_abc_settings_input():
+def advanced_abc_settings_input(selected_db: str):
     # Define an advanced setting screen that open when pressing it.
     with st.expander("Advanced Settings", expanded=False):
         # User input - voters and candidates start and end point.
-        # TODO: Based on the DB selection limit this sizes and choose default values.
-        voters_starting_point = st.number_input("Voters id to start from", min_value=0, step=1)
-        voters_group_size = st.number_input("Voters group size", min_value=1, step=1, value=10)
-        candidates_starting_point = st.number_input("Candidates id to start from", min_value=0, step=1)
-        candidates_group_size = st.number_input("Candidates group size", min_value=1, step=1, value=10)
+        voters_group_max_size = utils.extract_table_size(selected_db, config.VOTING_TABLE_NAME,
+                                                         config.VOTERS_COLUMN_NAME)
+        candidates_group_max_size = utils.extract_table_size(selected_db, config.CANDIDATES_TABLE_NAME,
+                                                             config.CANDIDATES_COLUMN_NAME)
+
+        voters_settings_column = st.columns(2)
+        with voters_settings_column[0]:
+            voters_starting_point = st.number_input("Voters id to start from", min_value=0, step=1)
+        with voters_settings_column[1]:
+            voters_group_size = st.number_input(
+                f"Voters group size (up to {voters_group_max_size})",
+                min_value=1,
+                max_value=voters_group_max_size,
+                step=1,
+                value=10000
+            )
+        candidates_settings_column = st.columns(2)
+        with candidates_settings_column[0]:
+            candidates_starting_point = st.number_input("Candidates id to start from", min_value=0, step=1)
+        with candidates_settings_column[1]:
+            candidates_group_size = st.number_input(
+                f"Candidates group size (up to {candidates_group_max_size})",
+                min_value=1,
+                max_value=candidates_group_max_size,
+                step=1,
+                value=100
+            )
 
         # User input - solver settings.
         solver_timeout = st.number_input("Solver time limit (in minutes)", min_value=1, step=1,

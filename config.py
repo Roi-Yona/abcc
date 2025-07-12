@@ -7,6 +7,7 @@ from mip.mip_reduction import score_functions
 # General:
 # --------------------------------------------------------------------------------
 DEBUG = True
+FRONTED_DEBUG = False
 unique_key_index = 0
 
 # Enable to print big Dataframe without any cutting.
@@ -49,12 +50,12 @@ SOLVER_TIME_LIMIT = int(0.5 * HOUR)
 SOLVER_NAMES = ["SAT", "CP_SAT", "SAT", "GLPK", "GUROBI"]
 SOLVER_NAME = SOLVER_NAMES[0]
 SCORE_RULES = {
-    'PAV': score_functions.pav_thiele_function,
-    'AV': score_functions.av_thiele_function,
-    'CC': score_functions.cc_thiele_function,
-    '2_TRUNCATED_AV': score_functions.k_2_truncated_av_thiele_function,
-    'SAV': score_functions.sav_score_rule_function}
-SCORE_RULE_NAME = 'PAV'
+    'Chamberlin-Courant': score_functions.cc_thiele_function,
+    'Proportional Approval Voting': score_functions.pav_thiele_function,
+    'Approval Voting': score_functions.av_thiele_function,
+    '2-Truncated Approval Voting': score_functions.k_2_truncated_av_thiele_function,
+    'Satisfaction Approval Voting': score_functions.sav_score_rule_function}
+SCORE_RULE_NAME = 'Proportional Approval Voting'
 SCORE_FUNCTION = SCORE_RULES[SCORE_RULE_NAME]
 
 LIFTED_INFERENCE = True
@@ -66,17 +67,15 @@ MINIMIZE_DC_CONSTRAINTS_EQUATIONS = True
 # --------------------------------------------------------------------------------
 VOTING_TABLE_NAME = 'voting'
 CANDIDATES_TABLE_NAME = 'candidates'
+CANDIDATES_SUMMARY_TABLE_NAME = 'candidates_summary'
 VOTERS_COLUMN_NAME = 'voter_id'
 CANDIDATES_COLUMN_NAME = 'candidate_id'
 APPROVAL_COLUMN_NAME = 'rating'
 
-# In the rating table in the database each user rates the candidate 1-5.
+# In the voting table in the database each user rates the candidate 1-5 (rating column).
 # Every candidate rated > approval_threshold consider as approved by the voter.
 APPROVAL_THRESHOLD = 4
 
-# The first of 'number_of_approved_candidate' in the ranked-choice ballot will consider as approved
-# candidates of the voter.
-NUMBER_OF_APPROVED_CANDIDATE = 3
 # --------------------------------------------------------------------------------
 
 # The Movies Dataset Consts:
@@ -100,6 +99,10 @@ MOVIES_DB_PATH = os.path.join(SQLITE_DATABASE_FOLDER_PATH, MOVIES_DB_NAME)
 
 # Glasgow Dataset Consts:
 # --------------------------------------------------------------------------------
+# The first of 'number_of_approved_candidate' in the ranked-choice ballot will consider as approved candidates of the
+# voter.
+GLASGOW_NUMBER_OF_APPROVED_CANDIDATE = 3
+
 GLASGOW_DISTRICTS_NUMBER_OF_CANDIDATES = {1: 9, 2: 11, 3: 10, 4: 11, 5: 10, 6: 10, 7: 13, 8: 10, 9: 11, 10: 9, 11: 10,
                                           12: 8,
                                           13: 11, 14: 8, 15: 9, 16: 10, 17: 9, 18: 9, 19: 11, 20: 9, 21: 10}
@@ -207,12 +210,19 @@ MOVIES_DIFFERENT_OPTIMIZATIONS_TOTAL_TIME_RESULTS_PATH = MOVIES_RESULTS_BASE_PAT
 MOVIES_DIFFERENT_OPTIMIZATIONS_CONSTRAINTS_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_optimization_constraints.eps'
 MOVIES_DIFFERENT_OPTIMIZATIONS_VARIABLES_RESULTS_PATH = MOVIES_RESULTS_BASE_PATH + '\\movies_optimization_variables.eps'
 
+DB_EXTRACTION_PROGRESS_BAR_FAKE_DELAY = 7
+MIP_CONVERSION_PROGRESS_BAR_FAKE_DELAY = 3
+MIP_SOLVER_PROGRESS_BAR_FAKE_DELAY = 20
 
 # --------------------------------------------------------------------------------
 DB_NAME_LIST = [MOVIES_DB_NAME, GLASGOW_ELECTIONS_DB_NAME, TRIP_ADVISOR_DB_NAME]
 COMMITTEE_RELATION_NAME = 'Com'
-COMPARISON_SINGS = ['<', '>', '=']
+COMPARISON_SIGNS = ['<', '>', '=', '≠']
 
+# Front End Constants:
+# --------------------------------------------------------------------------------
+NUMBER_OF_COLUMNS_IN_DC_CONSTRAINT = 7
+NUMBER_OF_COLUMNS_IN_TGD_CONSTRAINT = 7
 
 # Utility Functions:
 # --------------------------------------------------------------------------------
@@ -316,4 +326,26 @@ def generate_unique_key_string() -> str:
     key = f"name_{unique_key_index}"
     unique_key_index += 1
     return key
+
+
+def check_for_free_com_variables(committee_members_list: list, tables_dict: dict) -> bool:
+    """Test for free committee members variables (i.e. there is use of the relation Com(c_i) but
+    no use to its variable c_i in any relation afterwords).
+
+    :param committee_members_list: A list of committee members [c_1,...]
+    :param tables_dict: A dict of tgd/dc relations.
+    :return: True if there is a free committee member variable, false otherwise.
+    """
+    for committee_member_var in committee_members_list:
+        in_use = False
+        for t in tables_dict.values():
+            for attribute_tuple_new_name_old_name in t:
+                if attribute_tuple_new_name_old_name[0] == committee_member_var:
+                    in_use = True
+                    break
+            if in_use:
+                break
+        if not in_use:
+            return True
+    return False
 # --------------------------------------------------------------------------------
