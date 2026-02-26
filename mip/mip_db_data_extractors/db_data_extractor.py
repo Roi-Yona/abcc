@@ -40,10 +40,10 @@ class DBDataExtractor:
 
         # The resulted ids' set.
         self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
-        # The smallest id in candidates ids' range.
-        self._candidates_starting_point = int(candidates_id_columns.min().iloc[0])
+        # Derive min/max directly from the Python set — avoids extra pandas Series operations.
+        self._candidates_starting_point = min(self._candidates_ids_set)
         # The largest id in candidates ids' range.
-        self._candidates_ending_point = int(candidates_id_columns.max().iloc[0])
+        self._candidates_ending_point = max(self._candidates_ids_set)
         # The resulted number of candidates.
         self._candidates_size_limit = len(self._candidates_ids_set)
 
@@ -68,78 +68,83 @@ class DBDataExtractor:
         :return: The resulted df of the join operation, with the new names (such as 'x').
         """
         # Handle special case of an empty dict.
-        if len(tables_dict.items()) == 0:
+        if not tables_dict:
             return pd.DataFrame()
 
-        # Link between the new variable name to the new table name.
-        # For instance variable_dict['x'] = [('t1', 'original_x_column_name'), ...].
-        variables_dict = dict()
+        # Build variable → [(table_alias, original_col)] mapping.
+        # For instance variables_dict['x'] = [('t1', 'original_x_column_name'), ...].
+        variables_dict: dict = {}
         for (_, new_table_name), variables in tables_dict.items():
             for new_variable_name, original_variable_name in variables:
                 if new_variable_name not in variables_dict:
                     variables_dict[new_variable_name] = []
                 variables_dict[new_variable_name].append((new_table_name, original_variable_name))
 
-        # Create FROM phrase.
-        from_phrase = 'FROM '
-        for original_table_name, new_table_name in tables_dict:
-            from_phrase += f"{original_table_name} AS {new_table_name}, "
-        # Remove ', ' from the string and add EOL.
-        from_phrase = from_phrase[:len(from_phrase) - 2]
-        from_phrase += '\n'
+        # --- SELECT clause (list-based to avoid O(n²) string concatenation) ---
+        select_parts = [
+            f"{entries[0][0]}.{entries[0][1]} AS {var}"
+            for var, entries in variables_dict.items()
+        ]
+        select_phrase = "SELECT DISTINCT " + ", ".join(select_parts) + "\n"
 
-        # Create SELECT phrase.
-        select_phrase = 'SELECT DISTINCT '
-        for new_variable_name, new_table_names in variables_dict.items():
-            select_phrase += f"{new_table_names[0][0]}.{new_table_names[0][1]} AS {new_variable_name}, "
-        # Remove ', ' from the string and add EOL.
-        select_phrase = select_phrase[:len(select_phrase) - 2]
-        select_phrase += '\n'
+        # --- FROM clause with explicit INNER/CROSS JOINs ---
+        # Using explicit JOIN syntax gives the SQLite query planner more information
+        # than the implicit cross-join pattern (FROM t1, t2 WHERE t1.col = t2.col).
+        tables_list = list(tables_dict.keys())
+        first_orig, first_alias = tables_list[0]
+        from_parts = [f"FROM {first_orig} AS {first_alias}"]
+        joined_aliases: set = {first_alias}
 
-        # Create WHERE phrase.
-        where_phrase = 'WHERE '
-        for new_variable_name, new_table_names in variables_dict.items():
-            where_phrase = self.sql_concat_and(where_phrase)
-            for i in range(0, len(new_table_names) - 1, 1):
-                where_phrase += f"{new_table_names[i][0]}.{new_table_names[i][1]} = " \
-                                f"{new_table_names[i + 1][0]}.{new_table_names[i + 1][1]}"
-                if i != (len(new_table_names) - 2):
-                    where_phrase = self.sql_concat_and(where_phrase)
+        for orig_name, alias in tables_list[1:]:
+            # Collect ON conditions: equate this table's columns to already-joined tables.
+            join_conds = []
+            for var, entries in variables_dict.items():
+                aliases_in_var = {a for a, _ in entries}
+                if alias in aliases_in_var:
+                    my_col = next(col for a, col in entries if a == alias)
+                    for other_alias, other_col in entries:
+                        if other_alias in joined_aliases:
+                            join_conds.append(f"{alias}.{my_col} = {other_alias}.{other_col}")
+                            break  # one condition per shared variable is sufficient
 
-        # Add candidates ids' range constraint.
+            if join_conds:
+                from_parts.append(f"INNER JOIN {orig_name} AS {alias} ON {' AND '.join(join_conds)}")
+            else:
+                from_parts.append(f"CROSS JOIN {orig_name} AS {alias}")
+            joined_aliases.add(alias)
+
+        from_phrase = "\n".join(from_parts) + "\n"
+
+        # --- WHERE clause: only filter conditions (no join conditions — moved to ON) ---
+        where_parts = []
+
+        # Candidate id range restriction.
         for table_name in candidate_tables:
-            where_phrase = self.sql_concat_and(where_phrase)
-            where_phrase += f"{table_name}.{config.CANDIDATES_COLUMN_NAME} " \
-                            f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point}"
+            where_parts.append(
+                f"{table_name}.{config.CANDIDATES_COLUMN_NAME} "
+                f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point}"
+            )
 
-        # Add constants values constraint.
+        # Constant bindings.
         for constant_name, constant_value in constants.items():
             if constant_name in variables_dict:
                 for new_table_name, original_variable_name in variables_dict[constant_name]:
                     str_value = str(constant_value)
                     if not str_value.isdigit():
-                        str_value = f"\"{str_value}\""
-                    where_phrase = self.sql_concat_and(where_phrase)
-                    where_phrase += f"{new_table_name}.{original_variable_name}={str_value}"
+                        str_value = f'"{str_value}"'
+                    where_parts.append(f"{new_table_name}.{original_variable_name}={str_value}")
 
-        # Add the different variable constraint.
+        # Comparison atoms (e.g. x<y, x!=y).
         for comparison_atom in comparison_atoms:
-            where_phrase = self.sql_concat_and(where_phrase)
-            where_phrase += f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}"
+            where_parts.append(f"{comparison_atom[0]}{comparison_atom[1]}{comparison_atom[2]}")
 
-        where_phrase = self.sql_remove_and(where_phrase)
-        where_phrase += '\n'
+        where_phrase = ("WHERE " + " AND ".join(where_parts) + "\n") if where_parts else ""
 
-        # If trim WHERE phrase is empty, remove it.
-        if where_phrase.replace(" ", "").replace("\n", "") == "WHERE":
-            where_phrase = ""
+        sql = select_phrase + from_phrase + where_phrase
+        config.debug_print(MODULE_NAME, "The extract data SQL phrase is: \n" + sql)
+        legal_assignments = self._db_engine.run_query(sql)
 
-        config.debug_print(MODULE_NAME,
-                           "The extract data SQL phrase is: \n" + select_phrase + from_phrase + where_phrase)
-        legal_assignments = self._db_engine.run_query(select_phrase + from_phrase + where_phrase)
-
-        config.debug_print(MODULE_NAME,
-                           "The legal assignments are: \n" + str(legal_assignments.head()))
+        config.debug_print(MODULE_NAME, "The legal assignments are: \n" + str(legal_assignments.head()))
         return legal_assignments
 
     def _extract_data_from_db(self) -> None:
