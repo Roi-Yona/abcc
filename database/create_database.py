@@ -32,6 +32,44 @@ def create_voting_table(cur, con, voting_table_path: str):
     df.to_sql(config.VOTING_TABLE_NAME, con, if_exists='append', index=False)
 
 
+def create_sqlite_indexes(cur) -> None:
+    """Create B-tree indexes on join/filter columns used by DBDataExtractor.join_tables().
+
+    Safe to call multiple times (IF NOT EXISTS).  Each index is wrapped in its own
+    try/except so that tables absent in a particular dataset are silently skipped.
+    """
+    index_statements = [
+        # Core voting table — most frequently joined/filtered.
+        (f"CREATE INDEX IF NOT EXISTS idx_voting_voter "
+         f"ON {config.VOTING_TABLE_NAME}({config.VOTERS_COLUMN_NAME});"),
+        (f"CREATE INDEX IF NOT EXISTS idx_voting_candidate "
+         f"ON {config.VOTING_TABLE_NAME}({config.CANDIDATES_COLUMN_NAME});"),
+        (f"CREATE INDEX IF NOT EXISTS idx_voting_voter_candidate "
+         f"ON {config.VOTING_TABLE_NAME}({config.VOTERS_COLUMN_NAME}, {config.CANDIDATES_COLUMN_NAME});"),
+        # Candidates id range scans.
+        (f"CREATE INDEX IF NOT EXISTS idx_candidates_id "
+         f"ON {config.CANDIDATES_TABLE_NAME}({config.CANDIDATES_COLUMN_NAME});"),
+        # --- Movies dataset ---
+        "CREATE INDEX IF NOT EXISTS idx_movie_genre_genre_cid ON movie_genre(genre, candidate_id);",
+        "CREATE INDEX IF NOT EXISTS idx_movie_original_language_lang_cid ON movie_original_language(original_language, candidate_id);",
+        "CREATE INDEX IF NOT EXISTS idx_movie_spoken_languages_lang_cid ON movie_spoken_languages(spoken_language, candidate_id);",
+        "CREATE INDEX IF NOT EXISTS idx_movie_runtime_cid ON movie_runtime(candidate_id);",
+        # --- Glasgow dataset ---
+        "CREATE INDEX IF NOT EXISTS idx_candidate_party_party_cid ON candidate_party(party, candidate_id);",
+        "CREATE INDEX IF NOT EXISTS idx_candidate_district_dist_cid ON candidate_district(district_number, candidate_id);",
+        # --- TripAdvisor dataset ---
+        "CREATE INDEX IF NOT EXISTS idx_hotel_location_loc_cid ON hotel_location(location, candidate_id);",
+        "CREATE INDEX IF NOT EXISTS idx_hotel_price_range_pr_cid ON hotel_price_range(price_range, candidate_id);",
+        "CREATE INDEX IF NOT EXISTS idx_hotel_price_range_ext_pr_cid ON hotel_price_range_extended(price_range_extended, candidate_id);",
+    ]
+    for stmt in index_statements:
+        try:
+            cur.execute(stmt)
+        except Exception:
+            # Table does not exist in this database — skip silently.
+            pass
+
+
 # Example DB:
 # ---------------------------------------------------------------------------
 def create_tests_db(cur):
@@ -265,6 +303,8 @@ def trip_advisor_create_database_main():
                                      f"voting_table.csv"))
     create_trip_advisor_candidates_table(cur, con)
 
+    create_sqlite_indexes(cur)
+
     # Committing changes.
     con.commit()
     # Closing the connection.
@@ -472,6 +512,8 @@ def the_movies_database_create_database_main():
     create_movies_voting_table(cur, con)
     create_movies_candidates_table(cur, con)
 
+    create_sqlite_indexes(cur)
+
     # Committing changes.
     con.commit()
     # Closing the connection.
@@ -678,6 +720,8 @@ def glasgow_create_database_main():
     create_glasgow_candidates_table(cur, con)
     for i in range(1, 22):
         create_glasgow_voting_table(cur, con, i)
+
+    create_sqlite_indexes(cur)
 
     # Committing changes.
     con.commit()

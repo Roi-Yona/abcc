@@ -4,6 +4,7 @@ import config
 from database import database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 import mip.mip_db_data_extractors.db_data_extractor as db_data_extractor
+import mip.mip_db_data_extractors.bitmap_index as bitmap_index
 
 import pandas as pd
 
@@ -138,6 +139,22 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
             tgd_tuples_list = self._extract_data_from_db_aux(legal_assignments_end, tgd_tuples_list,
                                                              current_element_committee_members)
         else:
+            # Bitmap-index optimisation: execute the RHS query once (with only the static
+            # RHS constants), build an in-memory bitmap index over the result, then for
+            # each LHS row use fast frozenset intersections instead of issuing a new SQL
+            # query.  This reduces N+1 SQL round-trips to 2 SQL queries + N in-memory
+            # intersections, where N = len(legal_assignments_start).
+            legal_assignments_end_full = self.join_tables(
+                self._candidates_tables_end, self._tgd_dict_end,
+                self._constants_end, self._comparison_atoms_end,
+            )
+            config.debug_print(
+                MODULE_NAME,
+                f"RHS full result has {len(legal_assignments_end_full)} rows. "
+                f"Bitmap index avoids {len(legal_assignments_start)} repeated SQL queries.",
+            )
+            rhs_bitmap = bitmap_index.BitmapIndex(legal_assignments_end_full)
+
             # Extract the committee members sets out of the resulted join.
             for _, row in legal_assignments_start.iterrows():
                 current_row_assignment_constants = row.to_dict()
@@ -150,11 +167,17 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
                     raise ValueError(
                         "The input tgd_constants_end and the assignment of the committee members at the left "
                         "hand side of the TGD (committee_members_list_start) are overlap.")
-                else:
-                    union_constants = {**current_row_assignment_constants, **self._constants_end}
-                legal_assignments_end = self.join_tables(self._candidates_tables_end, self._tgd_dict_end,
-                                                         union_constants,
-                                                         self._comparison_atoms_end)
+
+                # Filter the precomputed RHS result using the bitmap index.
+                # Only LHS variables that also appear as columns in the RHS DataFrame
+                # are used as equality filters; others are irrelevant to the RHS.
+                shared_filters = {
+                    k: v for k, v in current_row_assignment_constants.items()
+                    if k in rhs_bitmap.columns
+                }
+                matching_indices = rhs_bitmap.query(shared_filters)
+                legal_assignments_end = legal_assignments_end_full.loc[sorted(matching_indices)]
+
                 tgd_tuples_list = self._extract_data_from_db_aux(legal_assignments_end, tgd_tuples_list,
                                                                  current_element_committee_members)
 
