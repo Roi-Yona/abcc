@@ -17,6 +17,9 @@ class Database:
         self._cur.execute(query)
         return pd.read_sql_query(query, self._con)
 
+    def run_query_params(self, query: str, params: tuple):
+        return pd.read_sql_query(query, self._con, params=params)
+
     def __del__(self):
         try:
             # Committing changes

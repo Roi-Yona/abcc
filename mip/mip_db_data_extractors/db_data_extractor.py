@@ -32,11 +32,17 @@ class DBDataExtractor:
 
         # Extract the candidates group ids. Starting from the id of candidates_starting_point, up to
         # candidates_size_limit ids.
-        sql_query = f"SELECT DISTINCT {config.CANDIDATES_COLUMN_NAME} FROM {config.CANDIDATES_TABLE_NAME} " \
-                    f"WHERE {config.CANDIDATES_COLUMN_NAME} >= {self._candidates_starting_point} " \
-                    f"ORDER BY {config.CANDIDATES_COLUMN_NAME} " \
-                    f"LIMIT {candidates_size_limit};"
-        candidates_id_columns = self._db_engine.run_query(sql_query)
+        # Table/column names are structural (from config) so they remain in the SQL string.
+        # The two user-supplied integers are bound via ? placeholders (prepared statement).
+        sql_query = (
+            f"SELECT DISTINCT {config.CANDIDATES_COLUMN_NAME} FROM {config.CANDIDATES_TABLE_NAME} "
+            f"WHERE {config.CANDIDATES_COLUMN_NAME} >= ? "
+            f"ORDER BY {config.CANDIDATES_COLUMN_NAME} "
+            f"LIMIT ?;"
+        )
+        candidates_id_columns = self._db_engine.run_query_params(
+            sql_query, (self._candidates_starting_point, candidates_size_limit)
+        )
 
         # The resulted ids' set.
         self._candidates_ids_set = set(candidates_id_columns[config.CANDIDATES_COLUMN_NAME])
@@ -117,22 +123,22 @@ class DBDataExtractor:
 
         # --- WHERE clause: only filter conditions (no join conditions — moved to ON) ---
         where_parts = []
+        bind_params: list = []
 
-        # Candidate id range restriction.
+        # Candidate id range restriction — bind the two integer range values.
         for table_name in candidate_tables:
             where_parts.append(
-                f"{table_name}.{config.CANDIDATES_COLUMN_NAME} "
-                f"BETWEEN {self._candidates_starting_point} AND {self._candidates_ending_point}"
+                f"{table_name}.{config.CANDIDATES_COLUMN_NAME} BETWEEN ? AND ?"
             )
+            bind_params.append(self._candidates_starting_point)
+            bind_params.append(self._candidates_ending_point)
 
-        # Constant bindings.
+        # Constant bindings — bind user-supplied constant values (e.g. "Paris", 5).
         for constant_name, constant_value in constants.items():
             if constant_name in variables_dict:
                 for new_table_name, original_variable_name in variables_dict[constant_name]:
-                    str_value = str(constant_value)
-                    if not str_value.isdigit():
-                        str_value = f'"{str_value}"'
-                    where_parts.append(f"{new_table_name}.{original_variable_name}={str_value}")
+                    where_parts.append(f"{new_table_name}.{original_variable_name}=?")
+                    bind_params.append(constant_value)
 
         # Comparison atoms (e.g. x<y, x!=y).
         for comparison_atom in comparison_atoms:
@@ -142,7 +148,8 @@ class DBDataExtractor:
 
         sql = select_phrase + from_phrase + where_phrase
         config.debug_print(MODULE_NAME, "The extract data SQL phrase is: \n" + sql)
-        legal_assignments = self._db_engine.run_query(sql)
+        config.debug_print(MODULE_NAME, "Bind parameters: " + str(bind_params))
+        legal_assignments = self._db_engine.run_query_params(sql, tuple(bind_params))
 
         config.debug_print(MODULE_NAME, "The legal assignments are: \n" + str(legal_assignments.head()))
         return legal_assignments
