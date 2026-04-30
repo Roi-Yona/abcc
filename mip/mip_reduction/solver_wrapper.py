@@ -1,5 +1,8 @@
 import ortools.linear_solver.pywraplp as pywraplp
-import gurobipy
+try:
+    import gurobipy
+except Exception:
+    gurobipy = None
 
 import config
 
@@ -139,6 +142,53 @@ class SolverWrapper:
             self._model.setObjective(expr, gurobipy.GRB.MAXIMIZE)
         else:
             self._model.Maximize(expr)
+
+
+class PywraplpAdapter:
+    """Adapter that exposes the SolverWrapper API for an existing
+    ortools `pywraplp.Solver` instance.
+
+    This allows tests and callers that already construct a pywraplp.Solver
+    to be passed directly to convertors without requiring them to create a
+    SolverWrapper instance.
+    """
+    def __init__(self, pywrap_solver):
+        self._model = pywrap_solver
+        self._solver_status = config.SOLVER_MODEL_NOT_SOLVED_ERROR_STATUS
+
+    def solve(self) -> None:
+        self._solver_status = self._model.Solve()
+
+    def model_status(self):
+        return self._solver_status
+
+    def model_optimal(self) -> bool:
+        return self.model_status() == config.SOLVER_FOUND_OPTIMAL_STATUS
+
+    def model_variables(self):
+        return {str(v): v.solution_value() for v in self._model.variables()}
+
+    def model_number_of_constraints(self):
+        return self._model.NumConstraints()
+
+    def model_number_of_variables(self):
+        return self._model.NumVariables()
+
+    def model_add_bool_var(self, var_name):
+        return self._model.BoolVar(var_name)
+
+    def model_add_int_var(self, lb, ub, var_name):
+        return self._model.IntVar(lb, ub, var_name)
+
+    def model_add_num_var(self, lb, ub, var_name):
+        return self._model.NumVar(lb, ub, var_name)
+
+    def model_add_constraint(self, constraint):
+        self._model.Add(constraint)
+
+    def model_add_objective_maximize(self, expr):
+        self._model.Maximize(expr)
+
 
 
 if __name__ == '__main__':

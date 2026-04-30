@@ -81,6 +81,13 @@ VOTERS_COLUMN_NAME = 'voter_id'
 CANDIDATES_COLUMN_NAME = 'candidate_id'
 APPROVAL_COLUMN_NAME = 'rating'
 
+# Use the indexed temp-table semi-join pipeline instead of the legacy
+# in-memory bitmap index. Toggle for safe rollout.
+USE_INDEXED_TEMP_JOIN_PIPELINE = True
+
+# Default batch size when enumerating lhs keys / batching lhs IN(...) queries.
+INDEXED_JOIN_LHS_BATCH_SIZE = 512
+
 # In the voting table in the database each user rates the candidate 1-5 (rating column).
 # Every candidate rated > approval_threshold consider as approved by the voter.
 APPROVAL_THRESHOLD = 4

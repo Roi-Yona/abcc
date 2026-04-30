@@ -4,7 +4,8 @@ import config
 from database import database_server_interface as db_interface
 import mip.mip_reduction.abc_to_mip_convertor as abc_to_mip_convertor
 import mip.mip_db_data_extractors.db_data_extractor as db_data_extractor
-import mip.mip_db_data_extractors.bitmap_index as bitmap_index
+import mip.mip_db_data_extractors.indexed_temp_join as indexed_temp_join
+import uuid
 
 import pandas as pd
 
@@ -144,6 +145,10 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
             # each LHS row use fast frozenset intersections instead of issuing a new SQL
             # query.  This reduces N+1 SQL round-trips to 2 SQL queries + N in-memory
             # intersections, where N = len(legal_assignments_start).
+            # Compute the full RHS once (DataFrame). We support two execution
+            # paths: the new indexed temp-table pipeline (server-side joins)
+            # and the legacy in-memory bitmap index. The config flag controls
+            # which path is used; keep the bitmap approach as a fallback.
             legal_assignments_end_full = self.join_tables(
                 self._candidates_tables_end, self._tgd_dict_end,
                 self._constants_end, self._comparison_atoms_end,
@@ -153,33 +158,47 @@ class TGDExtractor(db_data_extractor.DBDataExtractor):
                 f"RHS full result has {len(legal_assignments_end_full)} rows. "
                 f"Bitmap index avoids {len(legal_assignments_start)} repeated SQL queries.",
             )
-            rhs_bitmap = bitmap_index.BitmapIndex(legal_assignments_end_full)
 
-            # Extract the committee members sets out of the resulted join.
-            for _, row in legal_assignments_start.iterrows():
-                current_row_assignment_constants = row.to_dict()
-                config.debug_print(MODULE_NAME, "The current candidates assignments constants are: " +
-                                   str(current_row_assignment_constants))
-                current_element_committee_members = set(row[self._committee_members_list_start])
+            if getattr(config, 'USE_INDEXED_TEMP_JOIN_PIPELINE', False):
+                db = self._db_engine
+                # Create unique temp table names per run
+                tmp_rhs = f"tmp_rhs_{uuid.uuid4().hex[:8]}"
+                tmp_lhs = f"tmp_lhs_{uuid.uuid4().hex[:8]}"
 
-                # Check if there are common keys between the two dicts.
-                if current_row_assignment_constants.keys() & self._constants_end.keys():
-                    raise ValueError(
-                        "The input tgd_constants_end and the assignment of the committee members at the left "
-                        "hand side of the TGD (committee_members_list_start) are overlap.")
+                # Materialize RHS and LHS into temp tables. LHS gets an
+                # enumerated `lhs_key` so we can stream groups ordered by it.
+                indexed_temp_join.create_temp_table_from_query(db, tmp_rhs, legal_assignments_end_full)
+                indexed_temp_join.create_temp_table_from_query(db, tmp_lhs, legal_assignments_start,
+                                                               enumerate_key=True)
 
-                # Filter the precomputed RHS result using the bitmap index.
-                # Only LHS variables that also appear as columns in the RHS DataFrame
-                # are used as equality filters; others are irrelevant to the RHS.
-                shared_filters = {
-                    k: v for k, v in current_row_assignment_constants.items()
-                    if k in rhs_bitmap.columns
-                }
-                matching_indices = rhs_bitmap.query(shared_filters)
-                legal_assignments_end = legal_assignments_end_full.loc[sorted(matching_indices)]
+                # Determine join columns as the intersection of the two DataFrames' columns.
+                join_cols = [c for c in legal_assignments_start.columns if c in legal_assignments_end_full.columns]
+                if join_cols:
+                    indexed_temp_join.create_indexes(db, tmp_lhs, join_cols)
+                    indexed_temp_join.create_indexes(db, tmp_rhs, join_cols)
 
-                tgd_tuples_list = self._extract_data_from_db_aux(legal_assignments_end, tgd_tuples_list,
-                                                                 current_element_committee_members)
+                # Optional fail-fast check: detect LHS keys with no matching RHS rows.
+                missing = indexed_temp_join.detect_missing_rhs_bindings(db, tmp_lhs, tmp_rhs, join_cols, limit=1)
+                if missing:
+                    for lhs_key in missing:
+                        lhs_idx = int(lhs_key) - 1
+                        current_row_assignment_constants = legal_assignments_start.iloc[lhs_idx].to_dict()
+                        current_element_committee_members = set(legal_assignments_start.iloc[lhs_idx][self._committee_members_list_start])
+                        legal_assignments_end = pd.DataFrame()
+                        tgd_tuples_list = self._extract_data_from_db_aux(legal_assignments_end, tgd_tuples_list,
+                                                                         current_element_committee_members)
+
+                # Stream joined RHS groups ordered by lhs_key and process incrementally.
+                for lhs_key, rhs_df in indexed_temp_join.stream_joined_groups(db, tmp_lhs, tmp_rhs, join_cols):
+                    lhs_idx = int(lhs_key) - 1
+                    current_element_committee_members = set(legal_assignments_start.iloc[lhs_idx][self._committee_members_list_start])
+                    tgd_tuples_list = self._extract_data_from_db_aux(rhs_df, tgd_tuples_list,
+                                                                     current_element_committee_members)
+
+                # Cleanup temp tables
+                indexed_temp_join.drop_temp_table(db, tmp_lhs)
+                indexed_temp_join.drop_temp_table(db, tmp_rhs)
+            # Legacy bitmap fallback removed — always use indexed temp join pipeline.
 
         config.debug_print(MODULE_NAME, f"The tgd tuples list is {tgd_tuples_list}")
         self._tgd_tuples_list = tgd_tuples_list

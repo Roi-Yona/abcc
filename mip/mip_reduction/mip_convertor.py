@@ -10,13 +10,24 @@ class MIPConvertor:
     """An abstract class for converting a general problem to an MIP problem.
     """
 
-    def __init__(self, solver: solver_wrapper.SolverWrapper):
+    def __init__(self, solver):
         """Initializing the convertor.
 
-        :param solver: The input solver wrapper.
+        Accept either a `SolverWrapper` or a raw `pywraplp.Solver` instance.
+        If a raw solver is provided, wrap it with `PywraplpAdapter` so the
+        rest of the code can rely on the unified SolverWrapper API.
+        :param solver: The input solver wrapper or raw solver.
         """
         # Initialize solver related variables.
-        self._model = solver
+        if hasattr(solver, 'model_add_bool_var'):
+            self._model = solver
+        else:
+            # Prefer to adapt known pywraplp Solver objects.
+            try:
+                self._model = solver_wrapper.PywraplpAdapter(solver)
+            except Exception:
+                # Fallback: use as-is (may raise later if incompatible)
+                self._model = solver
         self._solved = False
         self.solver_status = None
         self.solving_time = -1

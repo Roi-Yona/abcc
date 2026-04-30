@@ -48,3 +48,44 @@ Thumbs.db
 .idea
 *__pycache__*
 abcc-venv*
+
+# Python related
+*.py[cod]
+__pycache__/
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging
+dist/
+build/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+
+# Test and coverage
+.pytest_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# IDEs
+.vscode/
+.ropeproject/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Misc
+*.swp
+*.swo
+*.log
+
+

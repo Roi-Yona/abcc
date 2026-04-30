@@ -4,8 +4,8 @@
 import argparse
 
 import config
-import create_database
-import parse_dataset
+from . import create_database
+from . import parse_dataset
 
 
 def parse_arguments():
